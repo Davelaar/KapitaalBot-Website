@@ -1,10 +1,60 @@
 "use client";
 
+import { useState } from "react";
+
 export function Tier2RequestForm() {
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError(null);
+    const form = e.currentTarget;
+    const email = (form.elements.namedItem("email") as HTMLInputElement)?.value?.trim();
+    const reason = (form.elements.namedItem("reason") as HTMLTextAreaElement)?.value?.trim();
+
+    if (!email || !email.includes("@")) {
+      setError("Vul een geldig e-mailadres in.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch("/api/tier2-request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, reason: reason || "" }),
+      });
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        setError(data.error ?? "Er is iets misgegaan. Probeer het later opnieuw.");
+        return;
+      }
+      setSuccess(true);
+      form.reset();
+    } catch {
+      setError("Netwerkfout. Probeer het later opnieuw.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (success) {
+    return (
+      <div className="card" style={{ maxWidth: "420px" }}>
+        <p style={{ margin: 0, color: "var(--freshness-good)", fontWeight: 600 }}>
+          Aanvraag ontvangen. We nemen contact met je op.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="card" style={{ maxWidth: "420px" }}>
       <form
-        onSubmit={(e) => e.preventDefault()}
+        onSubmit={handleSubmit}
         aria-label="Tier 2 aanvraag"
       >
         <div style={{ marginBottom: "1rem" }}>
@@ -25,12 +75,13 @@ export function Tier2RequestForm() {
             name="email"
             required
             placeholder="jouw@email.nl"
+            disabled={loading}
             style={{
               width: "100%",
               padding: "0.5rem 0.75rem",
               background: "var(--card-bg)",
               border: "1px solid var(--border)",
-              borderRadius: "6px",
+              borderRadius: "8px",
               color: "var(--fg)",
               fontSize: "1rem",
             }}
@@ -53,32 +104,40 @@ export function Tier2RequestForm() {
             name="reason"
             rows={4}
             placeholder="Bijv. technische review, compliance, interne observability."
+            disabled={loading}
             style={{
               width: "100%",
               padding: "0.5rem 0.75rem",
               background: "var(--card-bg)",
               border: "1px solid var(--border)",
-              borderRadius: "6px",
+              borderRadius: "8px",
               color: "var(--fg)",
               fontSize: "1rem",
               resize: "vertical",
             }}
           />
         </div>
+        {error && (
+          <p style={{ margin: "0 0 0.75rem", color: "var(--freshness-stale)", fontSize: "0.875rem" }}>
+            {error}
+          </p>
+        )}
         <button
           type="submit"
+          disabled={loading}
           style={{
             padding: "0.5rem 1.25rem",
             background: "var(--accent)",
             color: "#0f1419",
             border: "none",
-            borderRadius: "6px",
+            borderRadius: "8px",
             fontWeight: 600,
-            cursor: "pointer",
+            cursor: loading ? "not-allowed" : "pointer",
             fontSize: "0.9375rem",
+            opacity: loading ? 0.8 : 1,
           }}
         >
-          Verstuur aanvraag
+          {loading ? "Bezig…" : "Verstuur aanvraag"}
         </button>
       </form>
     </div>
