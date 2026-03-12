@@ -1,59 +1,66 @@
-# Bouwplan status — KapitaalBot Observability Website
+# Bouwplan status — 20 secties
 
-Overzicht van wat uit het (verspreide) plan komt en wat er staat. Bronnen: DEPLOY.md, README, docs/CMS-LIGHT.md, docs/ANALYTICS-PUSHOVER.md, lib/i18n.ts (sectie 16), snapshot contract, compliance.
-
----
-
-## Gereed
-
-| Onderdeel | Status | Opmerking |
-|-----------|--------|-----------|
-| **Tier 1 data** | ✅ | Status, regime, strategy, trading, market, demo snapshots geladen en getoond |
-| **Homepage** | ✅ | Hero, observability-teaser, statusstrip, metric grid, demo-teaser, architectuurtekst, Tier2-funnel |
-| **Dashboard** | ✅ | Tier 1-overview: statusstrip, metric cards, regime/strategy, market summary, demo trades |
-| **FAQ** | ✅ | Statische FAQ met 5 vragen (sectie 12; FAQ-bot later) |
-| **Tier2-aanvraag** | ✅ | Formulier /tier2-request (nog geen backend) |
-| **Admin** | ✅ | Placeholder /admin, Tier 3-gate (auth nog niet) |
-| **API routes** | ✅ | /api/snapshots/public/* voor status, regime, strategy, trading, market |
-| **Dark/light theme** | ✅ | ThemeToggle in header |
-| **Compliance-banner** | ✅ | Vaste AFM-tekst, wit, dikgedrukt, gecentreerd (sectie 19) |
-| **Deploy** | ✅ | Git-only, snapdiscounts.nl, kapitaalbot-web |
+Alle 20 secties van het observability-websiteplan met status. Na elke wijziging bijwerken.
 
 ---
 
-## Deels / nog niet zichtbaar
+## Overzicht 1–20
 
-| Onderdeel | Status | Wat ontbreekt |
-|-----------|--------|----------------|
-| **i18n / viertaligheid** (sectie 16) | 🔶 | NL/EN/DE/FR strings in lib/i18n.ts, maar **geen taalkeuze in de UI**; pagina’s gebruiken de strings niet |
-| **Tier2-dashboard** | 🔶 | Route /dashboard/tier2 bestaat; geen Tier 2-snapshots of content |
-| **Architectuurdiagram** | 🔶 | Tekst “Mermaid build-time SVG komt in volgende iteratie”; geen diagram |
-| **Navigatie** | 🔶 | Header: Home, Dashboard, FAQ, theme. Geen link Tier2-aanvraag of Admin in nav |
+| # | Sectie | Status | Opmerking |
+|---|--------|--------|-----------|
+| 1 | **Setup / repo** | ✅ | Next.js 14 App Router, env OBSERVABILITY_EXPORT_DIR |
+| 2 | **Staging / productie** | ✅ | snapdiscounts.nl live; kapitaalbot.nl na migratie |
+| 3 | **Snapshot-contract** | ✅ | Alleen JSON read-model; zie OBSERVABILITY_SNAPSHOT_CONTRACT.md |
+| 4 | **Tier-model** | ✅ | Tier 1 (publiek), Tier 2 (aanvraag), Tier 3 (admin) |
+| 5 | **Homepage** | ✅ | Hero, observability-teaser, statusstrip, metric grid, demo, architectuur, Tier2-funnel |
+| 6 | **Dashboard Tier 1** | ✅ | Statusstrip, metric cards, regime/strategy, market, demo trades |
+| 7 | **API-routes** | ✅ | /api/snapshots/public/* (status, regime, strategy, trading, market) |
+| 8 | **Statusstrip / metrics** | ✅ | Run, epoch, freshness, safety; metric cards (trades, orders, drawdown, etc.) |
+| 9 | **Regime & strategy** | ✅ | RegimeStrategyOverview, MarketSummary, DemoTradeTeaser |
+| 10 | **Tier2-dashboard** | 🔶 | Route /dashboard/tier2; inhoud wanneer Tier 2-snapshots beschikbaar |
+| 11 | **Tier2-aanvraag** | ✅ | Formulier /tier2-request (backend later) |
+| 12 | **FAQ** | ✅ | Statische FAQ; FAQ-bot (retrieval) later |
+| 13 | **CMS-light** | ⏳ | Homepage-notices, CTA, compliance overschrijfbaar (docs/CMS-LIGHT.md) |
+| 14 | **Analytics** | ⏳ | Umami/Plausible; events (docs/ANALYTICS-PUSHOVER.md) |
+| 15 | **Pushover** | ⏳ | Bot/BFF; data stale, safety, PnL-drempels |
+| 16 | **i18n / viertaligheid** | 🔶 | Strings NL/EN/DE/FR + taalkeuze in header; content nog niet per locale |
+| 17 | **Theme (dark/light)** | ✅ | ThemeToggle in header |
+| 18 | **Architectuurdiagram** | 🔶 | Mermaid/SVG op homepage/dashboard nog niet |
+| 19 | **Compliance-banner** | ✅ | Vaste AFM-tekst, wit, dikgedrukt, gecentreerd |
+| 20 | **Header / logo / nav** | 🔶 | Nav compleet (Dashboard, Tier 2, FAQ, Admin, taalkeuze, theme). **Logo: zie hieronder.** |
 
 ---
+
+## Logo header (sectie 20)
+
+**Gewenste formaten (in volgorde van voorkeur):**
+
+1. **SVG** — Aanbevolen: schaalbaar, scherp op elk formaat, kleine bestandsgrootte, eventueel te stylen met CSS (bijv. `currentColor` voor theme).
+2. **PNG** — Prima; liefst 2× (bijv. 64×64 of 80×40) voor retina.
+3. **JPG** — Kan; minder ideaal voor logo (geen transparantie).
+
+Plaats het bestand in `public/` (bijv. `public/logo.svg` of `public/logo.png`). De header gebruikt nu tekst "KapitaalBot"; na toevoegen van het bestand kan de link naar home een `<Image>` of `<img>` worden met het logo.
+
+---
+
+## Gereed (kort)
+
+- Secties 1–9, 11, 12, 17, 19; API, deploy, snapshot-wiring, compliance, theme, FAQ, Tier2-formulier.
+
+## Deels
+
+- 10: Tier2-dashboard (route klaar, content wacht op Tier 2-export).
+- 16: i18n (taalkeuze + cookie; content/locale-routing nog niet).
+- 18: Architectuurdiagram (tekst wel, Mermaid/SVG nog niet).
+- 20: Logo nog niet in header (wel nav compleet).
 
 ## Open (later)
 
-| Onderdeel | Bron | Opmerking |
-|-----------|------|-----------|
-| **CMS-light** (sectie 13) | docs/CMS-LIGHT.md | Homepage-notices, CTA-teksten, compliance overschrijfbaar; file-based of admin-API |
-| **Analytics** (sectie 14) | docs/ANALYTICS-PUSHOVER.md | Umami/Plausible; events Tier2-aanvraag, contact, FAQ, taalswitch |
-| **Pushover** (sectie 15) | docs/ANALYTICS-PUSHOVER.md | Bot- of BFF-side; data stale, safety escalation, PnL-drempels |
-| **FAQ-bot** | FAQ (sectie 12) | Retrieval-based, tier-aware; weigert strategie/thresholds |
-| **Tier 2-snapshots** | Snapshot contract | tier2_execution, tier2_latency, tier2_pnl, tier2_safety; backend export nog niet |
-| **Admin-observability** | Snapshot contract | admin_observability_snapshot; full lifecycle |
-| **Auth/sessie** | lib/auth.ts | getSessionTier() placeholder; Tier 2/3 gating op sessie |
-| **Mobile UX** | DEPLOY validatie | Niet expliciet uitgewerkt |
-| **Changelog-pagina** | CMS-light | Niet aanwezig |
-| **Contactpagina** | — | Niet aanwezig |
+- 13: CMS-light.  
+- 14: Analytics.  
+- 15: Pushover.  
+- FAQ-bot (retrieval), auth/sessie, Tier 2-snapshots backend, admin_observability_snapshot, Changelog-pagina, Contact-pagina.
 
 ---
-
-## Aanbevolen volgende stappen (zichtbaarheid)
-
-1. **Taalkeuze in header** — Language switcher die `lib/i18n` gebruikt (path-based of cookie), zodat viertaligheid zichtbaar is.
-2. **Tier2-aanvraag in nav** — Link “Tier 2” of “Aanvraag” in de header.
-3. **Architectuur-Mermaid** — Eén Mermaid-diagram (bijv. Ingest → Epochs → Execution) als SVG of component op homepage/dashboard.
-4. **Compliance uit i18n** — ComplianceBanner kan `t(locale, "compliance.default")` gebruiken zodra locale in de app zit; vaste AFM-tekst blijft default.
 
 Dit document bijwerken bij elke grotere wijziging.
