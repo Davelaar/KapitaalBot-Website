@@ -20,7 +20,8 @@ export function HeaderLogo() {
     }
   }, []);
 
-  const logoSrc = theme === "light" ? "/KapitaalBot-light.svg" : "/KapitaalBot.svg";
+  /* light theme = donker logo (contrast op lichte achtergrond), dark theme = licht logo */
+  const logoSrc = theme === "light" ? "/KapitaalBot.svg" : "/KapitaalBot-light.svg";
 
   return (
     <a href="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>

@@ -11,23 +11,23 @@ const LABELS: Record<Locale, string> = {
 };
 
 function FlagNL() {
+  /* NL: rood (boven), wit (midden), blauw (onder) */
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 9 6" style={{ width: "100%", height: "100%", display: "block" }}>
-      <path fill="#AE1C28" d="M0 0h9v6H0z" />
-      <path fill="#FFF" d="M0 0h9v4H0z" />
-      <path fill="#21468B" d="M0 0h9v2H0z" />
+      <path fill="#AE1C28" d="M0 0h9v2H0z" />
+      <path fill="#FFF" d="M0 2h9v2H0z" />
+      <path fill="#21468B" d="M0 4h9v2H0z" />
     </svg>
   );
 }
 
 function FlagEN() {
+  /* UK: blauw veld + rood kruis van St George (wit rand, rood midden) */
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 30" style={{ width: "100%", height: "100%", display: "block" }}>
       <path fill="#012169" d="M0 0h60v30H0z" />
-      <path fill="none" stroke="#FFF" strokeWidth="6" d="M0 0l60 30M60 0L0 30" />
-      <path fill="none" stroke="#FFF" strokeWidth="4" d="M0 0l60 30M60 0L0 30" transform="scale(0.5)" />
-      <path fill="none" stroke="#C8102E" strokeWidth="10" d="M30 0v30M0 15h60" />
-      <path fill="none" stroke="#C8102E" strokeWidth="6" d="M30 0v30M0 15h60" transform="scale(0.5)" />
+      <path fill="#FFF" d="M25 0h10v30h-10zM0 10h60v10H0z" />
+      <path fill="#C8102E" d="M27 0h6v30h-6zM0 12h60v6H0z" />
     </svg>
   );
 }
