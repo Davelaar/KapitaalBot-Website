@@ -5,7 +5,7 @@ export interface DemoTradeTeaserProps {
   maxItems?: number;
 }
 
-export function DemoTradeTeaser({ demo, maxItems = 5 }: DemoTradeTeaserProps) {
+export default function DemoTradeTeaser({ demo, maxItems = 5 }: DemoTradeTeaserProps) {
   if (!demo) {
     return (
       <section style={{ marginTop: "2rem" }}>
@@ -20,7 +20,10 @@ export function DemoTradeTeaser({ demo, maxItems = 5 }: DemoTradeTeaserProps) {
           }}
         >
           <p style={{ margin: 0, color: "var(--muted)" }}>
-            Geen demo-trade snapshot beschikbaar.
+            Awaiting bot export…
+          </p>
+          <p style={{ margin: "0.25rem 0 0", fontSize: "0.875rem", color: "var(--muted)" }}>
+            No demo trades snapshot yet.
           </p>
         </div>
       </section>
