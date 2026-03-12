@@ -1,11 +1,28 @@
 import Link from "next/link";
 import { requireTier } from "@/lib/auth";
+import {
+  getPublicStatusSnapshot,
+  getPublicRegimeSnapshot,
+  getPublicStrategySnapshot,
+  getPublicTradingSnapshot,
+  getPublicMarketSnapshot,
+} from "@/lib/read-snapshots";
+import { AdminSnapshotStatus } from "@/components/AdminSnapshotStatus";
+
+export const dynamic = "force-dynamic";
 
 /**
- * Admin: full observability, raw lifecycle (Tier 3). Placeholder until auth + admin_observability_snapshot.
+ * Admin: full observability, snapshot status, raw JSON (Tier 3 when auth is enabled).
  */
-export default function AdminPage() {
+export default async function AdminPage() {
   const allowed = requireTier(3);
+
+  const status = getPublicStatusSnapshot();
+  const regime = getPublicRegimeSnapshot();
+  const strategy = getPublicStrategySnapshot();
+  const trading = getPublicTradingSnapshot();
+  const market = getPublicMarketSnapshot();
+
   if (!allowed) {
     return (
       <main>
@@ -21,6 +38,7 @@ export default function AdminPage() {
       </main>
     );
   }
+
   return (
     <main>
       <nav style={{ marginBottom: "1.5rem" }}>
@@ -30,22 +48,15 @@ export default function AdminPage() {
       </nav>
       <h1 style={{ fontSize: "1.75rem", marginBottom: "0.5rem" }}>Admin — Full observability</h1>
       <p style={{ color: "var(--muted)", marginBottom: "1.5rem" }}>
-        Raw lifecycle, tuning. Data uit admin_observability_snapshot (nog niet geïmplementeerd).
+        Laatste snapshot-timestamps, run_id, epoch status, aanwezigheid market/trading. Raw JSON viewer.
       </p>
-      <section style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-        <div className="card">
-          <h2 style={{ fontSize: "1.1rem", marginBottom: "0.5rem" }}>Snapshot-status</h2>
-          <p style={{ color: "var(--muted)", margin: 0, fontSize: "0.9rem" }}>
-            Toekomst: overzicht van alle export-bestanden en laatste export-tijdstempel.
-          </p>
-        </div>
-        <div className="card">
-          <h2 style={{ fontSize: "1.1rem", marginBottom: "0.5rem" }}>Raw lifecycle</h2>
-          <p style={{ color: "var(--muted)", margin: 0, fontSize: "0.9rem" }}>
-            Toekomst: order/fill-lifecycle uit admin_observability_snapshot.
-          </p>
-        </div>
-      </section>
+      <AdminSnapshotStatus
+        status={status}
+        regime={regime}
+        strategy={strategy}
+        trading={trading}
+        market={market}
+      />
     </main>
   );
 }
