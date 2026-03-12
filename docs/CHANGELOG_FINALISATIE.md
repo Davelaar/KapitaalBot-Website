@@ -1,6 +1,14 @@
 # Changelog — Website finalisatie
 
-## Gewijzigde en nieuwe bestanden
+## 2026-03-12 — Changelog-pagina + nav
+
+- **app/changelog/page.tsx** — Nieuwe pagina: website-highlights (finalisatie) + engine/bot-technische highlights (Route v2, observability export, safety, epoch, lifecycle).
+- **Nav** — Link “Changelog” toegevoegd in header.
+- **sitemap.ts** — `/changelog` opgenomen.
+
+---
+
+## Gewijzigde en nieuwe bestanden (finalisatie)
 
 ### Nieuwe bestanden
 - **lib/snapshot-freshness.ts** — Freshness levels (GOOD/WARN/STALE) + tooltip tekst.

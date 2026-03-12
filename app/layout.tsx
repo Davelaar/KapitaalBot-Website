@@ -46,6 +46,7 @@ export default function RootLayout({
             <a href="/dashboard" style={{ color: "var(--fg)", textDecoration: "none", fontSize: "0.9rem" }}>Dashboard</a>
             <a href="/tier2-request" style={{ color: "var(--fg)", textDecoration: "none", fontSize: "0.9rem" }}>Tier 2</a>
             <a href="/faq" style={{ color: "var(--fg)", textDecoration: "none", fontSize: "0.9rem" }}>FAQ</a>
+            <a href="/changelog" style={{ color: "var(--fg)", textDecoration: "none", fontSize: "0.9rem" }}>Changelog</a>
             <a href="/admin" style={{ color: "var(--muted)", textDecoration: "none", fontSize: "0.85rem" }}>Admin</a>
             <LanguageSwitcher />
             <ThemeToggle />
