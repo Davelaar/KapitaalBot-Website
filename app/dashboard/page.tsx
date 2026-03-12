@@ -1,9 +1,28 @@
 import Link from "next/link";
+import {
+  getPublicStatusSnapshot,
+  getPublicRegimeSnapshot,
+  getPublicStrategySnapshot,
+  getPublicTradingSnapshot,
+  getPublicMarketSnapshot,
+  getPublicDemoTrades,
+} from "@/lib/read-snapshots";
 import { StatusStrip } from "@/components/StatusStrip";
 import { MetricCardGrid } from "@/components/MetricCardGrid";
 import { RegimeStrategyOverview } from "@/components/RegimeStrategyOverview";
+import { MarketSummary } from "@/components/MarketSummary";
+import { DemoTradeTeaser } from "@/components/DemoTradeTeaser";
 
-export default function DashboardPage() {
+export const dynamic = "force-dynamic";
+
+export default async function DashboardPage() {
+  const status = getPublicStatusSnapshot();
+  const regime = getPublicRegimeSnapshot();
+  const strategy = getPublicStrategySnapshot();
+  const trading = getPublicTradingSnapshot();
+  const market = getPublicMarketSnapshot();
+  const demo = getPublicDemoTrades();
+
   return (
     <main>
       <nav style={{ marginBottom: "1.5rem" }}>
@@ -19,9 +38,16 @@ export default function DashboardPage() {
         data.
       </p>
 
-      <StatusStrip />
-      <MetricCardGrid />
-      <RegimeStrategyOverview />
+      <StatusStrip status={status} />
+      <MetricCardGrid
+        status={status}
+        trading={trading}
+        regime={regime}
+        strategy={strategy}
+      />
+      <RegimeStrategyOverview regime={regime} strategy={strategy} />
+      <MarketSummary market={market} />
+      <DemoTradeTeaser demo={demo} maxItems={8} />
     </main>
   );
 }

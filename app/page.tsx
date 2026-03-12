@@ -1,11 +1,30 @@
 import Link from "next/link";
+import {
+  getPublicStatusSnapshot,
+  getPublicRegimeSnapshot,
+  getPublicStrategySnapshot,
+  getPublicTradingSnapshot,
+  getPublicDemoTrades,
+} from "@/lib/read-snapshots";
 import { StatusStrip } from "@/components/StatusStrip";
 import { MetricCardGrid } from "@/components/MetricCardGrid";
+import { DemoTradeTeaser } from "@/components/DemoTradeTeaser";
 
-export default function HomePage() {
+export const dynamic = "force-dynamic";
+
+export default async function HomePage() {
+  const status = getPublicStatusSnapshot();
+  const regime = getPublicRegimeSnapshot();
+  const strategy = getPublicStrategySnapshot();
+  const trading = getPublicTradingSnapshot();
+  const demo = getPublicDemoTrades();
+
   return (
     <main>
-      <section style={{ marginBottom: "2rem" }}>
+      <section style={{ marginBottom: "2rem", padding: "1.5rem" }} className="card">
+        <p style={{ fontSize: "0.8125rem", color: "var(--accent)", marginBottom: "0.25rem", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+          Observability
+        </p>
         <h1 style={{ fontSize: "1.75rem", marginBottom: "0.5rem" }}>
           KapitaalBot
         </h1>
@@ -31,8 +50,14 @@ export default function HomePage() {
         </Link>
       </section>
 
-      <StatusStrip />
-      <MetricCardGrid />
+      <StatusStrip status={status} />
+      <MetricCardGrid
+        status={status}
+        trading={trading}
+        regime={regime}
+        strategy={strategy}
+      />
+      <DemoTradeTeaser demo={demo} maxItems={3} />
 
       <section style={{ marginTop: "2rem" }} className="card">
         <h2 style={{ fontSize: "1.25rem", marginBottom: "0.5rem" }}>
@@ -40,8 +65,8 @@ export default function HomePage() {
         </h2>
         <p style={{ color: "var(--muted)", fontSize: "0.875rem" }}>
           Ingest → Epochs/Snapshots → Execution pipeline → Orders/Fills. Regime
-          detection → Strategy selection → Readiness gate → Route ranking. Mermaid
-          build-time SVG komt in volgende iteratie.
+          detection → Strategy selection → Readiness gate → Route ranking.
+          Mermaid build-time SVG komt in volgende iteratie.
         </p>
       </section>
 

@@ -4,6 +4,29 @@ import Link from "next/link";
  * FAQ (sectie 12). Retrieval-based FAQ-bot later; tier-aware; weigert strategie/thresholds.
  */
 export default function FAQPage() {
+  const items: { q: string; a: string }[] = [
+    {
+      q: "Wat is KapitaalBot?",
+      a: "Een autonoom crypto trading systeem met multi-regime en multi-strategy execution. Het platform toont uitsluitend observability-data (vertraagd, geaggregeerd); geen live orders of realtime signalen.",
+    },
+    {
+      q: "Waarom vertraagde data op Tier 1?",
+      a: "Om observability en uitleg te bieden zonder realtime signal-gedrag of reverse-engineering te faciliteren. Tier 1 toont run-status, regime/strategy-overviews, tellers en samenvattingen.",
+    },
+    {
+      q: "Wat is Tier 1 vs Tier 2?",
+      a: "Tier 1 is open: status, regimes, strategieën, handelstellers, markt-overzicht. Tier 2 (op aanvraag) biedt meer detail: execution dashboards, latency, strategy activity, shadow trades.",
+    },
+    {
+      q: "Is dit financieel advies?",
+      a: "Nee. Dit platform is informatief en technisch. Geen beleggingsadvies, geen garanties. Handel op eigen risico.",
+    },
+    {
+      q: "Waar komt de data vandaan?",
+      a: "De bot exporteert read-model snapshots (JSON) naar een export-directory. De website leest alleen deze snapshots; geen directe database-toegang of execution-tabellen.",
+    },
+  ];
+
   return (
     <main>
       <nav style={{ marginBottom: "1.5rem" }}>
@@ -15,19 +38,13 @@ export default function FAQPage() {
       <p style={{ color: "var(--muted)", marginBottom: "1.5rem" }}>
         Veelgestelde vragen. FAQ-bot (retrieval, tier-aware) komt in een latere fase.
       </p>
-      <div className="card">
-        <h2 style={{ fontSize: "1.1rem" }}>Wat is KapitaalBot?</h2>
-        <p style={{ color: "var(--muted)" }}>
-          Een autonoom crypto trading systeem met multi-regime en multi-strategy
-          execution. Dit platform is uitsluitend informatief.
-        </p>
-      </div>
-      <div className="card">
-        <h2 style={{ fontSize: "1.1rem" }}>Waarom vertraagde data op Tier 1?</h2>
-        <p style={{ color: "var(--muted)" }}>
-          Om observability en uitleg te bieden zonder realtime signal-gedrag of
-          reverse-engineering te faciliteren.
-        </p>
+      <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+        {items.map(({ q, a }) => (
+          <div key={q} className="card">
+            <h2 style={{ fontSize: "1.1rem", marginBottom: "0.5rem" }}>{q}</h2>
+            <p style={{ color: "var(--muted)", margin: 0, lineHeight: 1.6 }}>{a}</p>
+          </div>
+        ))}
       </div>
     </main>
   );

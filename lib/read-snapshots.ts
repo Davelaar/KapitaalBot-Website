@@ -6,6 +6,7 @@
 import fs from "fs";
 import path from "path";
 import type {
+  PublicDemoTrades,
   PublicMarketSnapshot,
   PublicRegimeSnapshot,
   PublicStatusSnapshot,
@@ -56,6 +57,11 @@ export function getPublicMarketSnapshot(): PublicMarketSnapshot | null {
 /** Tier 1: public_trading_snapshot */
 export function getPublicTradingSnapshot(): PublicTradingSnapshot | null {
   return readJson<PublicTradingSnapshot>("public_trading_snapshot.json");
+}
+
+/** Tier 1: public_demo_trades */
+export function getPublicDemoTrades(): PublicDemoTrades | null {
+  return readJson<PublicDemoTrades>("public_demo_trades.json");
 }
 
 /** Current tier from session (placeholder: always 1 for now; auth in Phase 6). */

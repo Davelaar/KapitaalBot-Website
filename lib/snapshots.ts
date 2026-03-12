@@ -70,4 +70,18 @@ export interface PublicTradingSnapshot {
   drawdown_pct: number | null;
 }
 
+export interface DemoTradeRow {
+  symbol: string;
+  side: string;
+  outcome: string | null;
+  result_bps: number | null;
+  lifecycle_summary: string;
+}
+
+export interface PublicDemoTrades {
+  contract_version: string;
+  exported_at: string;
+  demo_trades: DemoTradeRow[];
+}
+
 export type Tier = 1 | 2 | 3;

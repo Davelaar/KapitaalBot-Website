@@ -1,9 +1,19 @@
-import { getPublicRegimeSnapshot } from "@/lib/read-snapshots";
-import { getPublicStrategySnapshot } from "@/lib/read-snapshots";
+import type {
+  PublicRegimeSnapshot,
+  PublicStrategySnapshot,
+} from "@/lib/snapshots";
 
-export async function RegimeStrategyOverview() {
-  const regime = getPublicRegimeSnapshot();
-  const strategy = getPublicStrategySnapshot();
+export interface RegimeStrategyOverviewProps {
+  regime: PublicRegimeSnapshot | null;
+  strategy: PublicStrategySnapshot | null;
+}
+
+export function RegimeStrategyOverview({
+  regime,
+  strategy,
+}: RegimeStrategyOverviewProps) {
+  const hasRegime = regime?.active_regimes?.length;
+  const hasStrategy = strategy?.active_strategies?.length;
 
   return (
     <section style={{ marginTop: "2rem" }}>
@@ -17,41 +27,83 @@ export async function RegimeStrategyOverview() {
           gap: "1rem",
         }}
       >
-        <div className="card">
-          <h3 style={{ fontSize: "1rem", marginBottom: "0.75rem" }}>
+        <div
+          className="card"
+          style={{
+            padding: "1rem 1.25rem",
+          }}
+        >
+          <h3
+            style={{
+              fontSize: "1rem",
+              marginBottom: "0.75rem",
+              color: "var(--fg)",
+            }}
+          >
             Regimes (24h)
           </h3>
-          {regime?.active_regimes?.length ? (
-            <ul style={{ margin: 0, paddingLeft: "1.25rem" }}>
-              {regime.active_regimes.map((r) => (
-                <li key={r.regime}>
-                  {r.regime}: {r.count}
-                </li>
-              ))}
-            </ul>
+          {hasRegime ? (
+            <>
+              <ul
+                style={{
+                  margin: 0,
+                  paddingLeft: "1.25rem",
+                  lineHeight: 1.6,
+                }}
+              >
+                {regime!.active_regimes.map((r) => (
+                  <li key={r.regime}>
+                    <strong>{r.regime}</strong>: {r.count}
+                  </li>
+                ))}
+              </ul>
+              {regime!.dominant_regime && (
+                <p
+                  style={{
+                    marginTop: "0.5rem",
+                    color: "var(--muted)",
+                    fontSize: "0.875rem",
+                  }}
+                >
+                  Dominant: {regime!.dominant_regime}
+                </p>
+              )}
+            </>
           ) : (
-            <span style={{ color: "var(--muted)" }}>Geen data</span>
-          )}
-          {regime?.dominant_regime && (
-            <p style={{ marginTop: "0.5rem", color: "var(--muted)", fontSize: "0.875rem" }}>
-              Dominant: {regime.dominant_regime}
-            </p>
+            <p style={{ margin: 0, color: "var(--muted)" }}>Geen data</p>
           )}
         </div>
-        <div className="card">
-          <h3 style={{ fontSize: "1rem", marginBottom: "0.75rem" }}>
+        <div
+          className="card"
+          style={{
+            padding: "1rem 1.25rem",
+          }}
+        >
+          <h3
+            style={{
+              fontSize: "1rem",
+              marginBottom: "0.75rem",
+              color: "var(--fg)",
+            }}
+          >
             Strategies (24h)
           </h3>
-          {strategy?.active_strategies?.length ? (
-            <ul style={{ margin: 0, paddingLeft: "1.25rem" }}>
-              {strategy.active_strategies.map((s) => (
+          {hasStrategy ? (
+            <ul
+              style={{
+                margin: 0,
+                paddingLeft: "1.25rem",
+                lineHeight: 1.6,
+              }}
+            >
+              {strategy!.active_strategies.map((s) => (
                 <li key={s.strategy}>
-                  {s.strategy}: {s.count}
+                  <strong>{s.strategy}</strong>: {s.count}
                 </li>
               ))}
             </ul>
           ) : (
-            <span style={{ color: "var(--muted)" }}>Geen data</span>
+            <p style={{ margin: 0, color: "var(--muted)" }}>Geen data</p>
           )}
         </div>
       </div>
