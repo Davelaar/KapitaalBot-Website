@@ -4,11 +4,22 @@ import ComplianceBanner from "@/components/ComplianceBanner";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { HeaderLogo } from "@/components/HeaderLogo";
+import { Analytics } from "@/components/Analytics";
 
 export const metadata: Metadata = {
   title: "KapitaalBot — Observability",
   description:
     "Observability portal voor het autonome crypto trading systeem. Engineering showcase en informatief platform.",
+  openGraph: {
+    title: "KapitaalBot — Observability",
+    description: "Live trading observability engine. Transparantie, realtime metrics, risk-first.",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "KapitaalBot — Observability",
+    description: "Live trading observability engine. Transparantie, realtime metrics, risk-first.",
+  },
 };
 
 export default function RootLayout({
@@ -44,6 +55,19 @@ export default function RootLayout({
           {children}
           <ComplianceBanner />
         </div>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "SoftwareApplication",
+              name: "KapitaalBot",
+              applicationCategory: "FinanceApplication",
+              description: "Observability portal voor het autonome crypto trading systeem.",
+            }),
+          }}
+        />
+        <Analytics />
       </body>
     </html>
   );
