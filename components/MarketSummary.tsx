@@ -1,10 +1,11 @@
 import type { PublicMarketSnapshot } from "@/lib/snapshots";
+import { MarketSummaryTable } from "@/components/MarketSummaryTable";
 
 export interface MarketSummaryProps {
   market: PublicMarketSnapshot | null;
 }
 
-export function MarketSummary({ market }: MarketSummaryProps) {
+export default function MarketSummary({ market }: MarketSummaryProps) {
   if (!market) {
     return (
       <section>
@@ -19,7 +20,10 @@ export function MarketSummary({ market }: MarketSummaryProps) {
           }}
         >
           <p style={{ margin: 0, color: "var(--muted)" }}>
-            Geen market snapshot. Exporteer eerst vanuit de bot.
+            Awaiting bot export…
+          </p>
+          <p style={{ margin: "0.25rem 0 0", fontSize: "0.875rem", color: "var(--muted)" }}>
+            Export market snapshot from the bot to see pairs here.
           </p>
         </div>
       </section>
@@ -58,57 +62,14 @@ export function MarketSummary({ market }: MarketSummaryProps) {
           )}
         </div>
         {hasPairs ? (
-          <div
-            style={{
-              overflowX: "auto",
-            }}
-          >
-            <table
-              style={{
-                width: "100%",
-                borderCollapse: "collapse",
-                fontSize: "0.875rem",
-              }}
-            >
-              <thead>
-                <tr style={{ borderBottom: "1px solid var(--border)", textAlign: "left" }}>
-                  <th style={{ padding: "0.5rem 0.75rem 0.5rem 0", color: "var(--muted)", fontWeight: 600 }}>
-                    Symbol
-                  </th>
-                  <th style={{ padding: "0.5rem 0.75rem", color: "var(--muted)", fontWeight: 600 }}>
-                    Trades
-                  </th>
-                  <th style={{ padding: "0.5rem 0.75rem", color: "var(--muted)", fontWeight: 600 }}>
-                    Spread (bps)
-                  </th>
-                  <th style={{ padding: "0.5rem 0 0.5rem 0.75rem", color: "var(--muted)", fontWeight: 600 }}>
-                    Suitability
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {market.pairs.slice(0, 20).map((p) => (
-                  <tr key={p.symbol} style={{ borderBottom: "1px solid var(--border)" }}>
-                    <td style={{ padding: "0.5rem 0.75rem 0.5rem 0", fontFamily: "monospace" }}>
-                      {p.symbol}
-                    </td>
-                    <td style={{ padding: "0.5rem 0.75rem" }}>{p.trade_count}</td>
-                    <td style={{ padding: "0.5rem 0.75rem" }}>
-                      {p.avg_spread_bps != null ? p.avg_spread_bps.toFixed(1) : "—"}
-                    </td>
-                    <td style={{ padding: "0.5rem 0 0.5rem 0.75rem" }}>
-                      {p.suitability_score != null ? p.suitability_score.toFixed(2) : "—"}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <>
+            <MarketSummaryTable pairs={market.pairs} />
             {market.pairs.length > 20 && (
               <p style={{ margin: "0.5rem 0 0", fontSize: "0.8125rem", color: "var(--muted)" }}>
                 + {market.pairs.length - 20} meer
               </p>
             )}
-          </div>
+          </>
         ) : (
           <p style={{ margin: 0, color: "var(--muted)" }}>Geen pair-data in dit snapshot.</p>
         )}

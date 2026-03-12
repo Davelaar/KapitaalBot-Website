@@ -7,11 +7,11 @@ import {
   getPublicMarketSnapshot,
   getPublicDemoTrades,
 } from "@/lib/read-snapshots";
-import { StatusStrip } from "@/components/StatusStrip";
-import { MetricCardGrid } from "@/components/MetricCardGrid";
-import { RegimeStrategyOverview } from "@/components/RegimeStrategyOverview";
-import { MarketSummary } from "@/components/MarketSummary";
-import { DemoTradeTeaser } from "@/components/DemoTradeTeaser";
+import StatusStrip from "@/components/StatusStrip";
+import MetricCardGrid from "@/components/MetricCardGrid";
+import RegimeStrategyOverview from "@/components/RegimeStrategyOverview";
+import MarketSummary from "@/components/MarketSummary";
+import DemoTradeTeaser from "@/components/DemoTradeTeaser";
 
 export const dynamic = "force-dynamic";
 

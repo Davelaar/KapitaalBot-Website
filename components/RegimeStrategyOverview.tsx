@@ -8,7 +8,7 @@ export interface RegimeStrategyOverviewProps {
   strategy: PublicStrategySnapshot | null;
 }
 
-export function RegimeStrategyOverview({
+export default function RegimeStrategyOverview({
   regime,
   strategy,
 }: RegimeStrategyOverviewProps) {
@@ -58,19 +58,58 @@ export function RegimeStrategyOverview({
                 ))}
               </ul>
               {regime!.dominant_regime && (
-                <p
-                  style={{
-                    marginTop: "0.5rem",
-                    color: "var(--muted)",
-                    fontSize: "0.875rem",
-                  }}
-                >
-                  Dominant: {regime!.dominant_regime}
+                <p style={{ marginTop: "0.5rem", marginBottom: 0 }}>
+                  <span
+                    style={{
+                      display: "inline-block",
+                      padding: "0.2rem 0.5rem",
+                      borderRadius: 6,
+                      background: "var(--accent)",
+                      color: "#0f1419",
+                      fontSize: "0.8125rem",
+                      fontWeight: 600,
+                    }}
+                  >
+                    Dominant: {regime!.dominant_regime}
+                  </span>
                 </p>
+              )}
+              {hasRegime && regime!.active_regimes.length > 0 && (
+                <div style={{ marginTop: "0.75rem" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: 2,
+                      height: 8,
+                      borderRadius: 4,
+                      overflow: "hidden",
+                      background: "var(--border)",
+                    }}
+                  >
+                    {regime!.active_regimes.map((r, i) => {
+                      const total = regime!.active_regimes.reduce((s, x) => s + x.count, 0);
+                      const pct = total > 0 ? (r.count / total) * 100 : 0;
+                      return (
+                        <div
+                          key={r.regime}
+                          style={{
+                            width: `${pct}%`,
+                            minWidth: pct > 0 ? 4 : 0,
+                            background: "var(--accent)",
+                            opacity: 0.7 + (i * 0.1),
+                          }}
+                          title={`${r.regime}: ${r.count}`}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
               )}
             </>
           ) : (
-            <p style={{ margin: 0, color: "var(--muted)" }}>Geen data</p>
+            <div style={{ padding: "1rem 0", color: "var(--muted)", fontSize: "0.875rem" }}>
+              Geen regime-data. Awaiting bot export…
+            </div>
           )}
         </div>
         <div
@@ -103,7 +142,9 @@ export function RegimeStrategyOverview({
               ))}
             </ul>
           ) : (
-            <p style={{ margin: 0, color: "var(--muted)" }}>Geen data</p>
+            <div style={{ padding: "1rem 0", color: "var(--muted)", fontSize: "0.875rem" }}>
+              Geen strategy-data. Awaiting bot export…
+            </div>
           )}
         </div>
       </div>
