@@ -1,0 +1,79 @@
+:root {
+  --bg: #0f1419;
+  --fg: #e6edf3;
+  --muted: #8b949e;
+  --accent: #2dd4bf;
+  --card-bg: #161b22;
+  --border: #30363d;
+}
+
+[data-theme="light"] {
+  --bg: #f6f8fa;
+  --fg: #1f2328;
+  --muted: #656d76;
+  --accent: #098575;
+  --card-bg: #ffffff;
+  --border: #d0d7de;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  min-height: 100vh;
+}
+
+main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 1.5rem;
+  padding-bottom: 2rem;
+}
+
+/* Compliance banner: always white, dark text, not affected by theme */
+.compliance-banner {
+  background: #ffffff;
+  color: #1a1a1a;
+  padding: 1rem 1.5rem;
+  margin-top: auto;
+  font-size: clamp(14px, 2vw, 16px);
+  line-height: 1.5;
+  max-width: 100%;
+}
+
+.compliance-banner__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1rem;
+}
+
+.metric-card__value {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.metric-card__label {
+  font-size: 0.875rem;
+  color: var(--muted);
+}
