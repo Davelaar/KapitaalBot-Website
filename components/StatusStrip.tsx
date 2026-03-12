@@ -1,29 +1,37 @@
 import type { PublicStatusSnapshot } from "@/lib/snapshots";
+import { getFreshnessInfo } from "@/lib/snapshot-freshness";
 
 export interface StatusStripProps {
   status: PublicStatusSnapshot | null;
 }
 
-export function StatusStrip({ status }: StatusStripProps) {
+function StatusStripSkeleton() {
+  return (
+    <div
+      className="card"
+      style={{
+        marginBottom: "1rem",
+        padding: "1rem 1.25rem",
+        borderLeft: "4px solid var(--muted)",
+      }}
+    >
+      <p style={{ margin: 0, color: "var(--muted)", fontSize: "0.9375rem" }}>
+        Awaiting bot export…
+      </p>
+      <p style={{ margin: "0.25rem 0 0", color: "var(--muted)", fontSize: "0.8125rem" }}>
+        Configure <code style={{ fontSize: "0.875em" }}>OBSERVABILITY_EXPORT_DIR</code> and run the bot snapshot export.
+      </p>
+    </div>
+  );
+}
+
+export default function StatusStrip({ status }: StatusStripProps) {
   if (!status) {
-    return (
-      <div
-        className="card"
-        style={{
-          marginBottom: "1rem",
-          padding: "1rem 1.25rem",
-          borderLeft: "4px solid var(--muted)",
-        }}
-      >
-        <p style={{ margin: 0, color: "var(--muted)", fontSize: "0.9375rem" }}>
-          Geen snapshot beschikbaar. Start de bot export of controleer{" "}
-          <code style={{ fontSize: "0.875em" }}>OBSERVABILITY_EXPORT_DIR</code>.
-        </p>
-      </div>
-    );
+    return <StatusStripSkeleton />;
   }
 
-  const freshness =
+  const freshnessInfo = getFreshnessInfo(status.data_freshness_secs);
+  const freshnessSecs =
     status.data_freshness_secs != null
       ? `${status.data_freshness_secs}s`
       : "—";
@@ -59,12 +67,24 @@ export function StatusStrip({ status }: StatusStripProps) {
           {status.epoch_symbol_count ?? 0} symbols
         </div>
       </div>
-      <div>
+      <div
+        title={freshnessInfo.tooltip}
+        style={{ cursor: "help" }}
+      >
         <div style={{ fontSize: "0.75rem", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.02em" }}>
-          Data freshness
+          Freshness
         </div>
-        <div style={{ fontSize: "1.125rem", fontWeight: 600 }}>
-          {freshness}
+        <div
+          style={{
+            fontSize: "0.875rem",
+            fontWeight: 600,
+            color: freshnessInfo.color,
+          }}
+        >
+          {freshnessInfo.label}
+        </div>
+        <div style={{ fontSize: "0.8125rem", color: "var(--muted)" }}>
+          {freshnessSecs}
         </div>
       </div>
       <div>

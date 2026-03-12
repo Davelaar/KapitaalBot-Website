@@ -24,14 +24,17 @@ function exportPath(): string {
   return dir;
 }
 
-function readJson<T>(filename: string): T | null {
-  try {
-    const fullPath = path.join(exportPath(), filename);
-    const raw = fs.readFileSync(fullPath, "utf-8");
-    return JSON.parse(raw) as T;
-  } catch {
-    return null;
+function readJson<T>(filename: string, retries = 1): T | null {
+  const fullPath = path.join(exportPath(), filename);
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const raw = fs.readFileSync(fullPath, "utf-8");
+      return JSON.parse(raw) as T;
+    } catch {
+      if (attempt === retries) return null;
+    }
   }
+  return null;
 }
 
 /** Tier 1: public_status_snapshot */
