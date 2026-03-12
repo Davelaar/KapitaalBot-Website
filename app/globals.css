@@ -58,7 +58,7 @@ main {
 .card {
   background: var(--card-bg);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 1rem 1.25rem;
   margin-bottom: 1rem;
 }
@@ -78,4 +78,10 @@ main {
 .metric-card__label {
   font-size: 0.875rem;
   color: var(--muted);
+}
+
+button,
+input,
+textarea {
+  border-radius: 8px;
 }

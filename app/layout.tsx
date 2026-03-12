@@ -3,6 +3,7 @@ import "./globals.css";
 import ComplianceBanner from "@/components/ComplianceBanner";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { HeaderLogo } from "@/components/HeaderLogo";
 
 export const metadata: Metadata = {
   title: "KapitaalBot — Observability",
@@ -29,9 +30,7 @@ export default function RootLayout({
             margin: "0 auto",
           }}
         >
-          <a href="/" style={{ color: "var(--fg)", textDecoration: "none", fontWeight: 600 }}>
-            KapitaalBot
-          </a>
+          <HeaderLogo />
           <nav style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
             <a href="/dashboard" style={{ color: "var(--fg)", textDecoration: "none", fontSize: "0.9rem" }}>Dashboard</a>
             <a href="/tier2-request" style={{ color: "var(--fg)", textDecoration: "none", fontSize: "0.9rem" }}>Tier 2</a>

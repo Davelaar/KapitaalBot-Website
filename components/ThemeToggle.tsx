@@ -20,6 +20,9 @@ export function ThemeToggle() {
     setTheme(next);
     document.documentElement.setAttribute("data-theme", next);
     localStorage.setItem("theme", next);
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("theme-change", { detail: next }));
+    }
   }, [theme]);
 
   return (
