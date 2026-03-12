@@ -1,11 +1,10 @@
 "use client";
 
 /**
- * Verplichte crypto-waarschuwing (sectie 19). Altijd onderaan, wit, donkere tekst.
- * Niet meenemen in dark theme. CMS-light overschrijfbaar; fallback hier.
+ * Verplichte crypto-waarschuwing (AFM-stijl). Altijd onderaan, witte balk, dikgedrukte tekst.
  */
 const DEFAULT_TEXT =
-  "Handelen in cryptovaluta brengt aanzienlijke risico's met zich mee. Verlies van uw inleg is mogelijk. Dit platform is uitsluitend informatief en vormt geen beleggingsadvies of -aanbod.";
+  "Crypto is extreem volatiel. Sterke koersbewegingen kunnen snel tot grote verliezen leiden.";
 
 export default function ComplianceBanner({
   text,
@@ -19,7 +18,9 @@ export default function ComplianceBanner({
       role="note"
       aria-label="Crypto risk warning"
     >
-      <div className="compliance-banner__inner">{content}</div>
+      <div className="compliance-banner__inner">
+        <strong>{content}</strong>
+      </div>
     </aside>
   );
 }
