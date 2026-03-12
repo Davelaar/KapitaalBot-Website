@@ -18,12 +18,12 @@ Alle 20 secties van het observability-websiteplan met status. Na elke wijziging 
 | 8 | **Statusstrip / metrics** | ✅ | Run, epoch, freshness, safety; metric cards (trades, orders, drawdown, etc.) |
 | 9 | **Regime & strategy** | ✅ | RegimeStrategyOverview, MarketSummary, DemoTradeTeaser |
 | 10 | **Tier2-dashboard** | 🔶 | Route /dashboard/tier2; inhoud wanneer Tier 2-snapshots beschikbaar |
-| 11 | **Tier2-aanvraag** | ✅ | Formulier /tier2-request (backend later) |
+| 11 | **Tier2-aanvraag** | ✅ | Formulier + POST /api/tier2-request → data/tier2_requests.json |
 | 12 | **FAQ** | ✅ | Statische FAQ; FAQ-bot (retrieval) later |
 | 13 | **CMS-light** | ⏳ | Homepage-notices, CTA, compliance overschrijfbaar (docs/CMS-LIGHT.md) |
-| 14 | **Analytics** | ⏳ | Umami/Plausible; events (docs/ANALYTICS-PUSHOVER.md) |
+| 14 | **Analytics** | 🔶 | Plausible/Umami script (env); page views/Tier2 events bij configuratie |
 | 15 | **Pushover** | ⏳ | Bot/BFF; data stale, safety, PnL-drempels |
-| 16 | **i18n / viertaligheid** | 🔶 | Strings NL/EN/DE/FR + taalkeuze in header; content nog niet per locale |
+| 16 | **i18n / viertaligheid** | 🔶 | Cookie NEXT_LOCALE; compliance vertaald; nav/hero/FAQ keys in lib/i18n |
 | 17 | **Theme (dark/light)** | ✅ | ThemeToggle in header |
 | 18 | **Architectuurdiagram** | 🔶 | Mermaid/SVG op homepage/dashboard nog niet |
 | 19 | **Compliance-banner** | ✅ | Vaste AFM-tekst, wit, dikgedrukt, gecentreerd |
@@ -45,19 +45,24 @@ Plaats het bestand in `public/` (bijv. `public/logo.svg` of `public/logo.png`). 
 
 ## Gereed (kort)
 
-- Secties 1–9, 11, 12, 17, 19; API, deploy, snapshot-wiring, compliance, theme, FAQ, Tier2-formulier.
+- Secties 1–9, 11, 12, 17, 19; API, deploy, snapshot-wiring, compliance, theme, FAQ.
+- Tier2-aanvraag: formulier + POST /api/tier2-request, opslag in data/tier2_requests.json.
+- Freshness indicator (GOOD/WARN/STALE), null handling (Awaiting bot export…).
+- Admin: snapshot-status + raw JSON viewer (zichtbaar bij Tier 3).
+- SEO: OG/twitter, robots.txt, sitemap.xml, JSON-LD SoftwareApplication.
+- Error boundary (error.tsx, global-error.tsx), retry in read-snapshots.
 
 ## Deels
 
 - 10: Tier2-dashboard (route klaar, content wacht op Tier 2-export).
-- 16: i18n (taalkeuze + cookie; content/locale-routing nog niet).
+- 14: Analytics (Plausible/Umami script klaar; env nodig).
+- 16: i18n (cookie + compliance vertaald; nav/hero/FAQ vertaling optioneel).
 - 18: Architectuurdiagram (tekst wel, Mermaid/SVG nog niet).
-- 20: Logo nog niet in header (wel nav compleet).
+- 20: Logo in header (SVG light/dark); nav compleet.
 
 ## Open (later)
 
 - 13: CMS-light.  
-- 14: Analytics.  
 - 15: Pushover.  
 - FAQ-bot (retrieval), auth/sessie, Tier 2-snapshots backend, admin_observability_snapshot, Changelog-pagina, Contact-pagina.
 
