@@ -34,6 +34,9 @@ export function Tier2RequestForm() {
       }
       setSuccess(true);
       form.reset();
+      if (typeof window !== "undefined" && (window as any).plausible) {
+        (window as any).plausible("tier2_request_submitted");
+      }
     } catch {
       setError("Netwerkfout. Probeer het later opnieuw.");
     } finally {

@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useLocale } from "@/lib/locale";
+import { t } from "@/lib/i18n";
 
 interface ChatMessage {
   id: number;
@@ -9,6 +11,7 @@ interface ChatMessage {
 }
 
 export function FaqChatbot() {
+  const locale = useLocale();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -41,8 +44,11 @@ export function FaqChatbot() {
         content: data.answer,
       };
       setMessages((prev) => [...prev, assistantMsg]);
+      if (typeof window !== "undefined" && (window as any).plausible) {
+        (window as any).plausible("faq_chat_question");
+      }
     } catch (err: any) {
-      setError(err.message || "Onbekende fout");
+      setError(err.message || t(locale, "faq.chat.error"));
     } finally {
       setLoading(false);
     }
@@ -50,10 +56,9 @@ export function FaqChatbot() {
 
   return (
     <section className="card" style={{ marginTop: "2rem" }}>
-      <h2 style={{ fontSize: "1.25rem", marginBottom: "0.5rem" }}>FAQ chatbot (preview)</h2>
+      <h2 style={{ fontSize: "1.25rem", marginBottom: "0.5rem" }}>{t(locale, "faq.chat.title")}</h2>
       <p style={{ color: "var(--muted)", fontSize: "0.875rem", marginBottom: "0.75rem" }}>
-        Stel een vraag over KapitaalBot, de engine of de observability-website. Deze chatbot gebruikt
-        een kleine knowledge base; in een volgende fase wordt dit een volledige RAG over de SSOT-docs.
+        {t(locale, "faq.chat.intro")}
       </p>
       <div
         style={{
@@ -67,8 +72,7 @@ export function FaqChatbot() {
       >
         {messages.length === 0 && (
           <p style={{ color: "var(--muted)", fontSize: "0.875rem", margin: 0 }}>
-            Nog geen berichten. Stel een vraag, bijvoorbeeld:{" "}
-            <em>"Wat is het verschil tussen Tier 1 en Tier 2?"</em>
+            {t(locale, "faq.chat.empty")} <em>"{t(locale, "faq.chat.example")}"</em>
           </p>
         )}
         {messages.map((m) => (
@@ -104,7 +108,7 @@ export function FaqChatbot() {
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Stel een vraag over KapitaalBot..."
+          placeholder={t(locale, "faq.chat.placeholder")}
           style={{
             flex: 1,
             padding: "0.4rem 0.6rem",
@@ -129,7 +133,7 @@ export function FaqChatbot() {
             fontSize: "0.9rem",
           }}
         >
-          {loading ? "Bezig..." : "Stuur"}
+          {loading ? t(locale, "faq.chat.sending") : t(locale, "faq.chat.send")}
         </button>
       </form>
     </section>

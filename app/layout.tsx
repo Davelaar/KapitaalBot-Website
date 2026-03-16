@@ -1,24 +1,22 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import ComplianceBanner from "@/components/ComplianceBanner";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { HeaderLogo } from "@/components/HeaderLogo";
+import { NavBar } from "@/components/NavBar";
 import { Analytics } from "@/components/Analytics";
 
 export const metadata: Metadata = {
-  title: "KapitaalBot — Observability",
+  title: "KapitaalBot — System",
   description:
-    "Observability portal voor het autonome crypto trading systeem. Engineering showcase en informatief platform.",
+    "Autonome trading runtime. Gecontroleerd, state-first, observeerbaar. Geen performance claims; read-model snapshots en operationele context.",
   openGraph: {
-    title: "KapitaalBot — Observability",
-    description: "Live trading observability engine. Transparantie, realtime metrics, risk-first.",
+    title: "KapitaalBot — System",
+    description: "Autonome trading runtime. Gecontroleerd, state-first, observeerbaar.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "KapitaalBot — Observability",
-    description: "Live trading observability engine. Transparantie, realtime metrics, risk-first.",
+    title: "KapitaalBot — System",
+    description: "Autonome trading runtime. Gecontroleerd, state-first, observeerbaar.",
   },
 };
 
@@ -30,29 +28,12 @@ export default function RootLayout({
   return (
     <html lang="nl" suppressHydrationWarning>
       <body>
-        <header
-          style={{
-            borderBottom: "1px solid var(--border)",
-            padding: "0.75rem 1.5rem",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            maxWidth: "1200px",
-            margin: "0 auto",
-          }}
-        >
-          <HeaderLogo />
-          <nav style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-            <a href="/dashboard" style={{ color: "var(--fg)", textDecoration: "none", fontSize: "0.9rem" }}>Dashboard</a>
-            <a href="/changelog" style={{ color: "var(--fg)", textDecoration: "none", fontSize: "0.9rem" }}>Changelog</a>
-            <a href="/tier2-request" style={{ color: "var(--fg)", textDecoration: "none", fontSize: "0.9rem" }}>Tier 2</a>
-            <a href="/faq" style={{ color: "var(--fg)", textDecoration: "none", fontSize: "0.9rem" }}>FAQ</a>
-            <LanguageSwitcher />
-            <ThemeToggle />
-          </nav>
-        </header>
+        <NavBar />
         <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
           {children}
+          <footer style={{ padding: "0.5rem 1rem", textAlign: "center", fontSize: "0.8125rem", color: "var(--muted)", borderTop: "1px solid var(--border)" }}>
+            <a href="/tier2-request" style={{ color: "var(--muted)", textDecoration: "none" }}>Access</a>
+          </footer>
           <ComplianceBanner />
         </div>
         <script
@@ -63,7 +44,7 @@ export default function RootLayout({
               "@type": "SoftwareApplication",
               name: "KapitaalBot",
               applicationCategory: "FinanceApplication",
-              description: "Observability portal voor het autonome crypto trading systeem.",
+              description: "Autonome trading runtime. Gecontroleerd, state-first, observeerbaar.",
             }),
           }}
         />

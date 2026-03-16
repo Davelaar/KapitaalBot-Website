@@ -12,8 +12,8 @@ Alle 20 secties van het observability-websiteplan met status. Na elke wijziging 
 | 2 | **Staging / productie** | ✅ | snapdiscounts.nl live; kapitaalbot.nl na migratie |
 | 3 | **Snapshot-contract** | ✅ | Alleen JSON read-model; zie OBSERVABILITY_SNAPSHOT_CONTRACT.md |
 | 4 | **Tier-model** | ✅ | Tier 1 (publiek), Tier 2 (aanvraag), Tier 3 (admin) |
-| 5 | **Homepage** | ✅ | Hero, observability-teaser, statusstrip, metric grid, demo, architectuur, Tier2-funnel |
-| 6 | **Dashboard Tier 1** | ✅ | Statusstrip, metric cards, regime/strategy, market, demo trades |
+| 5 | **Homepage** | ✅ | Sober hero, What it is, How it works, System philosophy, Production notes, Access subtiel |
+| 6 | **Dashboard Tier 1** | ✅ | Data-pagina; observed system behaviour; statusstrip, metric cards, regime/strategy, market, demo |
 | 7 | **API-routes** | ✅ | /api/snapshots/public/* (status, regime, strategy, trading, market) |
 | 8 | **Statusstrip / metrics** | ✅ | Run, epoch, freshness, safety; metric cards (trades, orders, drawdown, etc.) |
 | 9 | **Regime & strategy** | ✅ | RegimeStrategyOverview, MarketSummary, DemoTradeTeaser |
@@ -23,11 +23,11 @@ Alle 20 secties van het observability-websiteplan met status. Na elke wijziging 
 | 13 | **CMS-light** | ⏳ | Homepage-notices, CTA, compliance overschrijfbaar (docs/CMS-LIGHT.md) |
 | 14 | **Analytics** | 🔶 | Plausible/Umami script (env); page views/Tier2 events bij configuratie |
 | 15 | **Pushover** | ⏳ | Bot/BFF; data stale, safety, PnL-drempels |
-| 16 | **i18n / viertaligheid** | 🔶 | Cookie NEXT_LOCALE; compliance vertaald; nav/hero/FAQ keys in lib/i18n |
+| 16 | **i18n / viertaligheid** | ✅ | Cookie NEXT_LOCALE; nav/FAQ/access/changelog/docs keys NL/EN/DE/FR; NavBar, FaqChatbot, FAQ-pagina |
 | 17 | **Theme (dark/light)** | ✅ | ThemeToggle in header |
-| 18 | **Architectuurdiagram** | 🔶 | Mermaid/SVG op homepage/dashboard nog niet |
+| 18 | **Architectuurdiagram** | ✅ | MermaidRenderer op /dashboard/tier2; mermaid npm package |
 | 19 | **Compliance-banner** | ✅ | Vaste AFM-tekst, wit, dikgedrukt, gecentreerd |
-| 20 | **Header / logo / nav** | 🔶 | Nav compleet (Dashboard, Tier 2, FAQ, Admin, taalkeuze, theme). **Logo: zie hieronder.** |
+| 20 | **Header / logo / nav** | ✅ | Nav: System, Data, Notes, Architecture, Research, Access; logo; taalkeuze; theme |
 
 ---
 
@@ -57,8 +57,8 @@ Plaats het bestand in `public/` (bijv. `public/logo.svg` of `public/logo.png`). 
 - 10: Tier2-dashboard (route klaar, content wacht op Tier 2-export).
 - 14: Analytics (Plausible/Umami script klaar; env nodig).
 - 16: i18n (cookie + compliance vertaald; nav/hero/FAQ vertaling optioneel).
-- 18: Architectuurdiagram (tekst wel, Mermaid/SVG nog niet).
-- 20: Logo in header (SVG light/dark); nav compleet.
+- Documentatie-pagina /docs (Tier 1) en /dashboard/tier2/docs (Tier 2) toegevoegd.
+- Positionering: audit (docs/SITE_AUDIT_POSITIONING.md), sober hero, Access in plaats van "Tier 2" in nav.
 
 ## Open (later)
 

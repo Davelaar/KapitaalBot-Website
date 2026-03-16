@@ -1,4 +1,21 @@
+"use client";
+
 import Link from "next/link";
+import { MermaidRenderer } from "@/components/MermaidRenderer";
+
+const TIER_FLOW = `flowchart LR
+  Tier1["Tier 1 (publiek)"] --> Tier2["Tier 2 (op aanvraag)"]
+  Tier2 --> Tier3["Tier 3 (admin)"]
+
+  Tier1 --> SnapPublic["public_* snapshots"]
+  Tier2 --> SnapTier2["tier2_* snapshots"]
+  Tier3 --> SnapAdmin["admin_observability_snapshot"]`;
+
+const BOT_FLOW = `flowchart TB
+  BotEngine["Krakenbot Engine"] --> Export["export-observability-snapshots"]
+  Export --> Dir["OBSERVABILITY_EXPORT_DIR"]
+  Dir --> SiteTier1["KapitaalBot Observability (Tier 1)"]
+  Dir --> SiteTier2["KapitaalBot Observability (Tier 2)"]`;
 
 const MODULES = [
   { id: "a", name: "Run & Data Health", data: "Sample counts, feed freshness, run timeline" },
@@ -59,28 +76,8 @@ export default function DashboardTier2Page() {
           observability op elkaar aansluiten. De data zelf komt uitsluitend uit read-model snapshots; geen directe
           DB-query’s vanaf de website.
         </p>
-        <div style={{ overflowX: "auto", fontSize: "0.8rem", lineHeight: 1.5 }}>
-          <pre style={{ marginBottom: "0.75rem" }}>
-{`\`\`\`mermaid
-flowchart LR
-  Tier1["Tier 1 (publiek)"] --> Tier2["Tier 2 (op aanvraag)"]
-  Tier2 --> Tier3["Tier 3 (admin)"]
-
-  Tier1 --> SnapPublic["public_* snapshots"]
-  Tier2 --> SnapTier2["tier2_* snapshots"]
-  Tier3 --> SnapAdmin["admin_observability_snapshot"]
-\`\`\``}
-          </pre>
-          <pre>
-{`\`\`\`mermaid
-flowchart TB
-  BotEngine["Krakenbot Engine"] --> Export["export-observability-snapshots"]
-  Export --> Dir["OBSERVABILITY_EXPORT_DIR"]
-  Dir --> SiteTier1["KapitaalBot Observability (Tier 1)"]
-  Dir --> SiteTier2["KapitaalBot Observability (Tier 2)"]
-\`\`\``}
-          </pre>
-        </div>
+        <MermaidRenderer code={TIER_FLOW} id="tier-flow" />
+        <MermaidRenderer code={BOT_FLOW} id="bot-flow" />
       </section>
     </main>
   );

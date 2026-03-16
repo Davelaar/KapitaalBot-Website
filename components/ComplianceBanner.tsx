@@ -1,26 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { t, defaultLocale, type Locale } from "@/lib/i18n";
-
-function getLocaleFromCookie(): Locale {
-  if (typeof document === "undefined") return defaultLocale;
-  const match = document.cookie.match(/NEXT_LOCALE=([^;]+)/);
-  const value = match?.[1] as Locale | undefined;
-  if (value && ["nl", "en", "de", "fr"].includes(value)) return value;
-  return defaultLocale;
-}
+import { useLocale } from "@/lib/locale";
+import { t } from "@/lib/i18n";
 
 export default function ComplianceBanner({
   text,
 }: {
   text?: string | null;
 }) {
-  const [locale, setLocale] = useState<Locale>(defaultLocale);
-
-  useEffect(() => {
-    setLocale(getLocaleFromCookie());
-  }, []);
+  const locale = useLocale();
 
   const content = text && text.trim() ? text : t(locale, "compliance.default");
   return (

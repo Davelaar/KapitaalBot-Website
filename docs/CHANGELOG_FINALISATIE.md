@@ -1,5 +1,16 @@
 # Changelog — Website finalisatie
 
+## 2026-03-12 — Positionering, i18n, docs, Mermaid
+
+- **Positionering** — Nav hernoemd naar System, Data, Notes, Architecture, Research, Access. Geen sales-funnel; contact als "Access", subtiel in footer. Hero sober: "Autonome trading runtime. Gecontroleerd, state-first, observeerbaar." Geen harde CTA boven de vouw. Secties: What it is, How it works (abstracted), System philosophy, Production notes. Access-pagina: disclaimer "Geen performance claims."
+- **Audit** — docs/SITE_AUDIT_POSITIONING.md: BEHOUDEN/HERSCHRIJVEN/VERWIJDEREN/HERPOSITIONEREN per onderdeel.
+- **i18n** — Uitgebreide keys (nav, faq, access, changelog, docs) in NL/EN/DE/FR. NavBar + FaqChatbot + FAQ-pagina gebruiken useLocale + t(). ComplianceBanner gebruikt useLocale uit lib/locale.ts.
+- **Docs** — app/docs/page.tsx (Tier 1: SSOT-overzicht); app/dashboard/tier2/docs/page.tsx (Tier 2: doc-index). Sitemap: /docs toegevoegd.
+- **Mermaid** — components/MermaidRenderer.tsx (client, mermaid.render); gebruikt op /dashboard/tier2 voor Tier- en Bot-flow diagrammen.
+- **KB/FAQ** — Origin (Raymond Davelaar, 23 okt 2025) + state-first + safety-modes in faq-chat route; systeemprompt verbiedt fictieve teams/tijdlijnen.
+- **Analytics** — Plausible events: tier2_request_submitted, faq_chat_question (indien plausible geladen).
+- **Layout** — Header 90% breedte; footer met Access-link; metadata sober ("Geen performance claims").
+
 ## 2026-03-12 — Changelog-pagina + nav
 
 - **app/changelog/page.tsx** — Nieuwe pagina: website-highlights (finalisatie) + engine/bot-technische highlights (Route v2, observability export, safety, epoch, lifecycle).

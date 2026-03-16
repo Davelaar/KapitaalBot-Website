@@ -48,6 +48,17 @@ Next.js App Router (KapitaalBot-Website)
 - **Freshness**: `lib/snapshot-freshness.ts` (GOOD/WARN/STALE).
 - **Tier2-aanvragen**: `POST /api/tier2-request` → `data/tier2_requests.json`.
 
+## i18n
+
+- Locale via cookie `NEXT_LOCALE` (nl, en, de, fr). `lib/locale.ts`: useLocale(), getLocaleFromCookie().
+- Vertalingen in `lib/i18n.ts`; nav, FAQ, access, changelog, docs. Merknaam "KapitaalBot" onvertaald.
+
+## Positionering
+
+- Geen sales funnel. Nav: System, Data, Notes, Architecture, Research, Access.
+- Hero sober; geen harde CTA boven de vouw. Secties: What it is, How it works (abstracted), System philosophy, Production notes.
+- Access-pagina met disclaimer: geen performance claims. Audit: docs/SITE_AUDIT_POSITIONING.md.
+
 ## Deployment
 
 - Git-only: code wijzigen → commit → push → op server `git pull` + build + restart.

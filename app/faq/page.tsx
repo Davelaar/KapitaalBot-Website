@@ -1,11 +1,26 @@
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
+import { useLocale } from "@/lib/locale";
+import { t } from "@/lib/i18n";
 import { FaqChatbot } from "@/components/FaqChatbot";
+
+type FaqItem = { q: string; a: string };
+
+interface FaqSection {
+  id: string;
+  title: string;
+  items: FaqItem[];
+}
 
 /**
  * FAQ (sectie 12) + FAQ-chatbot (RAG-preview), gecategoriseerd.
+ * Categorieën worden als accordion getoond; vragen/antwoorden klappen uit per categorie.
  */
 export default function FAQPage() {
-  const sections: { id: string; title: string; items: { q: string; a: string }[] }[] = [
+  const locale = useLocale();
+  const sections: FaqSection[] = [
     {
       id: "overview",
       title: "Overzicht & scope",
@@ -100,6 +115,12 @@ export default function FAQPage() {
     },
   ];
 
+  const [openSectionId, setOpenSectionId] = useState<string | null>(null);
+
+  function toggleSection(id: string) {
+    setOpenSectionId((current) => (current === id ? null : id));
+  }
+
   return (
     <main>
       <nav style={{ marginBottom: "1.5rem" }}>
@@ -107,25 +128,69 @@ export default function FAQPage() {
           ← Home
         </Link>
       </nav>
-      <h1 style={{ fontSize: "1.75rem", marginBottom: "0.5rem" }}>FAQ</h1>
+      <h1 style={{ fontSize: "1.75rem", marginBottom: "0.5rem" }}>{t(locale, "faq.title")}</h1>
       <p style={{ color: "var(--muted)", marginBottom: "1.5rem" }}>
-        Veelgestelde vragen over de KapitaalBot-engine, observability en tiers. De chatbot hieronder kan aanvullende,
-        meer gedetailleerde uitleg geven in meerdere talen (NL/EN/DE/FR), zonder strategiecode prijs te geven.
+        {t(locale, "faq.intro")}
       </p>
-      <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-        {sections.map((section) => (
-          <section key={section.id}>
-            <h2 style={{ fontSize: "1.2rem", marginBottom: "0.5rem" }}>{section.title}</h2>
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-              {section.items.map(({ q, a }) => (
-                <div key={q} className="card">
-                  <h3 style={{ fontSize: "1.05rem", marginBottom: "0.4rem" }}>{q}</h3>
-                  <p style={{ color: "var(--muted)", margin: 0, lineHeight: 1.6 }}>{a}</p>
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", marginBottom: "1.5rem" }}>
+        {sections.map((section) => {
+          const isOpen = openSectionId === section.id;
+          const panelId = `faq-panel-${section.id}`;
+          const buttonId = `faq-toggle-${section.id}`;
+
+          return (
+            <section key={section.id} className="card">
+              <button
+                id={buttonId}
+                type="button"
+                onClick={() => toggleSection(section.id)}
+                aria-expanded={isOpen}
+                aria-controls={panelId}
+                style={{
+                  width: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  background: "transparent",
+                  border: "none",
+                  padding: 0,
+                  color: "var(--fg)",
+                  cursor: "pointer",
+                  textAlign: "left",
+                  fontSize: "1.05rem",
+                  fontWeight: 600,
+                }}
+              >
+                <span>{section.title}</span>
+                <span
+                  aria-hidden="true"
+                  style={{
+                    fontSize: "1.2rem",
+                    transform: isOpen ? "rotate(90deg)" : "rotate(0deg)",
+                    transition: "transform 0.15s ease",
+                  }}
+                >
+                  ▸
+                </span>
+              </button>
+              {isOpen && (
+                <div
+                  id={panelId}
+                  role="region"
+                  aria-labelledby={buttonId}
+                  style={{ marginTop: "0.75rem", display: "flex", flexDirection: "column", gap: "0.75rem" }}
+                >
+                  {section.items.map(({ q, a }) => (
+                    <div key={q} className="card" style={{ marginBottom: 0 }}>
+                      <h3 style={{ fontSize: "1.0rem", marginBottom: "0.35rem" }}>{q}</h3>
+                      <p style={{ color: "var(--muted)", margin: 0, lineHeight: 1.6 }}>{a}</p>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </section>
-        ))}
+              )}
+            </section>
+          );
+        })}
       </div>
       <FaqChatbot />
     </main>

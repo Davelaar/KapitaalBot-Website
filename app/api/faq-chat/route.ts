@@ -16,6 +16,12 @@ import path from "path";
 
 const KB: { id: string; q: string; a: string; keywords: string[] }[] = [
   {
+    id: "origin",
+    q: "Wie heeft KapitaalBot gebouwd en wanneer is het project gestart?",
+    a: "KapitaalBot is ontwikkeld en wordt onderhouden door Raymond Davelaar. Het project is gestart op 23 oktober 2025 en sindsdien iteratief uitgebouwd tot een multi-regime, multi-strategy trading engine met een sterke focus op observability en verifieerbare runtime-gedragingen.",
+    keywords: ["raymond", "davelaar", "startdatum", "gestart", "wanneer", "wie", "oprichter", "maker", "origin"],
+  },
+  {
     id: "what-is-kapitaalbot",
     q: "Wat is KapitaalBot?",
     a: "KapitaalBot is een autonoom crypto trading systeem met multi-regime en multi-strategy execution. De observability-website toont alleen vertraagde, geaggregeerde read-model snapshots (JSON) over de runtime; geen realtime orders of signals.",
@@ -44,6 +50,18 @@ const KB: { id: string; q: string; a: string; keywords: string[] }[] = [
     q: "Waar vind ik de technische documentatie van de engine?",
     a: "De engine-documentatie leeft in de KRAKENBOTMAART-repository. De kern-SSOT is ENGINE_SSOT.md, met daaronder ARCHITECTURE_ENGINE_CURRENT.md, LIVE_RUNBOOK_CURRENT.md en VALIDATION_MODEL_CURRENT.md voor architectuur, runbook en validatiemodel.",
     keywords: ["documentatie", "engine", "ssot", "architecture", "runbook", "validation"],
+  },
+  {
+    id: "state-first",
+    q: "Wat is state-first architectuur?",
+    a: "De engine bouwt eerst een compacte state per symbol op uit raw marketdata. Evaluatie, regime-detectie, strategie-keuze en execution gebruiken uitsluitend die state. Dat voorkomt meerdere waarheden, maakt safety en freshness controleerbaar en auditing eenvoudiger. Geen directe beslissingen uit raw streams.",
+    keywords: ["state-first", "state", "architectuur", "database", "run_symbol_state"],
+  },
+  {
+    id: "safety-modes",
+    q: "Welke safety-modi zijn er?",
+    a: "Er zijn safety-modi per symbol: normal (actief), exit-only (alleen uitstappen), en hard-blocked (geen orders). Die worden o.a. gestuurd door data-freshness, WebSocket-health en interne guardrails. De observability-snapshots tonen aantallen per mode; exacte drempels worden niet gepubliceerd.",
+    keywords: ["safety", "exit-only", "hard-blocked", "normal", "guardrails"],
   },
 ];
 
@@ -121,6 +139,8 @@ export async function POST(req: NextRequest) {
     try {
       const systemPrompt =
         "Je bent een uitleg-bot voor KapitaalBot (autonome crypto trading engine). " +
+        "Feiten over oorsprong zijn vastgelegd: KapitaalBot is ontwikkeld en wordt onderhouden door Raymond Davelaar, " +
+        "met een projectstart op 23 oktober 2025. Noem geen fictieve teams of tijdlijnen die hiermee in strijd zijn. " +
         "Leg alles uit in hoofdlijnen, conceptueel, multi-regime en multi-strategy, " +
         "maar geef NOOIT letterlijke code, algoritmes, thresholds of recepten. " +
         "Gebruik alleen beschrijvende taal, geen copy/pastebare trading rules. " +

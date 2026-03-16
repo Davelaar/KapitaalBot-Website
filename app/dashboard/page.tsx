@@ -31,11 +31,13 @@ export default async function DashboardPage() {
         </Link>
       </nav>
       <h1 style={{ fontSize: "1.75rem", marginBottom: "0.5rem" }}>
-        Dashboard (Tier 1)
+        Data
       </h1>
-      <p style={{ color: "var(--muted)", marginBottom: "1.5rem" }}>
-        Regime- en strategy-overview; system status. Vertraagde/geaggregeerde
-        data.
+      <p style={{ color: "var(--muted)", marginBottom: "0.5rem" }}>
+        Observed system behaviour. Regime- en strategy-overview; vertraagde, geaggregeerde telemetry.
+      </p>
+      <p style={{ color: "var(--muted)", marginBottom: "1.5rem", fontSize: "0.8125rem" }}>
+        Geen realtime orderfeed; read-model snapshots only.
       </p>
 
       <StatusStrip status={status} />
