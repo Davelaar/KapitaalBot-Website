@@ -94,7 +94,7 @@ export default function BarChart({
                     fontSize: "0.8125rem",
                     fontWeight: 600,
                     color: "var(--muted)",
-                    minWidth: 2.5eem,
+                    minWidth: "2.5em",
                     textAlign: "right",
                   }}
                 >
