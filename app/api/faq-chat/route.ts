@@ -108,7 +108,9 @@ export async function POST(req: NextRequest) {
       ? "Ik heb geen exact antwoord in mijn kleine knowledge base. Probeer het anders te formuleren of bekijk de SSOT- en CURRENT-docs in de KRAKENBOTMAART-repository."
       : best.a;
 
-  const apiKey = process.env.OPENAI_API_KEY;
+  // Gebruik primair OPENAI_API_KEY; val desnoods terug op DOCS_EMBEDDING_API_KEY
+  // zodat bestaande server-env hergebruikt kan worden.
+  const apiKey = process.env.OPENAI_API_KEY || process.env.DOCS_EMBEDDING_API_KEY;
   const model = process.env.OPENAI_MODEL || "gpt-4.1-mini";
   const baseUrl = process.env.OPENAI_BASE_URL || "https://api.openai.com/v1";
 
