@@ -17,6 +17,8 @@ export interface PublicStatusSnapshot {
   trade_count: number;
   l2_count: number;
   l3_count: number;
+  /** Number of symbols with L3 data (l3_count >= 1). Use for L3 availability %. */
+  l3_symbol_count?: number | null;
   safety_normal_count: number;
   safety_exit_only_count: number;
   safety_hard_blocked_count: number;

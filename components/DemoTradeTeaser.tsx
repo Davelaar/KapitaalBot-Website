@@ -1,3 +1,7 @@
+"use client";
+
+import { useLocale } from "@/lib/locale";
+import { t } from "@/lib/i18n";
 import type { PublicDemoTrades } from "@/lib/snapshots";
 
 export interface DemoTradeTeaserProps {
@@ -6,11 +10,13 @@ export interface DemoTradeTeaserProps {
 }
 
 export default function DemoTradeTeaser({ demo, maxItems = 5 }: DemoTradeTeaserProps) {
+  const locale = useLocale();
+
   if (!demo) {
     return (
       <section style={{ marginTop: "2rem" }}>
         <h2 style={{ fontSize: "1.25rem", marginBottom: "1rem" }}>
-          Demo trades (Tier 1)
+          {t(locale, "demo.title")}
         </h2>
         <div
           className="card"
@@ -20,10 +26,10 @@ export default function DemoTradeTeaser({ demo, maxItems = 5 }: DemoTradeTeaserP
           }}
         >
           <p style={{ margin: 0, color: "var(--muted)" }}>
-            Awaiting bot export…
+            {t(locale, "metrics.awaiting")}
           </p>
           <p style={{ margin: "0.25rem 0 0", fontSize: "0.875rem", color: "var(--muted)" }}>
-            No demo trades snapshot yet.
+            {t(locale, "demo.noSnapshot")}
           </p>
         </div>
       </section>
@@ -36,7 +42,7 @@ export default function DemoTradeTeaser({ demo, maxItems = 5 }: DemoTradeTeaserP
   return (
     <section style={{ marginTop: "2rem" }}>
       <h2 style={{ fontSize: "1.25rem", marginBottom: "1rem" }}>
-        Demo trades (Tier 1)
+        {t(locale, "demo.title")}
       </h2>
       <div
         className="card"
@@ -65,7 +71,7 @@ export default function DemoTradeTeaser({ demo, maxItems = 5 }: DemoTradeTeaserP
             ))}
           </ul>
         ) : (
-          <p style={{ margin: 0, color: "var(--muted)" }}>Geen demo trades in dit snapshot.</p>
+          <p style={{ margin: 0, color: "var(--muted)" }}>{t(locale, "demo.empty")}</p>
         )}
       </div>
     </section>

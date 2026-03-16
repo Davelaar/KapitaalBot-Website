@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
 import {
   getPublicStatusSnapshot,
   getPublicRegimeSnapshot,
@@ -7,6 +8,8 @@ import {
   getPublicMarketSnapshot,
   getPublicDemoTrades,
 } from "@/lib/read-snapshots";
+import { t, type Locale } from "@/lib/i18n";
+import { DashboardIntro } from "@/components/DashboardIntro";
 import StatusStrip from "@/components/StatusStrip";
 import MetricCardGrid from "@/components/MetricCardGrid";
 import RegimeStrategyOverview from "@/components/RegimeStrategyOverview";
@@ -16,6 +19,8 @@ import DemoTradeTeaser from "@/components/DemoTradeTeaser";
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
+  const cookieStore = await cookies();
+  const locale = (cookieStore.get("NEXT_LOCALE")?.value || "nl") as Locale;
   const status = getPublicStatusSnapshot();
   const regime = getPublicRegimeSnapshot();
   const strategy = getPublicStrategySnapshot();
@@ -27,18 +32,10 @@ export default async function DashboardPage() {
     <main>
       <nav style={{ marginBottom: "1.5rem" }}>
         <Link href="/" style={{ color: "var(--accent)", textDecoration: "none" }}>
-          ← Home
+          ← {t(locale, "nav.system")}
         </Link>
       </nav>
-      <h1 style={{ fontSize: "1.75rem", marginBottom: "0.5rem" }}>
-        Data
-      </h1>
-      <p style={{ color: "var(--muted)", marginBottom: "0.5rem" }}>
-        Observed system behaviour. Regime- en strategy-overview; vertraagde, geaggregeerde telemetry.
-      </p>
-      <p style={{ color: "var(--muted)", marginBottom: "1.5rem", fontSize: "0.8125rem" }}>
-        Geen realtime orderfeed; read-model snapshots only.
-      </p>
+      <DashboardIntro />
 
       <StatusStrip status={status} />
       <MetricCardGrid

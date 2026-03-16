@@ -1,3 +1,7 @@
+"use client";
+
+import { useLocale } from "@/lib/locale";
+import { t } from "@/lib/i18n";
 import type {
   PublicRegimeSnapshot,
   PublicStatusSnapshot,
@@ -108,6 +112,7 @@ export default function MetricCardGrid({
   regime,
   strategy,
 }: MetricCardGridProps) {
+  const locale = useLocale();
   const hasAny =
     status !== null ||
     trading !== null ||
@@ -118,7 +123,7 @@ export default function MetricCardGrid({
     return (
       <section>
         <h2 style={{ fontSize: "1.25rem", marginBottom: "1rem" }}>
-          Metric cards
+          {t(locale, "metrics.title")}
         </h2>
         <div
           className="card"
@@ -128,10 +133,10 @@ export default function MetricCardGrid({
           }}
         >
           <p style={{ margin: 0, color: "var(--muted)" }}>
-            Awaiting bot export…
+            {t(locale, "metrics.awaiting")}
           </p>
           <p style={{ margin: "0.25rem 0 0", fontSize: "0.875rem", color: "var(--muted)" }}>
-            Export snapshots from the bot to see metrics here.
+            {t(locale, "metrics.awaitingExport")}
           </p>
         </div>
       </section>
@@ -144,7 +149,12 @@ export default function MetricCardGrid({
   const orders24h = trading?.orders_24h_count ?? 0;
   const safetyBlocked = status?.safety_hard_blocked_count ?? 0;
   const safetyExitOnly = status?.safety_exit_only_count ?? 0;
+  const safetyNormal = status?.safety_normal_count ?? 0;
   const guardInterventions = safetyExitOnly + safetyBlocked;
+  const tickerCount = status?.ticker_count ?? 0;
+  const tradeCountRaw = status?.trade_count ?? 0;
+  const l2Count = status?.l2_count ?? 0;
+  const l3CountRaw = status?.l3_count ?? 0;
   const freshnessSecs = status?.data_freshness_secs ?? null;
   const freshnessVal =
     freshnessSecs != null ? String(freshnessSecs) : "—";
@@ -152,17 +162,18 @@ export default function MetricCardGrid({
   const drawdown =
     drawdownPct != null ? `${drawdownPct.toFixed(2)}%` : "—";
   const symbolCount = status?.epoch_symbol_count ?? 0;
-  const l3Count = status?.l3_count ?? 0;
+  // L3 availability % = share of symbols with L3 data (from l3_symbol_count); l3_count is total rows, not a share
+  const l3SymbolCount = status?.l3_symbol_count ?? null;
   const l3Pct =
-    symbolCount > 0 && status?.l3_count != null
-      ? Math.round((status.l3_count / symbolCount) * 100)
+    symbolCount > 0 && l3SymbolCount != null && l3SymbolCount >= 0
+      ? Math.round((l3SymbolCount / symbolCount) * 100)
       : null;
   const regimeSwitches1h = regime?.regime_switches_last_hour ?? null;
 
   return (
     <section>
       <h2 style={{ fontSize: "1.25rem", marginBottom: "1rem" }}>
-        Metric cards
+        {t(locale, "metrics.title")}
       </h2>
       <div
         className="metric-grid"
@@ -176,8 +187,8 @@ export default function MetricCardGrid({
         <MetricCard label="Active Symbols" value={symbolCount} />
         <MetricCard
           label="L3 Availability %"
-          value={l3Pct != null ? `${l3Pct}%` : l3Count}
-          progress={l3Pct ?? undefined}
+          value={l3Pct != null ? `${Math.min(100, Math.max(0, l3Pct))}%` : "—"}
+          progress={l3Pct != null ? Math.min(100, Math.max(0, l3Pct)) : undefined}
         />
         <MetricCard label="Regime Switches (1h)" value={regimeSwitches1h ?? "—"} />
         <MetricCard label="Strategy Count" value={activeStrategies} />
@@ -191,6 +202,12 @@ export default function MetricCardGrid({
         <MetricCard label="Data Freshness (s)" value={freshnessVal} />
         <MetricCard label="Trades (24h)" value={trades24h} />
         <MetricCard label="Orders (24h)" value={orders24h} />
+        <MetricCard label="Ticker rows" value={tickerCount} />
+        <MetricCard label="Trade rows" value={tradeCountRaw} />
+        <MetricCard label="L2 rows" value={l2Count} />
+        <MetricCard label="L3 rows" value={l3CountRaw} />
+        <MetricCard label="Safety normal" value={safetyNormal} chip={safetyNormal > 0 ? "good" : undefined} />
+        <MetricCard label="Safety exit-only" value={safetyExitOnly} chip={safetyExitOnly > 0 ? "warn" : undefined} />
       </div>
     </section>
   );
