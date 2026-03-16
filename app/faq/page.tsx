@@ -1,7 +1,8 @@
 import Link from "next/link";
+import { FaqChatbot } from "@/components/FaqChatbot";
 
 /**
- * FAQ (sectie 12). Retrieval-based FAQ-bot later; tier-aware; weigert strategie/thresholds.
+ * FAQ (sectie 12) + FAQ-chatbot (RAG-preview).
  */
 export default function FAQPage() {
   const items: { q: string; a: string }[] = [
@@ -46,6 +47,7 @@ export default function FAQPage() {
           </div>
         ))}
       </div>
+      <FaqChatbot />
     </main>
   );
 }

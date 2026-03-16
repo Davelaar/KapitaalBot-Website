@@ -51,6 +51,37 @@ export default function DashboardTier2Page() {
           </p>
         </section>
       ))}
+
+      <section className="card" style={{ marginTop: "1.5rem" }}>
+        <h2 style={{ fontSize: "1.1rem", marginBottom: "0.5rem" }}>Tier-model & dataflow (conceptueel)</h2>
+        <p style={{ color: "var(--muted)", fontSize: "0.875rem", marginBottom: "0.5rem" }}>
+          Onderstaande diagrammen volgen de SSOT-engine-documentatie. Ze tonen hoe Tier 1, Tier 2 en Tier 3
+          observability op elkaar aansluiten. De data zelf komt uitsluitend uit read-model snapshots; geen directe
+          DB-query’s vanaf de website.
+        </p>
+        <div style={{ overflowX: "auto", fontSize: "0.8rem", lineHeight: 1.5 }}>
+          <pre style={{ marginBottom: "0.75rem" }}>
+{`\`\`\`mermaid
+flowchart LR
+  Tier1["Tier 1 (publiek)"] --> Tier2["Tier 2 (op aanvraag)"]
+  Tier2 --> Tier3["Tier 3 (admin)"]
+
+  Tier1 --> SnapPublic["public_* snapshots"]
+  Tier2 --> SnapTier2["tier2_* snapshots"]
+  Tier3 --> SnapAdmin["admin_observability_snapshot"]
+\`\`\``}
+          </pre>
+          <pre>
+{`\`\`\`mermaid
+flowchart TB
+  BotEngine["Krakenbot Engine"] --> Export["export-observability-snapshots"]
+  Export --> Dir["OBSERVABILITY_EXPORT_DIR"]
+  Dir --> SiteTier1["KapitaalBot Observability (Tier 1)"]
+  Dir --> SiteTier2["KapitaalBot Observability (Tier 2)"]
+\`\`\``}
+          </pre>
+        </div>
+      </section>
     </main>
   );
 }
