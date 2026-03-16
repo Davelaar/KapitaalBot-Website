@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import ComplianceBanner from "@/components/ComplianceBanner";
 import { NavBar } from "@/components/NavBar";
+import { Footer } from "@/components/Footer";
 import { Analytics } from "@/components/Analytics";
 
 export const metadata: Metadata = {
@@ -31,9 +32,7 @@ export default function RootLayout({
         <NavBar />
         <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
           {children}
-          <footer style={{ padding: "0.5rem 1rem", textAlign: "center", fontSize: "0.8125rem", color: "var(--muted)", borderTop: "1px solid var(--border)" }}>
-            <a href="/tier2-request" style={{ color: "var(--muted)", textDecoration: "none" }}>Access</a>
-          </footer>
+          <Footer />
           <ComplianceBanner />
         </div>
         <script

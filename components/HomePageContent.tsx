@@ -96,7 +96,7 @@ export function HomePageContent({
       <section style={{ marginTop: "1.5rem", paddingTop: "1rem", borderTop: "1px solid var(--border)" }}>
         <p style={{ fontSize: "0.875rem", color: "var(--muted)" }}>
           {t(locale, "home.access.text")}{" "}
-          <Link href="/tier2-request" style={{ color: "var(--accent)", textDecoration: "none" }}>Access</Link>.
+          <Link href="/tier2-request" style={{ color: "var(--accent)", textDecoration: "none" }}>{t(locale, "nav.access")}</Link>.
         </p>
       </section>
     </>

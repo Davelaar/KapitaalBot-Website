@@ -1,9 +1,9 @@
 import Link from "next/link";
+import { getSessionTier } from "@/lib/auth";
+import { TierGate } from "@/components/TierGate";
 
-/**
- * Tier 2: volledige doc-overzicht (DOC_INDEX-structuur).
- * Gated viazelfde Tier 2-logica als dashboard; voorlopig geen auth.
- */
+export const dynamic = "force-dynamic";
+
 const SECTIONS = [
   {
     title: "Leidende documenten",
@@ -29,7 +29,12 @@ const SECTIONS = [
   },
 ];
 
-export default function Tier2DocsPage() {
+export default async function Tier2DocsPage() {
+  const tier = await getSessionTier();
+  if (tier < 2) {
+    return <TierGate kind="tier2" />;
+  }
+
   return (
     <main>
       <nav style={{ marginBottom: "1.5rem" }}>

@@ -1,8 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useLocale } from "@/lib/locale";
+import { t } from "@/lib/i18n";
 
 export function Tier2RequestForm() {
+  const locale = useLocale();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -15,7 +18,7 @@ export function Tier2RequestForm() {
     const reason = (form.elements.namedItem("reason") as HTMLTextAreaElement)?.value?.trim();
 
     if (!email || !email.includes("@")) {
-      setError("Vul een geldig e-mailadres in.");
+      setError(t(locale, "access.form.error_email"));
       return;
     }
 
@@ -29,7 +32,7 @@ export function Tier2RequestForm() {
       const data = await res.json().catch(() => ({}));
 
       if (!res.ok) {
-        setError(data.error ?? "Er is iets misgegaan. Probeer het later opnieuw.");
+        setError(data.error ?? t(locale, "access.form.error_generic"));
         return;
       }
       setSuccess(true);
@@ -38,7 +41,7 @@ export function Tier2RequestForm() {
         (window as any).plausible("tier2_request_submitted");
       }
     } catch {
-      setError("Netwerkfout. Probeer het later opnieuw.");
+      setError(t(locale, "access.form.error_network"));
     } finally {
       setLoading(false);
     }
@@ -48,7 +51,7 @@ export function Tier2RequestForm() {
     return (
       <div className="card" style={{ maxWidth: "420px" }}>
         <p style={{ margin: 0, color: "var(--freshness-good)", fontWeight: 600 }}>
-          Aanvraag ontvangen. We nemen contact met je op.
+          {t(locale, "access.form.success")}
         </p>
       </div>
     );
@@ -58,7 +61,7 @@ export function Tier2RequestForm() {
     <div className="card" style={{ maxWidth: "420px" }}>
       <form
         onSubmit={handleSubmit}
-        aria-label="Tier 2 aanvraag"
+        aria-label={t(locale, "access.title")}
       >
         <div style={{ marginBottom: "1rem" }}>
           <label
@@ -70,14 +73,14 @@ export function Tier2RequestForm() {
               fontWeight: 500,
             }}
           >
-            E-mail
+            {t(locale, "access.form.email")}
           </label>
           <input
             id="tier2-email"
             type="email"
             name="email"
             required
-            placeholder="jouw@email.nl"
+            placeholder={t(locale, "access.form.placeholder_email")}
             disabled={loading}
             style={{
               width: "100%",
@@ -100,13 +103,13 @@ export function Tier2RequestForm() {
               fontWeight: 500,
             }}
           >
-            Reden / gebruik
+            {t(locale, "access.form.reason")}
           </label>
           <textarea
             id="tier2-reason"
             name="reason"
             rows={4}
-            placeholder="Bijv. technische review, compliance, interne observability."
+            placeholder={t(locale, "access.form.placeholder_reason")}
             disabled={loading}
             style={{
               width: "100%",
@@ -140,7 +143,7 @@ export function Tier2RequestForm() {
             opacity: loading ? 0.8 : 1,
           }}
         >
-          {loading ? "Bezig…" : "Verstuur aanvraag"}
+          {loading ? t(locale, "access.form.loading") : t(locale, "access.form.submit")}
         </button>
       </form>
     </div>

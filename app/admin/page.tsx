@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { requireTier } from "@/lib/auth";
+import { getSessionTier } from "@/lib/auth";
+import { TierGate } from "@/components/TierGate";
 import {
   getPublicStatusSnapshot,
   getPublicRegimeSnapshot,
@@ -11,33 +12,18 @@ import { AdminSnapshotStatus } from "@/components/AdminSnapshotStatus";
 
 export const dynamic = "force-dynamic";
 
-/**
- * Admin: full observability, snapshot status, raw JSON (Tier 3 when auth is enabled).
- */
 export default async function AdminPage() {
-  const allowed = requireTier(3);
+  const tier = await getSessionTier();
+
+  if (tier < 3) {
+    return <TierGate kind="tier3" />;
+  }
 
   const status = getPublicStatusSnapshot();
   const regime = getPublicRegimeSnapshot();
   const strategy = getPublicStrategySnapshot();
   const trading = getPublicTradingSnapshot();
   const market = getPublicMarketSnapshot();
-
-  if (!allowed) {
-    return (
-      <main>
-        <div className="card" style={{ maxWidth: "480px" }}>
-          <h2 style={{ fontSize: "1.125rem", marginBottom: "0.5rem" }}>Tier 3 vereist</h2>
-          <p style={{ color: "var(--muted)", marginBottom: "1rem" }}>
-            Deze pagina is alleen toegankelijk voor beheerders (Tier 3). Log in met admin-rechten.
-          </p>
-          <Link href="/" style={{ color: "var(--accent)", textDecoration: "none", fontWeight: 600 }}>
-            ← Terug naar home
-          </Link>
-        </div>
-      </main>
-    );
-  }
 
   return (
     <main>
