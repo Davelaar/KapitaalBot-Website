@@ -1,8 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
+import fs from "fs";
+import path from "path";
 
 /**
- * Simple retrieval-style FAQ endpoint.
- * In een volgende fase kan dit vervangen worden door echte RAG over de SSOT-docs.
+ * FAQ endpoint met eenvoudige RAG-light:
+ * - Kleine knowledge base (KB) met kernantwoorden.
+ * - Optioneel: OpenAI RAG-light als OPENAI_API_KEY is gezet.
+ * - Logt vragen/antwoorden in data/faq_logs.json (geen PII, alleen tekst).
+ *
+ * Belangrijke constraints:
+ * - Geen letterlijke code of copy/pastebare strategieën delen.
+ * - Uitleg altijd in hoofdlijnen, tier-aware, multi-regime/multi-strategy,
+ *   maar zonder thresholds of recipes.
  */
 
 const KB: { id: string; q: string; a: string; keywords: string[] }[] = [
@@ -52,6 +61,31 @@ function score(question: string, entry: (typeof KB)[number]): number {
   return s;
 }
 
+async function logFaq(question: string, answer: string, sources: string[]) {
+  try {
+    const dir = path.join(process.cwd(), "data");
+    const file = path.join(dir, "faq_logs.json");
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    const entry = {
+      ts: new Date().toISOString(),
+      question,
+      answer: answer.slice(0, 1000),
+      sources,
+    };
+    let current: any[] = [];
+    if (fs.existsSync(file)) {
+      const raw = fs.readFileSync(file, "utf8");
+      current = JSON.parse(raw);
+    }
+    current.push(entry);
+    fs.writeFileSync(file, JSON.stringify(current.slice(-500), null, 2), "utf8");
+  } catch {
+    // logging is best-effort; fouten hier mogen de API niet breken
+  }
+}
+
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
   const question = typeof body?.question === "string" ? body.question.trim() : "";
@@ -69,14 +103,70 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  const answer =
+  const kbAnswer =
     bestScore === 0
       ? "Ik heb geen exact antwoord in mijn kleine knowledge base. Probeer het anders te formuleren of bekijk de SSOT- en CURRENT-docs in de KRAKENBOTMAART-repository."
       : best.a;
 
+  const apiKey = process.env.OPENAI_API_KEY;
+  const model = process.env.OPENAI_MODEL || "gpt-4.1-mini";
+  const baseUrl = process.env.OPENAI_BASE_URL || "https://api.openai.com/v1";
+
+  let finalAnswer = kbAnswer;
+  const sources = [best.id];
+
+  if (apiKey) {
+    try {
+      const systemPrompt =
+        "Je bent een uitleg-bot voor KapitaalBot (autonome crypto trading engine). " +
+        "Leg alles uit in hoofdlijnen, conceptueel, multi-regime en multi-strategy, " +
+        "maar geef NOOIT letterlijke code, algoritmes, thresholds of recepten. " +
+        "Gebruik alleen beschrijvende taal, geen copy/pastebare trading rules. " +
+        "Respecteer tiers: Tier 1 toont alleen publieke snapshots; Tier 2/3 mogen als concept beschreven worden, " +
+        "maar nooit met signal-niveau details. Antwoord altijd in dezelfde taal als de vraag (NL/EN/DE/FR).";
+
+      const userPrompt =
+        `Vraag van gebruiker:\n` +
+        question +
+        `\n\nBeschikbare kennis uit een interne FAQ-entry:\n` +
+        `Q: ${best.q}\nA: ${best.a}\n\n` +
+        `Gebruik deze kennis als context, maar je mag ook aanvullende uitleg geven ` +
+        `op basis van je eigen begrip van multi-regime/multi-strategy engines, zolang je geen code of exacte tradingregels prijsgeeft.`;
+
+      const resp = await fetch(`${baseUrl}/chat/completions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt },
+          ],
+          temperature: 0.2,
+        }),
+      });
+
+      if (resp.ok) {
+        const json = await resp.json();
+        const content =
+          json.choices?.[0]?.message?.content?.toString().trim() || "";
+        if (content) {
+          finalAnswer = content;
+        }
+      }
+    } catch {
+      // Bij fout: val terug op kbAnswer zonder error naar gebruiker
+    }
+  }
+
+  await logFaq(question, finalAnswer, sources);
+
   return NextResponse.json({
-    answer,
-    sources: [best.id],
+    answer: finalAnswer,
+    sources,
   });
 }
 
