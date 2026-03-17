@@ -5,6 +5,7 @@ import {
   getPublicTradingSnapshot,
   getPublicDemoTrades,
 } from "@/lib/read-snapshots";
+import { getProductionNotes } from "@/lib/read-cms";
 import { HomePageContent } from "@/components/HomePageContent";
 
 export const dynamic = "force-dynamic";
@@ -15,6 +16,7 @@ export default async function HomePage() {
   const strategy = getPublicStrategySnapshot();
   const trading = getPublicTradingSnapshot();
   const demo = getPublicDemoTrades();
+  const productionNotes = getProductionNotes();
 
   return (
     <main>
@@ -24,6 +26,7 @@ export default async function HomePage() {
         strategy={strategy}
         trading={trading}
         demo={demo}
+        productionNotes={productionNotes}
       />
     </main>
   );

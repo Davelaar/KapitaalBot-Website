@@ -6,12 +6,17 @@
 import fs from "fs";
 import path from "path";
 import type {
+  AdminObservabilitySnapshot,
   PublicDemoTrades,
   PublicMarketSnapshot,
   PublicRegimeSnapshot,
   PublicStatusSnapshot,
   PublicStrategySnapshot,
   PublicTradingSnapshot,
+  Tier2ExecutionSnapshot,
+  Tier2LatencySnapshot,
+  Tier2PnlSnapshot,
+  Tier2SafetySnapshot,
 } from "./snapshots";
 
 const EXPORT_DIR =
@@ -67,8 +72,27 @@ export function getPublicDemoTrades(): PublicDemoTrades | null {
   return readJson<PublicDemoTrades>("public_demo_trades.json");
 }
 
-/** Current tier from session (placeholder: always 1 for now; auth in Phase 6). */
-export function getTierFromRequest(): 1 | 2 | 3 {
-  // TODO: read from session cookie / token
-  return 1;
+/** Tier 2: tier2_execution_snapshot */
+export function getTier2ExecutionSnapshot(): Tier2ExecutionSnapshot | null {
+  return readJson<Tier2ExecutionSnapshot>("tier2_execution_snapshot.json");
+}
+
+/** Tier 2: tier2_latency_snapshot */
+export function getTier2LatencySnapshot(): Tier2LatencySnapshot | null {
+  return readJson<Tier2LatencySnapshot>("tier2_latency_snapshot.json");
+}
+
+/** Tier 2: tier2_pnl_snapshot */
+export function getTier2PnlSnapshot(): Tier2PnlSnapshot | null {
+  return readJson<Tier2PnlSnapshot>("tier2_pnl_snapshot.json");
+}
+
+/** Tier 2: tier2_safety_snapshot */
+export function getTier2SafetySnapshot(): Tier2SafetySnapshot | null {
+  return readJson<Tier2SafetySnapshot>("tier2_safety_snapshot.json");
+}
+
+/** Tier 3: admin_observability_snapshot */
+export function getAdminObservabilitySnapshot(): AdminObservabilitySnapshot | null {
+  return readJson<AdminObservabilitySnapshot>("admin_observability_snapshot.json");
 }

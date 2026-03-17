@@ -86,4 +86,45 @@ export interface PublicDemoTrades {
   demo_trades: DemoTradeRow[];
 }
 
+export interface Tier2ExecutionSnapshot {
+  contract_version: string;
+  exported_at: string;
+  orders_24h_count: number;
+  fills_24h_count: number;
+}
+
+export interface Tier2LatencySnapshot {
+  contract_version: string;
+  exported_at: string;
+  submit_to_ack_ms_avg?: number | null;
+  sample_count: number;
+}
+
+export interface Tier2PnlSnapshot {
+  contract_version: string;
+  exported_at: string;
+  realized_pnl_quote_24h: number | null;
+}
+
+export interface Tier2SafetySnapshot {
+  contract_version: string;
+  exported_at: string;
+  safety_normal_count: number;
+  safety_exit_only_count: number;
+  safety_hard_blocked_count: number;
+}
+
+export interface AdminObservabilitySnapshot {
+  contract_version: string;
+  exported_at: string;
+  run_id: number | null;
+  epoch_status: string | null;
+  data_freshness_secs: number | null;
+  orders_24h_count: number;
+  fills_24h_count: number;
+  safety_normal_count: number;
+  safety_exit_only_count: number;
+  safety_hard_blocked_count: number;
+}
+
 export type Tier = 1 | 2 | 3;

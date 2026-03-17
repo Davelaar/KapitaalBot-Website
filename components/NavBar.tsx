@@ -33,6 +33,9 @@ export function NavBar() {
         <Link href="/changelog" style={{ color: "var(--fg)", textDecoration: "none", fontSize: "0.9rem" }}>
           {t(locale, "nav.notes")}
         </Link>
+        <Link href="/contact" style={{ color: "var(--fg)", textDecoration: "none", fontSize: "0.9rem" }}>
+          Contact
+        </Link>
         <Link href="/docs" style={{ color: "var(--fg)", textDecoration: "none", fontSize: "0.9rem" }}>
           {t(locale, "nav.architecture")}
         </Link>

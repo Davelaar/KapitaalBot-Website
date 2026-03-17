@@ -62,10 +62,23 @@ const FAQ_SECTIONS: { id: string; titleKey: string; items: { qKey: string; aKey:
 export default function FAQPage() {
   const locale = useLocale();
   const [openSectionId, setOpenSectionId] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
 
   function toggleSection(id: string) {
     setOpenSectionId((current) => (current === id ? null : id));
   }
+
+  const searchLower = search.trim().toLowerCase();
+  const filteredSections = searchLower
+    ? FAQ_SECTIONS.map((section) => {
+        const matchingItems = section.items.filter(
+          (item) =>
+            t(locale, item.qKey).toLowerCase().includes(searchLower) ||
+            t(locale, item.aKey).toLowerCase().includes(searchLower)
+        );
+        return matchingItems.length > 0 ? { ...section, items: matchingItems } : null;
+      }).filter(Boolean) as typeof FAQ_SECTIONS
+    : FAQ_SECTIONS;
 
   return (
     <main>
@@ -75,11 +88,29 @@ export default function FAQPage() {
         </Link>
       </nav>
       <h1 style={{ fontSize: "1.75rem", marginBottom: "0.5rem" }}>{t(locale, "faq.title")}</h1>
-      <p style={{ color: "var(--muted)", marginBottom: "1.5rem" }}>
+      <p style={{ color: "var(--muted)", marginBottom: "1rem" }}>
         {t(locale, "faq.intro")}
       </p>
+      <input
+        type="search"
+        placeholder="Zoek in FAQ…"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        aria-label="Zoek in FAQ"
+        style={{
+          width: "100%",
+          maxWidth: 320,
+          padding: "0.5rem 0.75rem",
+          marginBottom: "1.5rem",
+          border: "1px solid var(--border)",
+          borderRadius: 4,
+          background: "var(--bg)",
+          color: "var(--fg)",
+          fontSize: "0.9375rem",
+        }}
+      />
       <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", marginBottom: "1.5rem" }}>
-        {FAQ_SECTIONS.map((section) => {
+        {filteredSections.map((section) => {
           const isOpen = openSectionId === section.id;
           const panelId = `faq-panel-${section.id}`;
           const buttonId = `faq-toggle-${section.id}`;

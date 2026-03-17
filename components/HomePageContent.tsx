@@ -10,6 +10,7 @@ import type {
   PublicTradingSnapshot,
   PublicDemoTrades,
 } from "@/lib/snapshots";
+import type { ProductionNoteRow } from "@/lib/read-cms";
 import StatusStrip from "@/components/StatusStrip";
 import MetricCardGrid from "@/components/MetricCardGrid";
 import DemoTradeTeaser from "@/components/DemoTradeTeaser";
@@ -20,6 +21,7 @@ interface HomePageContentProps {
   strategy: PublicStrategySnapshot | null;
   trading: PublicTradingSnapshot | null;
   demo: PublicDemoTrades | null;
+  productionNotes: ProductionNoteRow[];
 }
 
 export function HomePageContent({
@@ -28,6 +30,7 @@ export function HomePageContent({
   strategy,
   trading,
   demo,
+  productionNotes,
 }: HomePageContentProps) {
   const locale = useLocale();
 
@@ -88,9 +91,19 @@ export function HomePageContent({
 
       <section style={{ marginTop: "1.5rem" }} className="card">
         <h2 style={{ fontSize: "1.2rem", marginBottom: "0.5rem" }}>{t(locale, "home.production.title")}</h2>
-        <p style={{ color: "var(--muted)", fontSize: "0.875rem" }}>
-          {t(locale, "home.production.text")}
-        </p>
+        {productionNotes.length > 0 ? (
+          <ul style={{ margin: 0, paddingLeft: "1.25rem", color: "var(--muted)", fontSize: "0.875rem", lineHeight: 1.6 }}>
+            {productionNotes.map((note, i) => (
+              <li key={i}>
+                <span style={{ color: "var(--fg)", fontWeight: 500 }}>{note.date}</span>: {note.text}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p style={{ color: "var(--muted)", fontSize: "0.875rem", margin: 0 }}>
+            Geen recente production notes. Strategy pauses, parameter reviews en monitoring events worden intern bijgehouden.
+          </p>
+        )}
       </section>
 
       <section style={{ marginTop: "1.5rem", paddingTop: "1rem", borderTop: "1px solid var(--border)" }}>
