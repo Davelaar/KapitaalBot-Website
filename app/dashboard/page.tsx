@@ -35,9 +35,9 @@ export default async function DashboardPage() {
           ← {t(locale, "nav.system")}
         </Link>
       </nav>
-      <DashboardIntro />
+      <DashboardIntro status={status} locale={locale} />
 
-      <StatusStrip status={status} />
+      <StatusStrip status={status} locale={locale} />
       <MetricCardGrid
         status={status}
         trading={trading}

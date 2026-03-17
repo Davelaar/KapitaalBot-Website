@@ -5,6 +5,16 @@
 
 export type FreshnessLevel = "good" | "warn" | "stale" | "unknown";
 
+/** Format delay in seconds as human-readable (e.g. "45 s", "2 min", "1 h"). */
+export function formatDelaySeconds(secs: number): string {
+  if (secs < 60) return `${secs} s`;
+  if (secs < 3600) return `${Math.round(secs / 60)} min`;
+  const h = Math.floor(secs / 3600);
+  const m = Math.round((secs % 3600) / 60);
+  if (m === 0) return `${h} h`;
+  return `${h} h ${m} min`;
+}
+
 export interface FreshnessInfo {
   level: FreshnessLevel;
   label: string;

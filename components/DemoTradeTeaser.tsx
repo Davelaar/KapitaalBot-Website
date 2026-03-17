@@ -44,6 +44,11 @@ export default function DemoTradeTeaser({ demo, maxItems = 5 }: DemoTradeTeaserP
       <h2 style={{ fontSize: "1.25rem", marginBottom: "1rem" }}>
         {t(locale, "demo.title")}
       </h2>
+      {!hasItems && (
+        <p style={{ marginBottom: "0.75rem", fontSize: "0.8125rem", color: "var(--muted)" }}>
+          {t(locale, "demo.emptyHint")}
+        </p>
+      )}
       <div
         className="card"
         style={{
@@ -58,13 +63,13 @@ export default function DemoTradeTeaser({ demo, maxItems = 5 }: DemoTradeTeaserP
               lineHeight: 1.7,
             }}
           >
-            {items.map((t, i) => (
-              <li key={`${t.symbol}-${t.side}-${i}`}>
-                <strong>{t.symbol}</strong> {t.side} — {t.lifecycle_summary}
-                {t.outcome != null && (
+            {items.map((row, i) => (
+              <li key={`${row.symbol}-${row.side}-${i}`}>
+                <strong>{row.symbol}</strong> {row.side} — {row.lifecycle_summary}
+                {row.outcome != null && (
                   <span style={{ color: "var(--muted)", marginLeft: "0.5rem" }}>
-                    ({t.outcome}
-                    {t.result_bps != null ? `, ${t.result_bps.toFixed(0)} bps` : ""})
+                    ({row.outcome}
+                    {row.result_bps != null ? `, ${row.result_bps.toFixed(0)} bps` : ""})
                   </span>
                 )}
               </li>
@@ -74,6 +79,11 @@ export default function DemoTradeTeaser({ demo, maxItems = 5 }: DemoTradeTeaserP
           <p style={{ margin: 0, color: "var(--muted)" }}>{t(locale, "demo.empty")}</p>
         )}
       </div>
+      {demo.exported_at && (
+        <p style={{ marginTop: "0.5rem", fontSize: "0.75rem", color: "var(--muted)" }}>
+          Snapshot: {demo.exported_at}
+        </p>
+      )}
     </section>
   );
 }

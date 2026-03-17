@@ -209,6 +209,9 @@ export default function MetricCardGrid({
         <MetricCard label="Safety normal" value={safetyNormal} chip={safetyNormal > 0 ? "good" : undefined} />
         <MetricCard label="Safety exit-only" value={safetyExitOnly} chip={safetyExitOnly > 0 ? "warn" : undefined} />
       </div>
+      <p style={{ marginTop: "0.75rem", fontSize: "0.8125rem", color: "var(--muted)" }}>
+        {t(locale, "metrics.trades24hHint")}
+      </p>
     </section>
   );
 }

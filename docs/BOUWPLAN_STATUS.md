@@ -1,5 +1,7 @@
 # Bouwplan status — 20 secties
 
+**Opdracht/specificatie:** Dit document is samen met **SITE_AUDIT_POSITIONING.md** (nav, hero, positionering) en het snapshot-contract in de bot-repo (**KRAKENBOTMAART/docs/OBSERVABILITY_SNAPSHOT_CONTRACT.md**) de leidende specificatie voor de KapitaalBot-observability-site.
+
 Alle 20 secties van het observability-websiteplan met status. Na elke wijziging bijwerken.
 
 ---
@@ -27,7 +29,7 @@ Alle 20 secties van het observability-websiteplan met status. Na elke wijziging 
 | 17 | **Theme (dark/light)** | ✅ | ThemeToggle in header |
 | 18 | **Architectuurdiagram** | ✅ | MermaidRenderer op /dashboard/tier2; mermaid npm package |
 | 19 | **Compliance-banner** | ✅ | Vaste AFM-tekst, wit, dikgedrukt, gecentreerd |
-| 20 | **Header / logo / nav** | ✅ | Nav: System, Data, Notes, Architecture, Research, Access; logo; taalkeuze; theme |
+| 20 | **Header / logo / nav** | ✅ | Nav: System, Data, Notes, Architecture, Research, Access, **Log in**; logo; taalkeuze; theme |
 
 ---
 
@@ -48,7 +50,9 @@ Plaats het bestand in `public/` (bijv. `public/logo.svg` of `public/logo.png`). 
 - Secties 1–9, 11, 12, 17, 19; API, deploy, snapshot-wiring, compliance, theme, FAQ.
 - Tier2-aanvraag: formulier + POST /api/tier2-request, opslag in data/tier2_requests.json.
 - Freshness indicator (GOOD/WARN/STALE), null handling (Awaiting bot export…).
-- Admin: snapshot-status + raw JSON viewer (zichtbaar bij Tier 3).
+- Admin: snapshot-status + raw JSON viewer (zichtbaar bij Tier 3); **beveiligd met Tier 3-login**.
+- **Auth/sessie:** Cookie-gebaseerde tier-sessie; /login voor Tier 2/3; gate op /dashboard/tier2, tier2/docs, /admin. Geen standaard credentials; zie docs/ACCESS_AND_CREDENTIALS.md (TIER_COOKIE_SECRET, TIER2_SECRET, TIER3_SECRET).
+- Nav bevat **Log in** (naast Access) voor zichtbare toegang tot de inlogpagina.
 - SEO: OG/twitter, robots.txt, sitemap.xml, JSON-LD SoftwareApplication.
 - Error boundary (error.tsx, global-error.tsx), retry in read-snapshots.
 
@@ -64,7 +68,8 @@ Plaats het bestand in `public/` (bijv. `public/logo.svg` of `public/logo.png`). 
 
 - 13: CMS-light.  
 - 15: Pushover.  
-- FAQ-bot (retrieval), auth/sessie, Tier 2-snapshots backend, admin_observability_snapshot, Changelog-pagina, Contact-pagina.
+- FAQ-bot (retrieval), Tier 2-snapshots backend, admin_observability_snapshot, Changelog-pagina, Contact-pagina.
+- **Trades:** "Trades (24h)" = execution fills (bot: fill_count_last_24h); 0 als er geen orders zijn gevuld. "Demo trades" = sample uit bot-export; **bot exporteert momenteel altijd een lege lijst** (placeholder in KRAKENBOTMAART export.rs). Website toont uitleg bij lege state.
 
 ---
 

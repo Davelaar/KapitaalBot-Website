@@ -42,6 +42,9 @@ export function NavBar() {
         <Link href="/tier2-request" style={{ color: "var(--fg)", textDecoration: "none", fontSize: "0.9rem" }}>
           {t(locale, "nav.access")}
         </Link>
+        <Link href="/login" style={{ color: "var(--fg)", textDecoration: "none", fontSize: "0.9rem" }}>
+          {t(locale, "nav.login")}
+        </Link>
         <LanguageSwitcher />
         <ThemeToggle />
       </nav>
