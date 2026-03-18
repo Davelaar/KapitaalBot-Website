@@ -17,6 +17,12 @@
 - **Nav** — Link “Changelog” toegevoegd in header.
 - **sitemap.ts** — `/changelog` opgenomen.
 
+## 2026-03-18 — Compliance-banner + homepage architectuurdiagram
+
+- **ComplianceBanner** — Omgezet naar server component; tekst uit CMS (`content/cms.json.compliance_override`) met fallback naar i18n (`compliance.default`), aria-label "Crypto risk warning", altijd onderaan elke pagina en visueel losgekoppeld van dark theme (witte achtergrond, donkere tekst).
+- **Root layout** — `html lang` afgeleid van `NEXT_LOCALE` cookie, zodat SEO/i18n-meta en toegankelijkheid per taal kloppen; Analytics-component blijft client-side.
+- **Homepage** — Hero-sectie uitgebreid met compact Mermaid-architectuurdiagram (state-first: ingest → state → route/exec → observability snapshots → Tier 1 / Tier 2), als visuele samenvatting van het SSOT-architectuurverhaal.
+
 ---
 
 ## Gewijzigde en nieuwe bestanden (finalisatie)
