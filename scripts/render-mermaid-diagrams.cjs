@@ -76,6 +76,14 @@ async function renderDiagram(code, id, outName) {
   const { svg } = await mermaid.render(id, code.trim());
   // Defensieve fix: sommige Mermaid versies/evaluaties injecteren een max-width constraint in de root.
   // We verwijderen die constraint zodat de SVG normaal schaalbaar is via <img> of CSS.
+  const escapeXml = (s) =>
+    String(s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&apos;");
+
   let svgFixed = svg
     // Schaal constraint breed weghalen: ook als Mermaid ineens een andere px waarde kiest.
     .replace(/max-width:\s*\d+(\.\d+)?px;/g, "max-width: 100%;")
@@ -84,9 +92,18 @@ async function renderDiagram(code, id, outName) {
     .replace(/stroke:#ccc/g, "stroke:#ffffff")
     .replace(/stroke:lightgrey/g, "stroke:#ffffff")
     .replace(/stroke-width:1px/g, "stroke-width:2px")
-    // Mermaid kan foreignObject voor labels genereren met width/height = 0 (vaak niet-rendert in Safari).
-    // Vervang die 0x0 door een praktische labelmaat.
-    .replace(/<foreignObject width="0" height="0">/g, '<foreignObject width="200" height="60">');
+    // Mermaid kan foreignObject voor labels genereren (div + p).
+    // Safari rendert dat vaak niet/anders bij SVG-in-SVG of external SVG.
+    // We vervangen foreignObject labels door pure SVG <text>.
+    .replace(
+      /<foreignObject[^>]*>\s*<div[\s\S]*?<p>\s*([\s\S]*?)\s*<\/p>[\s\S]*?<\/foreignObject>/g,
+      (_m, rawLabel) => {
+        const label = String(rawLabel ?? "").replace(/\s+/g, " ").trim();
+        const escaped = escapeXml(label);
+        // Label groups zitten in een <g transform="..."> waarin (0,0) de box-center is.
+        return `<text x="0" y="0" text-anchor="middle" dominant-baseline="middle" style="font-family:\"trebuchet ms\",verdana,arial,sans-serif;font-size:16px;fill:#ccc;">${escaped}</text>`;
+      }
+    );
 
   const outPath = path.join(outDir, outName);
   fs.writeFileSync(outPath, svgFixed, "utf-8");
