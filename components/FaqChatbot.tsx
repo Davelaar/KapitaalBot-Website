@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useLocale } from "@/lib/locale";
 import { t } from "@/lib/i18n";
 
@@ -8,6 +9,7 @@ interface ChatMessage {
   id: number;
   role: "user" | "assistant";
   content: string;
+  sources?: string[];
 }
 
 export function FaqChatbot() {
@@ -42,6 +44,7 @@ export function FaqChatbot() {
         id: nextId + 1,
         role: "assistant",
         content: data.answer,
+        sources: Array.isArray(data.sources) ? data.sources : undefined,
       };
       setMessages((prev) => [...prev, assistantMsg]);
       if (typeof window !== "undefined" && (window as any).plausible) {
@@ -95,6 +98,19 @@ export function FaqChatbot() {
             >
               {m.content}
             </div>
+            {m.role === "assistant" && m.sources && m.sources.length > 0 && (
+              <div style={{ marginTop: "0.35rem", color: "var(--muted)", fontSize: "0.8rem" }}>
+                Bronnen:{" "}
+                {m.sources.map((slug, i) => (
+                  <span key={slug}>
+                    <Link href={`/docs/${slug}`} style={{ color: "var(--accent)", textDecoration: "none" }}>
+                      {slug}
+                    </Link>
+                    {i < m.sources.length - 1 ? ", " : ""}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         ))}
       </div>

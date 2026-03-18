@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 
+import { retrieveFaqFromDocs } from "@/lib/faq-retrieval";
+
 /**
  * FAQ endpoint met eenvoudige RAG-light:
  * - Kleine knowledge base (KB) met kernantwoorden.
@@ -126,16 +128,16 @@ export async function POST(req: NextRequest) {
       ? "Ik heb geen exact antwoord in mijn kleine knowledge base. Probeer het anders te formuleren of bekijk de SSOT- en CURRENT-docs in de KRAKENBOTMAART-repository."
       : best.a;
 
-  // Gebruik primair OPENAI_API_KEY; val desnoods terug op DOCS_EMBEDDING_API_KEY
-  // zodat bestaande server-env hergebruikt kan worden.
   const apiKey = process.env.OPENAI_API_KEY || process.env.DOCS_EMBEDDING_API_KEY;
   const model = process.env.OPENAI_MODEL || "gpt-4.1-mini";
   const baseUrl = process.env.OPENAI_BASE_URL || "https://api.openai.com/v1";
 
-  let finalAnswer = kbAnswer;
-  const sources = [best.id];
+  // Retrieval-based first: get a candidate answer from CURRENT/SSOT docs (tier-aware).
+  const retrieval = await retrieveFaqFromDocs(question);
+  let finalAnswer = retrieval.bestScore > 0 ? retrieval.candidate : kbAnswer;
+  const sources = retrieval.sources.length ? retrieval.sources : [best.id];
 
-  if (apiKey) {
+  if (apiKey && finalAnswer) {
     try {
       const systemPrompt =
         "Je bent een uitleg-bot voor KapitaalBot (autonome crypto trading engine). " +
@@ -148,12 +150,10 @@ export async function POST(req: NextRequest) {
         "maar nooit met signal-niveau details. Antwoord altijd in dezelfde taal als de vraag (NL/EN/DE/FR).";
 
       const userPrompt =
-        `Vraag van gebruiker:\n` +
-        question +
-        `\n\nBeschikbare kennis uit een interne FAQ-entry:\n` +
-        `Q: ${best.q}\nA: ${best.a}\n\n` +
-        `Gebruik deze kennis als context, maar je mag ook aanvullende uitleg geven ` +
-        `op basis van je eigen begrip van multi-regime/multi-strategy engines, zolang je geen code of exacte tradingregels prijsgeeft.`;
+        `Vraag van gebruiker:\n${question}\n\n` +
+        `Context die al uit (public/current) documentatie of interne FAQ is opgehaald (gesanitized):\n${finalAnswer}\n\n` +
+        `Schrijf nu een antwoord in dezelfde taal als de vraag. "FinalAnswer" is een bron voor concepten; mag herschikken/inkorten, maar blijf bij hoofdlijnen. ` +
+        `Geen code, geen letterlijke algoritmes, geen exacte drempels of "recepten".`;
 
       const resp = await fetch(`${baseUrl}/chat/completions`, {
         method: "POST",
