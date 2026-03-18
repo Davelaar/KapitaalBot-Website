@@ -5,6 +5,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const fs = require("fs");
 const path = require("path");
+const { JSDOM } = require("jsdom");
 
 async function getMermaid() {
   // Use ESM default export in Node context.
@@ -17,6 +18,17 @@ async function renderDiagram(code, id, outName) {
   fs.mkdirSync(outDir, { recursive: true });
 
   const mermaid = await getMermaid();
+
+  // Mermaid's Node rendering path expects a DOM (document/window) because it uses d3-selection.
+  // Provide a minimal headless DOM.
+  const dom = new JSDOM("<!doctype html><html><body></body></html>", {
+    pretendToBeVisual: true,
+  });
+  global.window = dom.window;
+  global.document = dom.window.document;
+  global.SVGElement = dom.window.SVGElement;
+  global.HTMLElement = dom.window.HTMLElement;
+  global.navigator = dom.window.navigator;
 
   mermaid.initialize({
     startOnLoad: false,
