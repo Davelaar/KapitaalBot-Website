@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import "./globals.css";
 import ComplianceBanner from "@/components/ComplianceBanner";
 import { NavBar } from "@/components/NavBar";
 import { Footer } from "@/components/Footer";
 import { Analytics } from "@/components/Analytics";
+import { defaultLocale, type Locale } from "@/lib/i18n";
 
 export const metadata: Metadata = {
   title: "KapitaalBot — System",
@@ -21,13 +23,17 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const cookieStore = await cookies();
+  const raw = cookieStore.get("NEXT_LOCALE")?.value;
+  const lang = (raw && ["nl", "en", "de", "fr"].includes(raw) ? raw : defaultLocale) as Locale;
+
   return (
-    <html lang="nl" suppressHydrationWarning>
+    <html lang={lang} suppressHydrationWarning>
       <body>
         <NavBar />
         <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>

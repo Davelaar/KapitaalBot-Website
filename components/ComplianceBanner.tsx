@@ -1,22 +1,25 @@
-"use client";
+import { cookies } from "next/headers";
+import { getCmsData } from "@/lib/read-cms";
+import { defaultLocale, t, type Locale } from "@/lib/i18n";
 
-import { useLocale } from "@/lib/locale";
-import { t } from "@/lib/i18n";
+function getLocaleFromCookieStore(
+  cookieStore: Awaited<ReturnType<typeof cookies>>,
+): Locale {
+  const raw = cookieStore.get("NEXT_LOCALE")?.value;
+  if (raw && ["nl", "en", "de", "fr"].includes(raw)) return raw as Locale;
+  return defaultLocale;
+}
 
-export default function ComplianceBanner({
-  text,
-}: {
-  text?: string | null;
-}) {
-  const locale = useLocale();
+export default async function ComplianceBanner() {
+  const cookieStore = await cookies();
+  const locale = getLocaleFromCookieStore(cookieStore);
 
-  const content = text && text.trim() ? text : t(locale, "compliance.default");
+  const cms = getCmsData();
+  const override = cms?.compliance_override?.trim() ?? "";
+  const content = override ? override : t(locale, "compliance.default");
+
   return (
-    <aside
-      className="compliance-banner"
-      role="note"
-      aria-label="Crypto risk warning"
-    >
+    <aside className="compliance-banner" role="note" aria-label="Crypto risk warning">
       <div className="compliance-banner__inner">
         <strong>{content}</strong>
       </div>
