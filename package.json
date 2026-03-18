@@ -4,9 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "node scripts/render-mermaid-diagrams.cjs && next build",
+    "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "build:diagrams": "node scripts/render-mermaid-diagrams.cjs"
   },
   "dependencies": {
     "mermaid": "^11.0.0",

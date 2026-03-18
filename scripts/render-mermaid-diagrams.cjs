@@ -5,11 +5,18 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const fs = require("fs");
 const path = require("path");
-const mermaid = require("mermaid");
+
+async function getMermaid() {
+  // Use ESM default export in Node context.
+  const mod = await import("mermaid");
+  return mod.default || mod;
+}
 
 async function renderDiagram(code, id, outName) {
   const outDir = path.join(process.cwd(), "public", "diagrams");
   fs.mkdirSync(outDir, { recursive: true });
+
+  const mermaid = await getMermaid();
 
   mermaid.initialize({
     startOnLoad: false,
