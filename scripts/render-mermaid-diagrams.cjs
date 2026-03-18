@@ -88,7 +88,8 @@ async function renderDiagram(code, id, outName) {
   // Mermaid in jsdom zet viewBox op 816x616 terwijl nodes op 400–5000+ staan → diagram buiten beeld.
   function computeViewBox(svgStr) {
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-    const pad = 24;
+    // Ruime marge: node-centra worden gevangen, maar geschaalde node-recten steken ver uit (tot ~240px).
+    const pad = 280;
     let m;
 
     // translate(x, y) — node- en labelposities

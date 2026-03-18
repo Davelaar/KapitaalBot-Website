@@ -42,11 +42,11 @@ export function MermaidRenderer({ code, id }: MermaidRendererProps) {
           : "Mermaid diagram";
 
   return (
-    <div style={{ overflowX: "auto", marginBottom: "0.75rem", width: "100%" }}>
+    <div style={{ overflowX: "auto", marginBottom: "0.75rem", width: "100%", minWidth: 0 }}>
       <img
         src={filename}
         alt={ariaLabel}
-        style={{ maxWidth: "100%", width: "100%", height: "auto", display: "block" }}
+        style={{ maxWidth: "100%", width: "100%", height: "auto", display: "block", verticalAlign: "top" }}
         loading="lazy"
         onError={() => {
           // Debug: if a mermaid hash svg is missing, log which filename was requested.
