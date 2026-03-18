@@ -30,6 +30,18 @@ async function renderDiagram(code, id, outName) {
   global.HTMLElement = dom.window.HTMLElement;
   global.navigator = dom.window.navigator;
 
+  // Mermaid expects DOMPurify to be an instance with .sanitize/.addHook.
+  // With dompurify v3, the default export is a factory; patch it so Mermaid can use it.
+  const dompurifyMod = await import("dompurify");
+  const dompurifyFactory = dompurifyMod.default;
+  if (typeof dompurifyFactory === "function" && typeof dompurifyFactory.sanitize !== "function") {
+    const dompurifyInstance = dompurifyFactory(dom.window);
+    dompurifyFactory.sanitize = dompurifyInstance.sanitize.bind(dompurifyInstance);
+    if (typeof dompurifyInstance.addHook === "function") {
+      dompurifyFactory.addHook = dompurifyInstance.addHook.bind(dompurifyInstance);
+    }
+  }
+
   mermaid.initialize({
     startOnLoad: false,
     theme: "dark",
