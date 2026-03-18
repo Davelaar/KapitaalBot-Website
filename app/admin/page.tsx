@@ -36,6 +36,11 @@ export default async function AdminPage() {
       <p style={{ color: "var(--muted)", marginBottom: "1.5rem" }}>
         Laatste snapshot-timestamps, run_id, epoch status, aanwezigheid market/trading. Raw JSON viewer.
       </p>
+      <section className="card" style={{ marginBottom: "1.5rem", padding: "1rem 1.25rem" }}>
+        <Link href="/admin/cms" style={{ color: "var(--accent)", textDecoration: "none", fontWeight: 600 }}>
+          → CMS-light editor (content + notes)
+        </Link>
+      </section>
       <AdminSnapshotStatus
         status={status}
         regime={regime}

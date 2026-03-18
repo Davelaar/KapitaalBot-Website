@@ -31,6 +31,7 @@ interface HomePageContentProps {
   trading: PublicTradingSnapshot | null;
   demo: PublicDemoTrades | null;
   productionNotes: ProductionNoteRow[];
+  notices: string[];
 }
 
 export function HomePageContent({
@@ -40,6 +41,7 @@ export function HomePageContent({
   trading,
   demo,
   productionNotes,
+  notices,
 }: HomePageContentProps) {
   const locale = useLocale();
 
@@ -63,6 +65,17 @@ export function HomePageContent({
           </Link>
         </p>
       </section>
+
+      {notices.length > 0 && (
+        <section style={{ marginBottom: "1.5rem" }} className="card">
+          <h2 style={{ fontSize: "1.2rem", marginBottom: "0.75rem" }}>{t(locale, "home.notices.title")}</h2>
+          <ul style={{ margin: 0, paddingLeft: "1.25rem", color: "var(--muted)", lineHeight: 1.7, fontSize: "0.9375rem" }}>
+            {notices.map((n, i) => (
+              <li key={i}>{n}</li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <StatusStrip status={status} />
       <MetricCardGrid

@@ -5,7 +5,7 @@ import {
   getPublicTradingSnapshot,
   getPublicDemoTrades,
 } from "@/lib/read-snapshots";
-import { getProductionNotes } from "@/lib/read-cms";
+import { getCmsData, getProductionNotes } from "@/lib/read-cms";
 import { HomePageContent } from "@/components/HomePageContent";
 
 export const dynamic = "force-dynamic";
@@ -17,6 +17,8 @@ export default async function HomePage() {
   const trading = getPublicTradingSnapshot();
   const demo = getPublicDemoTrades();
   const productionNotes = getProductionNotes();
+  const cms = getCmsData();
+  const notices = cms?.notices ?? [];
 
   return (
     <main>
@@ -27,6 +29,7 @@ export default async function HomePage() {
         trading={trading}
         demo={demo}
         productionNotes={productionNotes}
+        notices={notices}
       />
     </main>
   );
