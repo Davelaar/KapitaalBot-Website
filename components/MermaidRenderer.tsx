@@ -3,28 +3,43 @@ interface MermaidRendererProps {
   id?: string;
 }
 
-export function MermaidRenderer({ code, id }: MermaidRendererProps) {
-  const key = id || code;
-  let filename = "";
-  if (key === "home-arch-diagram") {
-    filename = "/diagrams/home-architecture-flow.svg";
-  } else if (key === "tier-flow") {
-    filename = "/diagrams/tier-model-observability.svg";
-  } else if (key === "bot-flow") {
-    filename = "/diagrams/bot-export-pipeline.svg";
+function fnv1a32Hex(input: string): string {
+  let hash = 0x811c9dc5; // FNV offset basis
+  for (let i = 0; i < input.length; i++) {
+    hash ^= input.charCodeAt(i);
+    // FNV prime: 0x01000193
+    hash = (hash + (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24)) >>> 0;
   }
+  return hash.toString(16).padStart(8, "0");
+}
 
-  // Fallback: show nothing if we do not have a mapped SVG yet.
-  if (!filename) {
-    return null;
+export function MermaidRenderer({ code, id }: MermaidRendererProps) {
+  let filename = "";
+
+  const trimmed = code?.trim() ?? "";
+  if (!trimmed) return null;
+
+  if (id === "home-arch-diagram") {
+    filename = "/diagrams/home-architecture-flow.svg";
+  } else if (id === "tier-flow") {
+    filename = "/diagrams/tier-model-observability.svg";
+  } else if (id === "bot-flow") {
+    filename = "/diagrams/bot-export-pipeline.svg";
+  } else {
+    // Generic fallback for Mermaid blocks coming from markdown/docs.
+    // Must match `scripts/render-mermaid-diagrams.cjs` hashing.
+    const hash = fnv1a32Hex(trimmed);
+    filename = `/diagrams/mermaid-${hash}.svg`;
   }
 
   const ariaLabel =
-    key === "home-arch-diagram"
+    id === "home-arch-diagram"
       ? "Architectuur van KapitaalBot observability en dataflow"
-      : key === "tier-flow"
+      : id === "tier-flow"
         ? "Tier-model van observability (Tier 1, Tier 2, Tier 3)"
-        : "Data-exportpijplijn van bot naar observability-website";
+        : id === "bot-flow"
+          ? "Data-exportpijplijn van bot naar observability-website"
+          : "Mermaid diagram";
 
   return (
     <div style={{ overflowX: "auto", marginBottom: "0.75rem", width: "100%" }}>

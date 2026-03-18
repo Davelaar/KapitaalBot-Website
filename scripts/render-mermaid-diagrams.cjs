@@ -111,6 +111,44 @@ async function renderDiagram(code, id, outName) {
   console.log(`Rendered ${id} -> ${outPath}`);
 }
 
+function fnv1a32Hex(input) {
+  let hash = 0x811c9dc5; // FNV offset basis
+  for (let i = 0; i < input.length; i++) {
+    hash ^= input.charCodeAt(i);
+    // FNV prime: 0x01000193
+    hash = (hash + (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24)) >>> 0;
+  }
+  return hash.toString(16).padStart(8, "0");
+}
+
+function extractMermaidBlocks(md) {
+  const blocks = [];
+  // Mermaid fenced code blocks in markdown:
+  // ```mermaid
+  // flowchart ...
+  // ```
+  const re = /```mermaid[^\n]*\n([\s\S]*?)```/g;
+  let m;
+  while ((m = re.exec(md)) !== null) {
+    const code = String(m[1] ?? "").trim();
+    if (code) blocks.push(code);
+  }
+  return blocks;
+}
+
+function walkMdFiles(dir, acc) {
+  if (!fs.existsSync(dir)) return;
+  const entries = fs.readdirSync(dir, { withFileTypes: true });
+  for (const e of entries) {
+    const p = path.join(dir, e.name);
+    if (e.isDirectory()) {
+      walkMdFiles(p, acc);
+    } else if (e.isFile() && e.name.endsWith(".md")) {
+      acc.push(p);
+    }
+  }
+}
+
 async function main() {
   const homeArch = `
 flowchart LR
@@ -140,9 +178,33 @@ flowchart TB
   Dir --> SiteTier2["KapitaalBot Observability (Tier 2)"]
 `;
 
+  // 1) Render the explicitly mapped diagrams used on the website UI.
   await renderDiagram(homeArch, "home-architecture-flow", "home-architecture-flow.svg");
   await renderDiagram(tierFlow, "tier-model-observability", "tier-model-observability.svg");
   await renderDiagram(botFlow, "bot-export-pipeline", "bot-export-pipeline.svg");
+
+  // 2) Render any additional ```mermaid blocks found in repo docs/.
+  // These are used by DocViewer via MermaidRenderer (hash-based filenames).
+  const docsDir = path.join(process.cwd(), "..", "docs");
+  const mdFiles = [];
+  walkMdFiles(docsDir, mdFiles);
+
+  const codeByHash = new Map();
+  for (const filePath of mdFiles) {
+    const md = fs.readFileSync(filePath, "utf-8");
+    const blocks = extractMermaidBlocks(md);
+    for (const code of blocks) {
+      const hash = fnv1a32Hex(code.trim());
+      // Keep first occurrence; blocks with same code produce same hash.
+      if (!codeByHash.has(hash)) codeByHash.set(hash, code);
+    }
+  }
+
+  for (const [hash, code] of codeByHash.entries()) {
+    const id = `mermaid-${hash}`;
+    const outName = `mermaid-${hash}.svg`;
+    await renderDiagram(code, id, outName);
+  }
 }
 
 main().catch((err) => {
