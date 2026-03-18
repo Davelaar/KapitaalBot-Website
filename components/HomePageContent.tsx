@@ -14,6 +14,15 @@ import type { ProductionNoteRow } from "@/lib/read-cms";
 import StatusStrip from "@/components/StatusStrip";
 import MetricCardGrid from "@/components/MetricCardGrid";
 import DemoTradeTeaser from "@/components/DemoTradeTeaser";
+import { MermaidRenderer } from "@/components/MermaidRenderer";
+
+const HOME_ARCH_DIAGRAM = `flowchart LR
+  Ingest["Ingest (ticker/trades/L2/L3)"] --> State["State-first: run_symbol_state"]
+  State --> Route["Route engine + universe selection"]
+  Route --> Exec["Execution engine (queue-aware + safety)"]
+  State --> Snap["Observability snapshots (read-model)"]
+  Snap --> Tier1["Tier 1: public dashboards"]
+  Snap --> Tier2["Tier 2: extended dashboards"]`;
 
 interface HomePageContentProps {
   status: PublicStatusSnapshot | null;
@@ -43,6 +52,11 @@ export function HomePageContent({
         <p style={{ color: "var(--muted)", maxWidth: "56ch", fontSize: "0.9375rem", lineHeight: 1.6 }}>
           {t(locale, "hero.subline")}
         </p>
+
+        <div style={{ marginTop: "1rem" }}>
+          <MermaidRenderer code={HOME_ARCH_DIAGRAM} id="home-arch-diagram" />
+        </div>
+
         <p style={{ marginTop: "1rem", fontSize: "0.8125rem", color: "var(--muted)" }}>
           <Link href="/dashboard" style={{ color: "var(--accent)", textDecoration: "none" }}>
             {t(locale, "hero.dataLink")}
