@@ -3,6 +3,10 @@
 import Link from "next/link";
 import { MermaidRenderer } from "@/components/MermaidRenderer";
 import type {
+  EventBufferKpis,
+  LabelCount,
+  MissedMoveBucket,
+  RunHealthPoint,
   Tier2ExecutionSnapshot,
   Tier2LatencySnapshot,
   Tier2PnlSnapshot,
@@ -28,6 +32,31 @@ interface DashboardTier2ContentProps {
   latency: Tier2LatencySnapshot | null;
   pnl: Tier2PnlSnapshot | null;
   safety: Tier2SafetySnapshot | null;
+}
+
+function formatRunHealthPoint(p: RunHealthPoint | null | undefined): string {
+  if (!p) return "Geen recente run-health sample.";
+  const freshness = p.feed_freshness_secs != null ? `${Math.round(p.feed_freshness_secs)} s` : "n.v.t.";
+  return `Run ${p.run_id} · mode=${p.mode ?? "onbekend"} · feed freshness ~${freshness}`;
+}
+
+function summarizeLabelCounts(rows: LabelCount[] | null | undefined): string {
+  if (!rows || rows.length === 0) return "geen data";
+  return rows
+    .map((r) => `${r.label}: ${r.count}`)
+    .join(" · ");
+}
+
+function summarizeMissedMoves(rows: MissedMoveBucket[] | null | undefined): string {
+  if (!rows || rows.length === 0) return "geen metingen";
+  const total = rows.reduce((acc, r) => acc + r.count, 0);
+  const worst = rows[rows.length - 1];
+  return `n=${total}, zwaarste bucket ~${worst.bucket_bps} bps (count=${worst.count})`;
+}
+
+function summarizeEventBuffer(kpis: EventBufferKpis | null | undefined): string {
+  if (!kpis) return "geen event-buffer statistieken (n.v.t. of tabel leeg).";
+  return `buffered=${kpis.buffered_count}, released=${kpis.released_count}, timed_out=${kpis.timed_out_count}, unknown=${kpis.unknown_state_count}`;
 }
 
 export function DashboardTier2Content({ execution, latency, pnl, safety }: DashboardTier2ContentProps) {
@@ -71,38 +100,132 @@ export function DashboardTier2Content({ execution, latency, pnl, safety }: Dashb
 
       {execution && (
         <section className="card" style={{ marginBottom: "1rem" }}>
-          <h2 style={{ fontSize: "1.1rem", marginBottom: "0.5rem" }}>Execution (24h)</h2>
-          <p style={{ color: "var(--muted)", fontSize: "0.875rem", margin: 0 }}>
-            Orders: <strong style={{ color: "var(--fg)" }}>{execution.orders_24h_count}</strong> · Fills: <strong style={{ color: "var(--fg)" }}>{execution.fills_24h_count}</strong>
-            {execution.exported_at && (
-              <span style={{ marginLeft: "0.5rem" }}>(export {execution.exported_at})</span>
-            )}
+          <h2 style={{ fontSize: "1.1rem", marginBottom: "0.25rem" }}>A. Run &amp; Data Health</h2>
+          <p style={{ color: "var(--muted)", fontSize: "0.875rem", marginBottom: "0.5rem" }}>
+            {formatRunHealthPoint(execution.run_health_timeline?.[0] ?? null)}
+          </p>
+          <p style={{ color: "var(--muted)", fontSize: "0.8125rem", margin: 0 }}>
+            Export: {execution.exported_at ?? "onbekend"} · symbols_traded_24h:{" "}
+            {execution.symbols_traded_24h != null ? execution.symbols_traded_24h : "—"}
           </p>
         </section>
       )}
+
+      {execution && (
+        <section className="card" style={{ marginBottom: "1rem" }}>
+          <h2 style={{ fontSize: "1.1rem", marginBottom: "0.25rem" }}>B. Epoch &amp; Ingest</h2>
+          <p style={{ color: "var(--muted)", fontSize: "0.875rem", marginBottom: 0 }}>
+            {execution.epoch_ingest_point
+              ? `Epoch ${execution.epoch_ingest_point.epoch_id ?? "n.v.t."} · symbols_ok=${execution.epoch_ingest_point.symbols_ok ?? "?"}/${execution.epoch_ingest_point.symbols_expected ?? "?"} · valid=${
+                  execution.epoch_ingest_point.is_valid === null ? "n.v.t." : execution.epoch_ingest_point.is_valid ? "ja" : "nee"
+                }`
+              : "Geen epoch/ingest-samenvatting in snapshot."}
+          </p>
+        </section>
+      )}
+
+      {execution && (
+        <section className="card" style={{ marginBottom: "1rem" }}>
+          <h2 style={{ fontSize: "1.1rem", marginBottom: "0.25rem" }}>C. Execution (orders/fills)</h2>
+          <p style={{ color: "var(--muted)", fontSize: "0.875rem", marginBottom: "0.25rem" }}>
+            Orders 24h:{" "}
+            <strong style={{ color: "var(--fg)" }}>{execution.orders_24h_count}</strong> · Fills 24h:{" "}
+            <strong style={{ color: "var(--fg)" }}>{execution.fills_24h_count}</strong>
+          </p>
+          <p style={{ color: "var(--muted)", fontSize: "0.8125rem", marginBottom: "0.25rem" }}>
+            Orderstatus 24h: {summarizeLabelCounts(execution.orders_status_counts_24h)}
+          </p>
+          <p style={{ color: "var(--muted)", fontSize: "0.8125rem", margin: 0 }}>
+            Fills per side 24h: {summarizeLabelCounts(execution.fills_side_counts_24h)}
+          </p>
+        </section>
+      )}
+
       {latency && (
         <section className="card" style={{ marginBottom: "1rem" }}>
-          <h2 style={{ fontSize: "1.1rem", marginBottom: "0.5rem" }}>Latency (submit→ack)</h2>
-          <p style={{ color: "var(--muted)", fontSize: "0.875rem", margin: 0 }}>
+          <h2 style={{ fontSize: "1.1rem", marginBottom: "0.25rem" }}>D. Latency-profiel</h2>
+          <p style={{ color: "var(--muted)", fontSize: "0.875rem", marginBottom: "0.25rem" }}>
             {latency.submit_to_ack_ms_avg != null
-              ? `Gemiddeld ${Math.round(latency.submit_to_ack_ms_avg)} ms (n=${latency.sample_count})`
-              : `Geen samples (n=${latency.sample_count})`}
+              ? `submit→ack gemiddeld ~${Math.round(latency.submit_to_ack_ms_avg)} ms (n=${latency.sample_count})`
+              : `Geen submit→ack samples (n=${latency.sample_count})`}
+          </p>
+          <p style={{ color: "var(--muted)", fontSize: "0.8125rem", marginBottom: 0 }}>
+            Histogram (submit→ack):{" "}
+            {latency.submit_to_ack_histogram_ms_24h && latency.submit_to_ack_histogram_ms_24h.length > 0
+              ? `${latency.submit_to_ack_histogram_ms_24h.length} buckets`
+              : "geen histogram beschikbaar"}
           </p>
         </section>
       )}
+
       {pnl && (
         <section className="card" style={{ marginBottom: "1rem" }}>
-          <h2 style={{ fontSize: "1.1rem", marginBottom: "0.5rem" }}>PnL (24h)</h2>
-          <p style={{ color: "var(--muted)", fontSize: "0.875rem", margin: 0 }}>
-            Gerealiseerd PnL (quote): {pnl.realized_pnl_quote_24h != null ? pnl.realized_pnl_quote_24h.toFixed(2) : "—"}
+          <h2 style={{ fontSize: "1.1rem", marginBottom: "0.25rem" }}>E. PnL &amp; Positions</h2>
+          <p style={{ color: "var(--muted)", fontSize: "0.875rem", marginBottom: "0.25rem" }}>
+            Gerealiseerd PnL (24h, quote):{" "}
+            {pnl.realized_pnl_quote_24h != null ? pnl.realized_pnl_quote_24h.toFixed(2) : "—"}
+          </p>
+          <p style={{ color: "var(--muted)", fontSize: "0.8125rem", marginBottom: "0.25rem" }}>
+            Max drawdown (op basis van equity-trend, vertraagd):{" "}
+            {pnl.drawdown_pct != null ? `${pnl.drawdown_pct.toFixed(2)} %` : "n.v.t."}
+          </p>
+          {pnl.exposure_summary && (
+            <p style={{ color: "var(--muted)", fontSize: "0.8125rem", margin: 0 }}>
+              Open posities: {pnl.exposure_summary.open_positions_count} (exit-only:{" "}
+              {pnl.exposure_summary.exit_only_positions_count}, hard-blocked:{" "}
+              {pnl.exposure_summary.hard_blocked_positions_count}); net exposure (base):{" "}
+              {pnl.exposure_summary.net_base_position_s ?? "n.v.t."}
+            </p>
+          )}
+        </section>
+      )}
+
+      {safety && (
+        <section className="card" style={{ marginBottom: "1rem" }}>
+          <h2 style={{ fontSize: "1.1rem", marginBottom: "0.25rem" }}>F. Safety &amp; WS</h2>
+          <p style={{ color: "var(--muted)", fontSize: "0.875rem", marginBottom: "0.25rem" }}>
+            Normal:{" "}
+            <strong style={{ color: "var(--fg)" }}>{safety.safety_normal_count}</strong> · Exit-only:{" "}
+            {safety.safety_exit_only_count} · Hard-blocked: {safety.safety_hard_blocked_count}
+          </p>
+          <p style={{ color: "var(--muted)", fontSize: "0.8125rem", margin: 0 }}>
+            Symbolen per safety-mode:{" "}
+            {safety.symbol_safety_active_modes && safety.symbol_safety_active_modes.length > 0
+              ? `${safety.symbol_safety_active_modes.length} symbolen met expliciete modus`
+              : "geen per-symbol safety-modes in snapshot."}
           </p>
         </section>
       )}
-      {safety && (
+
+      <section className="card" style={{ marginBottom: "1rem" }}>
+        <h2 style={{ fontSize: "1.1rem", marginBottom: "0.25rem" }}>G. Market / pair summary</h2>
+        <p style={{ color: "var(--muted)", fontSize: "0.875rem", marginBottom: 0 }}>
+          Markt- en pairsamenvatting (spreads, suitability, L3-kwaliteit) blijft op het Tier 1 dashboard staan.
+          Gebruik daarvoor de{" "}
+          <Link href="/dashboard" style={{ color: "var(--accent)", textDecoration: "none" }}>
+            Data-pagina
+          </Link>{" "}
+          met de MarketSummary-module.
+        </p>
+      </section>
+
+      {execution && (
         <section className="card" style={{ marginBottom: "1rem" }}>
-          <h2 style={{ fontSize: "1.1rem", marginBottom: "0.5rem" }}>Safety</h2>
-          <p style={{ color: "var(--muted)", fontSize: "0.875rem", margin: 0 }}>
-            Normal: <strong style={{ color: "var(--fg)" }}>{safety.safety_normal_count}</strong> · Exit-only: {safety.safety_exit_only_count} · Hard-blocked: {safety.safety_hard_blocked_count}
+          <h2 style={{ fontSize: "1.1rem", marginBottom: "0.25rem" }}>H. Shadow trades</h2>
+          <p style={{ color: "var(--muted)", fontSize: "0.8125rem", marginBottom: "0.25rem" }}>
+            Outcome-distributie: {summarizeLabelCounts(execution.shadow_outcome_counts)}
+          </p>
+          <p style={{ color: "var(--muted)", fontSize: "0.8125rem", margin: 0 }}>
+            Missed-move histogram: {summarizeMissedMoves(execution.shadow_missed_move_histogram)}
+          </p>
+        </section>
+      )}
+
+      {execution && (
+        <section className="card" style={{ marginBottom: "1.5rem" }}>
+          <h2 style={{ fontSize: "1.1rem", marginBottom: "0.25rem" }}>I. Event buffer KPI</h2>
+          <p style={{ color: "var(--muted)", fontSize: "0.8125rem", margin: 0 }}>
+            {summarizeEventBuffer(execution.event_buffer_kpis)}
           </p>
         </section>
       )}
