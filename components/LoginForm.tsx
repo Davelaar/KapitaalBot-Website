@@ -28,12 +28,21 @@ export function LoginForm() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
+        if (typeof window !== "undefined" && (window as any).plausible) {
+          (window as any).plausible("login_failure");
+        }
         setError(data.error ?? t(locale, "login.error"));
         return;
+      }
+      if (typeof window !== "undefined" && (window as any).plausible) {
+        (window as any).plausible("login_success");
       }
       router.push(next);
       router.refresh();
     } catch {
+      if (typeof window !== "undefined" && (window as any).plausible) {
+        (window as any).plausible("login_failure");
+      }
       setError(t(locale, "login.error"));
     } finally {
       setLoading(false);

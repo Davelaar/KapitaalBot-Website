@@ -61,6 +61,10 @@ const FLAG_ICON: Record<Locale, () => JSX.Element> = {
 
 export function LanguageSwitcher() {
   const setLocale = useCallback((locale: Locale) => {
+    if (typeof window !== "undefined" && (window as any).plausible) {
+      // Plausible supports simple event names; payloads are optional.
+      (window as any).plausible("language_switch");
+    }
     document.cookie = `NEXT_LOCALE=${locale};path=/;max-age=31536000`;
     window.location.reload();
   }, []);

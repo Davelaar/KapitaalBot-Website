@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useLocale } from "@/lib/locale";
 import { t } from "@/lib/i18n";
 import type { PublicDemoTrades } from "@/lib/snapshots";
@@ -11,6 +12,13 @@ export interface DemoTradeTeaserProps {
 
 export default function DemoTradeTeaser({ demo, maxItems = 5 }: DemoTradeTeaserProps) {
   const locale = useLocale();
+
+  useEffect(() => {
+    if (!demo) return;
+    if (typeof window === "undefined") return;
+    if (!(window as any).plausible) return;
+    (window as any).plausible("demo_trade_view");
+  }, [demo]);
 
   if (!demo) {
     return (

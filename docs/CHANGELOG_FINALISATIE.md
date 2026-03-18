@@ -30,6 +30,12 @@
 
 ---
 
+## 2026-03-18 — Analytics events (FAQ/Tier2/demo/lang/login)
+
+- **DemoTradeTeaser** — Plausible event `demo_trade_view` bij render van demo trades.
+- **LanguageSwitcher** — Plausible event `language_switch` bij taalwissel (voor reload).
+- **LoginForm** — Plausible event `login_success` of `login_failure` na submit naar `/api/auth/session`.
+
 ## Gewijzigde en nieuwe bestanden (finalisatie)
 
 ### Nieuwe bestanden
