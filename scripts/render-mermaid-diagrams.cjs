@@ -83,7 +83,10 @@ async function renderDiagram(code, id, outName) {
     .replace(/fill:#1f2020/g, "fill:#2f2f2f")
     .replace(/stroke:#ccc/g, "stroke:#ffffff")
     .replace(/stroke:lightgrey/g, "stroke:#ffffff")
-    .replace(/stroke-width:1px/g, "stroke-width:2px");
+    .replace(/stroke-width:1px/g, "stroke-width:2px")
+    // Mermaid kan foreignObject voor labels genereren met width/height = 0 (vaak niet-rendert in Safari).
+    // Vervang die 0x0 door een praktische labelmaat.
+    .replace(/<foreignObject width="0" height="0">/g, '<foreignObject width="200" height="60">');
 
   const outPath = path.join(outDir, outName);
   fs.writeFileSync(outPath, svgFixed, "utf-8");
