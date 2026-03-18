@@ -56,16 +56,32 @@ export function MermaidRenderer({ code, id }: MermaidRendererProps) {
         : "Data-exportpijplijn van bot naar observability-website";
 
   return (
-    <div style={{ overflowX: "auto", marginBottom: "0.75rem" }}>
+    <div style={{ overflowX: "auto", marginBottom: "0.75rem", width: "100%" }}>
       {svgMarkup ? (
         <div
           aria-label={ariaLabel}
+          className={`mermaid-svg-inline mermaid-svg-${key}`}
           // SVG wordt build-time gegenereerd; we geven het als pure markup weer.
           dangerouslySetInnerHTML={{ __html: svgMarkup }}
-          style={{ maxWidth: "100%" }}
-        />
+          style={{ maxWidth: "100%", width: "100%" }}
+        >
+          {/* Ensure the inline SVG gets a deterministic layout in Safari */}
+          <style>{`
+            .mermaid-svg-${key} svg {
+              max-width: 100%;
+              width: 100%;
+              height: auto;
+              display: block;
+            }
+          `}</style>
+        </div>
       ) : (
-        <img src={filename} alt={ariaLabel} style={{ maxWidth: "100%", height: "auto", display: "block" }} loading="lazy" />
+        <img
+          src={filename}
+          alt={ariaLabel}
+          style={{ maxWidth: "100%", width: "100%", height: "auto", display: "block" }}
+          loading="lazy"
+        />
       )}
     </div>
   );
