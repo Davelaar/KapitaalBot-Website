@@ -52,6 +52,8 @@ export default async function RootLayout({
         </div>
         <script
           type="application/ld+json"
+          // Important: use an explicit closing tag (no children) to avoid
+          // React error #60 in some runtimes.
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
@@ -61,7 +63,7 @@ export default async function RootLayout({
               description: t(lang, "hero.subline"),
             }),
           }}
-        />
+        ></script>
         <Analytics />
       </body>
     </html>
