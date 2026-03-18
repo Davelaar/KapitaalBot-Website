@@ -164,16 +164,22 @@ async function renderDiagram(code, id, outName) {
         .replace(/font-size:18px/g, `font-size:${font18}px`)
         .replace(/stroke-width:2px/g, `stroke-width:${strokePx}px`)
         .replace(/stroke-width:2\.0px/g, `stroke-width:${strokePx}px`);
-      // Node-rect vergroten zodat ze de geschaalde tekst bedekken; anders lopen lijnen door de tekst.
+      // Node-rect flink vergroten zodat geschaalde tekst ruim binnen de rect valt; anders lijnen door tekst.
       const scale = baseFontPx / 16;
+      const pad = Math.round(baseFontPx * 1.2); // extra marge rond tekst
       svgFixed = svgFixed.replace(
         /<rect class="basic label-container" style="" x="(-?[\d.]+)" y="(-?[\d.]+)" width="([\d.]+)" height="([\d.]+)"[^>]*>/g,
         (_m, _x, _y, w, h) => {
-          const W = Math.max(80, Math.round(Number(w) * scale));
-          const H = Math.max(40, Math.round(Number(h) * scale));
+          const W = Math.max(120, Math.round(Number(w) * scale) + pad * 2);
+          const H = Math.max(60, Math.round(Number(h) * scale) + pad * 2);
           if (!Number.isFinite(W) || !Number.isFinite(H)) return _m;
           return `<rect class="basic label-container" style="" x="${-W / 2}" y="${-H / 2}" width="${W}" height="${H}" fill="#2f2f2f">`;
         }
+      );
+      // Path-based node shapes (bijv. rounded) ook ondoorzichtig maken zodat lijnen niet door tekst lopen.
+      svgFixed = svgFixed.replace(
+        /<path class="basic label-container"([^>]*)>/g,
+        (m, rest) => (rest.includes('fill=') ? m : `<path class="basic label-container" fill="#2f2f2f"${rest}>`)
       );
     }
   }
