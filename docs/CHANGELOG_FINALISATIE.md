@@ -23,6 +23,11 @@
 - **Root layout** — `html lang` afgeleid van `NEXT_LOCALE` cookie, zodat SEO/i18n-meta en toegankelijkheid per taal kloppen; Analytics-component blijft client-side.
 - **Homepage** — Hero-sectie uitgebreid met compact Mermaid-architectuurdiagram (state-first: ingest → state → route/exec → observability snapshots → Tier 1 / Tier 2), als visuele samenvatting van het SSOT-architectuurverhaal.
 
+## 2026-03-18 — FAQ-bot: retrieval-based docs lookup
+
+- **FAQ/API (`/api/faq-chat`)** — Eerst retrieval op basis van SSOT/CURRENT docs (tier-aware) uit `content/docs/*`, daarna optioneel OpenAI-herformulering als `OPENAI_API_KEY` beschikbaar is (altijd zonder code/thresholds/recepten).
+- **FAQ UI (`FaqChatbot`)** — Laat gebruikte bronnen zien als links naar `/docs/[slug]`.
+
 ---
 
 ## Gewijzigde en nieuwe bestanden (finalisatie)
