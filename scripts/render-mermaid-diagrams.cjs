@@ -84,6 +84,42 @@ async function renderDiagram(code, id, outName) {
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&apos;");
 
+  // Bounding box uit content halen en viewBox corrigeren.
+  // Mermaid in jsdom zet viewBox op 816x616 terwijl nodes op 400–5000+ staan → diagram buiten beeld.
+  function computeViewBox(svgStr) {
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    const pad = 24;
+    let m;
+
+    // translate(x, y) — node- en labelposities
+    const transRe = /translate\(\s*([-\d.]+)\s*,\s*([-\d.]+)\s*\)/g;
+    while ((m = transRe.exec(svgStr)) !== null) {
+      const x = parseFloat(m[1]), y = parseFloat(m[2]);
+      minX = Math.min(minX, x); minY = Math.min(minY, y);
+      maxX = Math.max(maxX, x); maxY = Math.max(maxY, y);
+    }
+
+    // path d="M x,y L x,y ..." — lijnen
+    const pathRe = /[ML]\s*([-\d.]+)\s*[, ]\s*([-\d.]+)/g;
+    while ((m = pathRe.exec(svgStr)) !== null) {
+      const x = parseFloat(m[1]), y = parseFloat(m[2]);
+      minX = Math.min(minX, x); minY = Math.min(minY, y);
+      maxX = Math.max(maxX, x); maxY = Math.max(maxY, y);
+    }
+
+    // rect x,y,width,height — clusters e.d.
+    const rectRe = /<rect[^>]*\sx="([-\d.]+)"[^>]*\sy="([-\d.]+)"[^>]*\swidth="([-\d.]+)"[^>]*\sheight="([-\d.]+)"/gi;
+    while ((m = rectRe.exec(svgStr)) !== null) {
+      const x = parseFloat(m[1]), y = parseFloat(m[2]), w = parseFloat(m[3]), h = parseFloat(m[4]);
+      minX = Math.min(minX, x); minY = Math.min(minY, y);
+      maxX = Math.max(maxX, x + w); maxY = Math.max(maxY, y + h);
+    }
+
+    if (minX === Infinity) return null;
+    minX -= pad; minY -= pad; maxX += pad; maxY += pad;
+    return `${minX} ${minY} ${maxX - minX} ${maxY - minY}`;
+  }
+
   let svgFixed = svg
     // Schaal constraint breed weghalen: ook als Mermaid ineens een andere px waarde kiest.
     .replace(/max-width:\s*\d+(\.\d+)?px;/g, "max-width: 100%;")
@@ -105,6 +141,11 @@ async function renderDiagram(code, id, outName) {
         return `<text x="0" y="0" text-anchor="middle" dominant-baseline="middle" style="font-size:16px;fill:#ccc;">${escaped}</text>`;
       }
     );
+
+  const newViewBox = computeViewBox(svgFixed);
+  if (newViewBox) {
+    svgFixed = svgFixed.replace(/viewBox="[^"]*"/, `viewBox="${newViewBox}"`);
+  }
 
   const outPath = path.join(outDir, outName);
   fs.writeFileSync(outPath, svgFixed, "utf-8");
