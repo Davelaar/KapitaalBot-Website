@@ -76,7 +76,15 @@ async function renderDiagram(code, id, outName) {
   const { svg } = await mermaid.render(id, code.trim());
   // Defensieve fix: sommige Mermaid versies/evaluaties injecteren een max-width constraint in de root.
   // We verwijderen die constraint zodat de SVG normaal schaalbaar is via <img> of CSS.
-  const svgFixed = svg.replace(/max-width:\s*16px;/g, "max-width: 100%;");
+  let svgFixed = svg
+    // Schaal constraint breed weghalen: ook als Mermaid ineens een andere px waarde kiest.
+    .replace(/max-width:\s*\d+(\.\d+)?px;/g, "max-width: 100%;")
+    // Contrast boost: shapes/edges zichtbaar op donkere site.
+    .replace(/fill:#1f2020/g, "fill:#2f2f2f")
+    .replace(/stroke:#ccc/g, "stroke:#ffffff")
+    .replace(/stroke:lightgrey/g, "stroke:#ffffff")
+    .replace(/stroke-width:1px/g, "stroke-width:2px");
+
   const outPath = path.join(outDir, outName);
   fs.writeFileSync(outPath, svgFixed, "utf-8");
   console.log(`Rendered ${id} -> ${outPath}`);
