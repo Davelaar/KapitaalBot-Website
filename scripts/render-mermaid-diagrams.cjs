@@ -33,7 +33,14 @@ async function renderDiagram(code, id, outName) {
   // jsdom heeft geen echte layout engine; Mermaid gebruikt getBBox om labels te meten.
   // Monkey-patch een minimale getBBox zodat render niet crasht.
   if (dom.window.SVGElement) {
-    dom.window.SVGElement.prototype.getBBox = () => ({ x: 0, y: 0, width: 0, height: 0 });
+    // Geef een realistische bbox zodat Mermaid niet uitkomt op een tiny max-width
+    // (in de gegenereerde SVG root verscheen anders `style="max-width: 16px;"`).
+    dom.window.SVGElement.prototype.getBBox = () => ({
+      x: 0,
+      y: 0,
+      width: 800,
+      height: 600,
+    });
   }
 
   // Mermaid expects DOMPurify to be an instance with .sanitize/.addHook.
@@ -55,8 +62,11 @@ async function renderDiagram(code, id, outName) {
   });
 
   const { svg } = await mermaid.render(id, code.trim());
+  // Defensieve fix: sommige Mermaid versies/evaluaties injecteren een max-width constraint in de root.
+  // We verwijderen die constraint zodat de SVG normaal schaalbaar is via <img> of CSS.
+  const svgFixed = svg.replace(/max-width:\s*16px;/g, "max-width: 100%;");
   const outPath = path.join(outDir, outName);
-  fs.writeFileSync(outPath, svg, "utf-8");
+  fs.writeFileSync(outPath, svgFixed, "utf-8");
   console.log(`Rendered ${id} -> ${outPath}`);
 }
 
