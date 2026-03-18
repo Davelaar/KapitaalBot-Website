@@ -59,6 +59,9 @@ async function renderDiagram(code, id, outName) {
     startOnLoad: false,
     theme: "dark",
     securityLevel: "loose",
+    // Render labels as pure SVG (<text>) i.p.v. foreignObject.
+    // Safari can render foreignObject inconsistently inside external SVG images.
+    flowchart: { htmlLabels: false },
   });
 
   const { svg } = await mermaid.render(id, code.trim());
