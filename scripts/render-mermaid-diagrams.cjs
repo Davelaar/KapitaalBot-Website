@@ -166,11 +166,12 @@ async function renderDiagram(code, id, outName) {
       // Node-rect vergroten zodat ze de geschaalde tekst bedekken; anders lopen lijnen door de tekst.
       const scale = baseFontPx / 16;
       svgFixed = svgFixed.replace(
-        /<rect class="basic label-container" style="" x="(-?[\d.]+)" y="(-?[\d.]+)" width="([\d.]+)" height="([\d.]+)"\s*\/?>/g,
+        /<rect class="basic label-container" style="" x="(-?[\d.]+)" y="(-?[\d.]+)" width="([\d.]+)" height="([\d.]+)"[^>]*>/g,
         (_m, _x, _y, w, h) => {
           const W = Math.max(80, Math.round(Number(w) * scale));
           const H = Math.max(40, Math.round(Number(h) * scale));
-          return `<rect class="basic label-container" style="" x="${-W / 2}" y="${-H / 2}" width="${W}" height="${H}" fill="#2f2f2f"></rect>`;
+          if (!Number.isFinite(W) || !Number.isFinite(H)) return _m;
+          return `<rect class="basic label-container" style="" x="${-W / 2}" y="${-H / 2}" width="${W}" height="${H}" fill="#2f2f2f">`;
         }
       );
     }
