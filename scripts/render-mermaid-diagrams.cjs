@@ -164,34 +164,10 @@ async function renderDiagram(code, id, outName) {
         .replace(/font-size:18px/g, `font-size:${font18}px`)
         .replace(/stroke-width:2px/g, `stroke-width:${strokePx}px`)
         .replace(/stroke-width:2\.0px/g, `stroke-width:${strokePx}px`);
-      // Node-rect flink vergroten zodat geschaalde tekst ruim binnen de rect valt; anders lijnen door tekst.
-      const scale = baseFontPx / 16;
-      const pad = Math.round(baseFontPx * 1.2); // extra marge rond tekst
-      svgFixed = svgFixed.replace(
-        /<rect class="basic label-container" style="" x="(-?[\d.]+)" y="(-?[\d.]+)" width="([\d.]+)" height="([\d.]+)"[^>]*>/g,
-        (_m, _x, _y, w, h) => {
-          const W = Math.max(120, Math.round(Number(w) * scale) + pad * 2);
-          const H = Math.max(60, Math.round(Number(h) * scale) + pad * 2);
-          if (!Number.isFinite(W) || !Number.isFinite(H)) return _m;
-          return `<rect class="basic label-container" style="" x="${-W / 2}" y="${-H / 2}" width="${W}" height="${H}" fill="#2f2f2f" fill-opacity="1">`;
-        }
-      );
-      // Path-based node shapes (bijv. rounded) ook ondoorzichtig maken.
-      svgFixed = svgFixed.replace(
-        /<path class="basic label-container"([^>]*)>/g,
-        (m, rest) => (rest.includes('fill=') ? m : `<path class="basic label-container" fill="#2f2f2f" fill-opacity="1"${rest}>`)
-      );
-      // Extra: label-groep krijgt een dekkende rect direct achter de tekst (dubbel vangnet).
-      const labelRectW = Math.round(baseFontPx * 6);
-      const labelRectH = Math.round(baseFontPx * 1.8);
+      // Eén ding: vaste achtergrondrect direct achter de tekst in elke node (lijnen niet door tekst).
       svgFixed = svgFixed.replace(
         /<g class="label" style="" transform="translate\(0, 0\)"><rect><\/rect>/g,
-        `<g class="label" style="" transform="translate(0, 0)"><rect x="${-labelRectW / 2}" y="${-labelRectH / 2}" width="${labelRectW}" height="${labelRectH}" fill="#2f2f2f" fill-opacity="1"></rect>`
-      );
-      // Nodes-groep expliciet boven edges laten tekenen (Safari stacking).
-      svgFixed = svgFixed.replace(
-        /<g class="nodes">/,
-        '<g class="nodes" style="isolation:isolate">'
+        '<g class="label" style="" transform="translate(0, 0)"><rect x="-260" y="-50" width="520" height="100" fill="#2f2f2f"/>'
       );
     }
   }
