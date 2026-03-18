@@ -101,7 +101,8 @@ async function renderDiagram(code, id, outName) {
         const label = String(rawLabel ?? "").replace(/\s+/g, " ").trim();
         const escaped = escapeXml(label);
         // Label groups zitten in een <g transform="..."> waarin (0,0) de box-center is.
-        return `<text x="0" y="0" text-anchor="middle" dominant-baseline="middle" style="font-family:\"trebuchet ms\",verdana,arial,sans-serif;font-size:16px;fill:#ccc;">${escaped}</text>`;
+        // We vermijden font-family quotes in het style attribuut; de root SVG zet al font-family.
+        return `<text x="0" y="0" text-anchor="middle" dominant-baseline="middle" style="font-size:16px;fill:#ccc;">${escaped}</text>`;
       }
     );
 
