@@ -17,6 +17,10 @@ export default function Error({
     console.error(error);
   }, [error]);
 
+  const debugName = (error as any)?.name ?? "NO_NAME";
+  const debugMessage = error?.message ?? "NO_MESSAGE";
+  const debugDigest = (error as any)?.digest ?? "NO_DIGEST";
+
   return (
     <main>
       <div className="card" style={{ maxWidth: "480px" }}>
@@ -24,6 +28,25 @@ export default function Error({
         <p style={{ color: "var(--muted)", marginBottom: "1rem" }}>
           {t(locale, "global.error.message")}
         </p>
+        <pre
+          style={{
+            marginTop: "0.25rem",
+            marginBottom: "1rem",
+            padding: "0.75rem",
+            background: "rgba(255,255,255,0.06)",
+            border: "1px solid rgba(255,255,255,0.12)",
+            borderRadius: 8,
+            whiteSpace: "pre-wrap",
+            wordBreak: "break-word",
+            fontSize: "0.85rem",
+            color: "#cbd5e1",
+          }}
+        >
+DEBUG_ERROR
+name: {debugName}
+message: {debugMessage}
+digest: {debugDigest}
+        </pre>
         <button
           type="button"
           onClick={reset}
