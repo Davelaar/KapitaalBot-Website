@@ -145,6 +145,25 @@ async function renderDiagram(code, id, outName) {
   const newViewBox = computeViewBox(svgFixed);
   if (newViewBox) {
     svgFixed = svgFixed.replace(/viewBox="[^"]*"/, `viewBox="${newViewBox}"`);
+    // Diagram is vaak heel breed → bij width:100% wordt tekst microscopisch. Schaal font op
+    // viewBox-breedte zodat bij ~1000px weergave de tekst ~14px blijft (leesbaar op desktop).
+    const vbMatch = newViewBox.match(/^(-?[\d.]+)\s+(-?[\d.]+)\s+([\d.]+)\s+([\d.]+)$/);
+    if (vbMatch) {
+      const vbWidth = parseFloat(vbMatch[3]);
+      const refDisplayWidth = 1000;
+      const desiredFontPx = 14;
+      let baseFontPx = Math.round((desiredFontPx * vbWidth) / refDisplayWidth);
+      baseFontPx = Math.max(20, Math.min(96, baseFontPx));
+      const font12 = Math.round(baseFontPx * 0.75);
+      const font18 = Math.round(baseFontPx * 1.125);
+      const strokePx = Math.min(8, Math.max(2, Math.round(2 * (baseFontPx / 16))));
+      svgFixed = svgFixed
+        .replace(/font-size:16px/g, `font-size:${baseFontPx}px`)
+        .replace(/font-size:12px/g, `font-size:${font12}px`)
+        .replace(/font-size:18px/g, `font-size:${font18}px`)
+        .replace(/stroke-width:2px/g, `stroke-width:${strokePx}px`)
+        .replace(/stroke-width:2\.0px/g, `stroke-width:${strokePx}px`);
+    }
   }
 
   const outPath = path.join(outDir, outName);
