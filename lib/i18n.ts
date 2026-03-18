@@ -139,6 +139,9 @@ const strings: Record<Locale, Record<string, string>> = {
     "tier_gate.tier3.message": "Deze pagina is alleen toegankelijk voor beheerders. Log in met admin-rechten.",
     "tier_gate.request_access": "Toegang aanvragen",
     "tier_gate.login": "Inloggen",
+    "global.error.title": "Fout",
+    "global.error.message": "Er is een fout opgetreden. Probeer de pagina te vernieuwen.",
+    "global.error.retry": "Opnieuw proberen",
   },
   en: {
     "nav.home": "Home",
@@ -269,6 +272,9 @@ const strings: Record<Locale, Record<string, string>> = {
     "tier_gate.tier3.message": "This page is only accessible to administrators. Log in with admin rights.",
     "tier_gate.request_access": "Request access",
     "tier_gate.login": "Log in",
+    "global.error.title": "Error",
+    "global.error.message": "An error occurred. Please try refreshing the page.",
+    "global.error.retry": "Try again",
   },
   de: {
     "nav.home": "Start",
@@ -399,6 +405,9 @@ const strings: Record<Locale, Record<string, string>> = {
     "tier_gate.tier3.message": "Diese Seite ist nur für Administratoren zugänglich. Mit Admin-Rechten anmelden.",
     "tier_gate.request_access": "Zugang anfragen",
     "tier_gate.login": "Anmelden",
+    "global.error.title": "Fehler",
+    "global.error.message": "Beim Laden ist ein Fehler aufgetreten. Bitte die Seite neu laden.",
+    "global.error.retry": "Nochmal versuchen",
   },
   fr: {
     "nav.home": "Accueil",
@@ -529,6 +538,9 @@ const strings: Record<Locale, Record<string, string>> = {
     "tier_gate.tier3.message": "Cette page est réservée aux administrateurs. Connectez-vous avec les droits admin.",
     "tier_gate.request_access": "Demander l'accès",
     "tier_gate.login": "Connexion",
+    "global.error.title": "Erreur",
+    "global.error.message": "Une erreur est survenue. Veuillez actualiser la page.",
+    "global.error.retry": "Réessayer",
   },
 };
 

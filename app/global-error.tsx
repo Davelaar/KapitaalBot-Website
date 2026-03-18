@@ -1,4 +1,8 @@
+// global-error is rendered on the client (error boundary), so keep it as a client component
 "use client";
+
+import { useLocale } from "@/lib/locale";
+import { t } from "@/lib/i18n";
 
 export default function GlobalError({
   error,
@@ -7,11 +11,16 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const locale = useLocale();
+  const title = t(locale, "global.error.title");
+  const message = t(locale, "global.error.message");
+  const retry = t(locale, "global.error.retry");
+
   return (
-    <html lang="nl">
+    <html lang={locale}>
       <body style={{ margin: 0, fontFamily: "system-ui", padding: "2rem", background: "#0f1419", color: "#e6edf3" }}>
-        <h1 style={{ fontSize: "1.25rem" }}>Fout</h1>
-        <p style={{ color: "#8b949e" }}>Er is een fout opgetreden. Probeer de pagina te vernieuwen.</p>
+        <h1 style={{ fontSize: "1.25rem" }}>{title}</h1>
+        <p style={{ color: "#8b949e" }}>{message}</p>
         <button
           type="button"
           onClick={reset}
@@ -26,7 +35,7 @@ export default function GlobalError({
             cursor: "pointer",
           }}
         >
-          Opnieuw proberen
+          {retry}
         </button>
       </body>
     </html>
