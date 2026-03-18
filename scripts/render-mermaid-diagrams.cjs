@@ -43,6 +43,15 @@ async function renderDiagram(code, id, outName) {
     });
   }
 
+  // Mermaid gebruikt ook getComputedTextLength voor het formatteren van (SVG) labels.
+  // jsdom implementeert dit vaak niet; patch een minimale waarde.
+  if (dom.window.SVGTextContentElement && typeof dom.window.SVGTextContentElement.prototype.getComputedTextLength !== "function") {
+    dom.window.SVGTextContentElement.prototype.getComputedTextLength = () => 120;
+  }
+  if (dom.window.SVGElement && typeof dom.window.SVGElement.prototype.getComputedTextLength !== "function") {
+    dom.window.SVGElement.prototype.getComputedTextLength = () => 120;
+  }
+
   // Mermaid expects DOMPurify to be an instance with .sanitize/.addHook.
   // With dompurify v3, the default export is a factory; patch it so Mermaid can use it.
   const dompurifyMod = await import("dompurify");
