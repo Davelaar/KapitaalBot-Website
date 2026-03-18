@@ -173,13 +173,25 @@ async function renderDiagram(code, id, outName) {
           const W = Math.max(120, Math.round(Number(w) * scale) + pad * 2);
           const H = Math.max(60, Math.round(Number(h) * scale) + pad * 2);
           if (!Number.isFinite(W) || !Number.isFinite(H)) return _m;
-          return `<rect class="basic label-container" style="" x="${-W / 2}" y="${-H / 2}" width="${W}" height="${H}" fill="#2f2f2f">`;
+          return `<rect class="basic label-container" style="" x="${-W / 2}" y="${-H / 2}" width="${W}" height="${H}" fill="#2f2f2f" fill-opacity="1">`;
         }
       );
-      // Path-based node shapes (bijv. rounded) ook ondoorzichtig maken zodat lijnen niet door tekst lopen.
+      // Path-based node shapes (bijv. rounded) ook ondoorzichtig maken.
       svgFixed = svgFixed.replace(
         /<path class="basic label-container"([^>]*)>/g,
-        (m, rest) => (rest.includes('fill=') ? m : `<path class="basic label-container" fill="#2f2f2f"${rest}>`)
+        (m, rest) => (rest.includes('fill=') ? m : `<path class="basic label-container" fill="#2f2f2f" fill-opacity="1"${rest}>`)
+      );
+      // Extra: label-groep krijgt een dekkende rect direct achter de tekst (dubbel vangnet).
+      const labelRectW = Math.round(baseFontPx * 6);
+      const labelRectH = Math.round(baseFontPx * 1.8);
+      svgFixed = svgFixed.replace(
+        /<g class="label" style="" transform="translate\(0, 0\)"><rect><\/rect>/g,
+        `<g class="label" style="" transform="translate(0, 0)"><rect x="${-labelRectW / 2}" y="${-labelRectH / 2}" width="${labelRectW}" height="${labelRectH}" fill="#2f2f2f" fill-opacity="1"></rect>`
+      );
+      // Nodes-groep expliciet boven edges laten tekenen (Safari stacking).
+      svgFixed = svgFixed.replace(
+        /<g class="nodes">/,
+        '<g class="nodes" style="isolation:isolate">'
       );
     }
   }
