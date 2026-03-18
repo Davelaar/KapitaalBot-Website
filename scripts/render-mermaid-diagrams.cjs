@@ -30,6 +30,12 @@ async function renderDiagram(code, id, outName) {
   global.HTMLElement = dom.window.HTMLElement;
   global.navigator = dom.window.navigator;
 
+  // jsdom heeft geen echte layout engine; Mermaid gebruikt getBBox om labels te meten.
+  // Monkey-patch een minimale getBBox zodat render niet crasht.
+  if (dom.window.SVGElement) {
+    dom.window.SVGElement.prototype.getBBox = () => ({ x: 0, y: 0, width: 0, height: 0 });
+  }
+
   // Mermaid expects DOMPurify to be an instance with .sanitize/.addHook.
   // With dompurify v3, the default export is a factory; patch it so Mermaid can use it.
   const dompurifyMod = await import("dompurify");
