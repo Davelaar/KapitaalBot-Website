@@ -1,89 +1,38 @@
-"use client";
-
-import { useEffect, useRef, useState } from "react";
-
 interface MermaidRendererProps {
   code: string;
   id?: string;
 }
 
 export function MermaidRenderer({ code, id }: MermaidRendererProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [svg, setSvg] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!code?.trim() || !containerRef.current) return;
-    const uid = id || `mermaid-${Math.random().toString(36).slice(2, 9)}`;
-    let cancelled = false;
-
-    async function render() {
-      try {
-        const mermaid = (await import("mermaid")).default;
-        mermaid.initialize({
-          startOnLoad: false,
-          theme: "dark",
-          securityLevel: "loose",
-        });
-        const { svg: out } = await mermaid.render(uid, code.trim());
-        if (!cancelled) {
-          setSvg(out);
-          setError(null);
-        }
-      } catch (e: unknown) {
-        if (!cancelled) {
-          setError(e instanceof Error ? e.message : "Diagram failed to render");
-          setSvg(null);
-        }
-      }
-    }
-
-    render();
-    return () => {
-      cancelled = true;
-    };
-  }, [code, id]);
-
-  if (error) {
-    return (
-      <div
-        style={{
-          padding: "1rem",
-          border: "1px solid var(--border)",
-          borderRadius: 8,
-          fontSize: "0.875rem",
-          color: "var(--muted)",
-        }}
-      >
-        Diagram: {error}
-      </div>
-    );
+  const key = id || code;
+  let filename = "";
+  if (key === "home-arch-diagram") {
+    filename = "/diagrams/home-architecture-flow.svg";
+  } else if (key === "tier-flow") {
+    filename = "/diagrams/tier-model-observability.svg";
+  } else if (key === "bot-flow") {
+    filename = "/diagrams/bot-export-pipeline.svg";
   }
 
-  if (svg) {
-    return (
-      <div
-        ref={containerRef}
-        className="mermaid-output"
-        dangerouslySetInnerHTML={{ __html: svg }}
-        style={{ overflowX: "auto", marginBottom: "0.75rem" }}
-      />
-    );
+  // Fallback: show nothing if we do not have a mapped SVG yet.
+  if (!filename) {
+    return null;
   }
 
   return (
-    <div
-      ref={containerRef}
-      style={{
-        minHeight: 60,
-        padding: "1rem",
-        border: "1px solid var(--border)",
-        borderRadius: 8,
-        fontSize: "0.875rem",
-        color: "var(--muted)",
-      }}
-    >
-      …
+    <div style={{ overflowX: "auto", marginBottom: "0.75rem" }}>
+      <img
+        src={filename}
+        alt={
+          key === "home-arch-diagram"
+            ? "Architectuur van KapitaalBot observability en dataflow"
+            : key === "tier-flow"
+            ? "Tier-model van observability (Tier 1, Tier 2, Tier 3)"
+            : "Data-exportpijplijn van bot naar observability-website"
+        }
+        style={{ maxWidth: "100%", height: "auto", display: "block" }}
+        loading="lazy"
+      />
     </div>
   );
 }
