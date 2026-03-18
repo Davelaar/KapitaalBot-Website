@@ -185,17 +185,209 @@ flowchart TB
 
   // 2) Render any additional ```mermaid blocks found in repo docs/.
   // These are used by DocViewer via MermaidRenderer (hash-based filenames).
-  const docsDir = path.join(process.cwd(), "..", "docs");
-  const mdFiles = [];
-  walkMdFiles(docsDir, mdFiles);
-
   const codeByHash = new Map();
-  for (const filePath of mdFiles) {
-    const md = fs.readFileSync(filePath, "utf-8");
-    const blocks = extractMermaidBlocks(md);
-    for (const code of blocks) {
+
+  // On the server we don't have access to the repo root `docs/` folder.
+  // So we support two modes:
+  // - if ../docs exists: scan automatically
+  // - otherwise: fall back to the mermaid blocks we know exist in this project
+  //   (see `KRAKENBOTMAART/docs/*`).
+  const docsDir = path.join(process.cwd(), "..", "docs");
+
+  const fallbackMermaidBlocks = [
+    // docs/ENGINE_SSOT.md (section 8 Runtime topology (diagram))
+    `
+flowchart TB
+  subgraph Ingest["Persistent Ingest (run-ingest)"]
+    WS[Public WS: ticker, trade, L2, L3]
+    Writer[Async writer]
+    UM[UniverseManager]
+    Epoch[ingest_epochs / lineage]
+    Snap[execution_universe_snapshots]
+    Refresh[refresh_run_symbol_state]
+    WS --> Writer
+    Writer --> DB_Ingest[(DB Ingest)]
+    UM --> Epoch
+    Epoch --> Snap
+    Snap --> DB_Ingest
+    DB_Ingest --> Refresh
+    Refresh --> State_Ingest[(run_symbol_state)]
+  end
+
+  Sync[sync_run_symbol_state_to_decision]
+
+  subgraph Decision["DB Decision (bij 2 pools)"]
+    DB_Decision[(DB Decision)]
+    State_Decision[(run_symbol_state)]
+    Epoch_D[ingest_epochs / snapshots]
+    Orders[execution_orders / fills]
+    DB_Decision --> State_Decision
+    DB_Decision --> Epoch_D
+    DB_Decision --> Orders
+  end
+
+  subgraph Execution["Execution (run-execution-live / execution-only)"]
+    Eval[Evaluation loop]
+    RefreshEval[refresh op ingest]
+    Readiness[Readiness from state]
+    Pipeline[Pipeline from state]
+    Gate[Generation gate + route freshness]
+    Submit[DB-first submit + OrderTracker]
+    AuthWS[Private WS: orders, fills]
+    Eval --> RefreshEval
+    RefreshEval --> Sync
+    Sync --> State_Decision
+    State_Decision --> Readiness
+    Readiness --> Pipeline
+    Pipeline --> Gate
+    Gate --> Submit
+    Submit --> AuthWS
+    AuthWS --> DB_Decision
+  end
+
+  State_Ingest --> Sync
+  Epoch_D --> Eval
+`.trim(),
+
+    // docs/VALIDATION_MODEL_CURRENT.md (section 7 Diagram)
+    `
+flowchart LR
+  Bootstrap[Bootstrap proof] --> Attach[Attach proof]
+  Attach --> Eval[Evaluation proof]
+  Eval --> Lifecycle[Lifecycle proof]
+  Eval --> Economic[Economically empty]
+  Eval --> DataBlocked[Data-blocked]
+  Attach --> AttachBlocked[Attach-blocked]
+`.trim(),
+
+    // docs/ARCHITECTURE_ENGINE_CURRENT.md (multiple mermaid blocks)
+    `
+flowchart TB
+  subgraph Ingest["Persistent Ingest (krakenbot run-ingest)"]
+    Ticker[Ticker WS]
+    Trade[Trade WS]
+    L2[L2 feed]
+    L3[L3 feed]
+    Writer[Async writer]
+    UM[UniverseManager]
+    Lineage[ingest_lineage]
+    Epoch[ingest_epochs]
+    Snap[execution_universe_snapshots]
+    Ticker --> Writer
+    Trade --> Writer
+    L2 --> Writer
+    L3 --> Writer
+    Writer --> DB_Ingest[(DB Ingest)]
+    UM --> Lineage
+    UM --> Epoch
+    Epoch --> Snap
+    Snap --> DB_Ingest
+    Lineage --> DB_Ingest
+  end
+
+  RefreshState[refresh_run_symbol_state]
+  Sync[sync → DB Decision]
+
+  subgraph Decision["DB Decision (bij 2 pools)"]
+    DB_Decision[(DB Decision)]
+    State_D[(run_symbol_state)]
+    Epoch_D[epochs / snapshots]
+    ExecTables[execution_orders / fills]
+  end
+
+  subgraph Execution["Execution (run-execution-live / run-execution-only)"]
+    EvalLoop[Evaluation loop]
+    Readiness[run_readiness_analysis_for_run_from_state]
+    Pipeline[run_strategy_pipeline_with_readiness]
+    Choke[choke_decide]
+    Submit[submit_and_wait_for_execution_reports]
+    OT[OrderTracker]
+    WS_Private[Private WS]
+    EvalLoop --> RefreshState
+    RefreshState --> Sync
+    Sync --> State_D
+    State_D --> Readiness
+    Readiness --> Pipeline
+    Pipeline --> Choke
+    Choke --> Submit
+    Submit --> OT
+    Submit --> WS_Private
+    WS_Private --> Fills[fills_ledger / state_machine]
+    Fills --> DB_Decision
+  end
+
+  DB_Ingest --> RefreshState
+  State_D --> Readiness
+  Epoch_D --> EvalLoop
+`.trim(),
+
+    `
+flowchart LR
+  WS[Public WS] --> Writer[writer]
+  Writer --> DB_Ingest[(DB Ingest: raw)]
+  DB_Ingest --> Refresh[refresh_run_symbol_state]
+  Refresh --> Sync[sync]
+  Sync --> State_D[(state op DB Decision)]
+  State_D --> Readiness[readiness from state]
+  Readiness --> Pipeline[strategy_pipeline]
+  Pipeline --> Gate[generation + route freshness]
+  Gate --> Outcomes[Execute / Skip]
+  Outcomes --> Runner[runner: 1st Execute]
+  Runner --> DBFirst[on_submitted]
+  DBFirst --> Kraken[Kraken add_order]
+  Kraken --> PrivateWS[Private WS]
+  PrivateWS --> OrderTracker[OrderTracker]
+  PrivateWS --> Fills[fills_ledger]
+  Fills --> DB_Decision[(DB Decision)]
+`.trim(),
+
+    `
+flowchart TB
+  Metrics[RegimeMetrics per pair]
+  Regime[detect_regime]
+  Strategies[candidate_strategies_for_regime]
+  ReadinessGate[readiness_gate: strategy-specific]
+  Rank[Rank by pair_score + edge]
+  Risk[run_risk_gate]
+  Plan[plan_execution]
+  Metrics --> Regime
+  Regime --> Strategies
+  Strategies --> ReadinessGate
+  ReadinessGate --> Rank
+  Rank --> Risk
+  Risk --> Plan
+`.trim(),
+
+    `
+stateDiagram-v2
+  [*] --> Candidate: pipeline Execute
+  Candidate --> DB_FIRST: on_submitted
+  DB_FIRST --> PendingSubmit: register OrderTracker
+  PendingSubmit --> PendingAck: add_order sent
+  PendingAck --> Filled: fill
+  PendingAck --> Rejected: reject
+  PendingAck --> Cancelled: cancel
+  Filled --> fills_ledger: position + realized_pnl
+  Rejected --> [*]
+  Cancelled --> [*]
+  Filled --> [*]
+`.trim(),
+  ];
+
+  if (fs.existsSync(docsDir)) {
+    const mdFiles = [];
+    walkMdFiles(docsDir, mdFiles);
+    for (const filePath of mdFiles) {
+      const md = fs.readFileSync(filePath, "utf-8");
+      const blocks = extractMermaidBlocks(md);
+      for (const code of blocks) {
+        const hash = fnv1a32Hex(code.trim());
+        if (!codeByHash.has(hash)) codeByHash.set(hash, code);
+      }
+    }
+  } else {
+    for (const code of fallbackMermaidBlocks) {
       const hash = fnv1a32Hex(code.trim());
-      // Keep first occurrence; blocks with same code produce same hash.
       if (!codeByHash.has(hash)) codeByHash.set(hash, code);
     }
   }
