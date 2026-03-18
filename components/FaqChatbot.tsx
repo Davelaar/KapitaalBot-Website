@@ -106,7 +106,7 @@ export function FaqChatbot() {
                     <Link href={`/docs/${slug}`} style={{ color: "var(--accent)", textDecoration: "none" }}>
                       {slug}
                     </Link>
-                    {i < m.sources.length - 1 ? ", " : ""}
+                    {i < m.sources!.length - 1 ? ", " : ""}
                   </span>
                 ))}
               </div>
