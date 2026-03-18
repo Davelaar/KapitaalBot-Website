@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
+import { useLocale } from "@/lib/locale";
+import { t } from "@/lib/i18n";
 
 export default function Error({
   error,
@@ -9,6 +11,8 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const locale = useLocale();
+
   useEffect(() => {
     console.error(error);
   }, [error]);
@@ -16,9 +20,9 @@ export default function Error({
   return (
     <main>
       <div className="card" style={{ maxWidth: "480px" }}>
-        <h2 style={{ fontSize: "1.125rem", marginBottom: "0.5rem" }}>Er is iets misgegaan</h2>
+        <h2 style={{ fontSize: "1.125rem", marginBottom: "0.5rem" }}>{t(locale, "global.error.title")}</h2>
         <p style={{ color: "var(--muted)", marginBottom: "1rem" }}>
-          De pagina kon niet worden geladen. Probeer het opnieuw.
+          {t(locale, "global.error.message")}
         </p>
         <button
           type="button"
@@ -33,7 +37,7 @@ export default function Error({
             cursor: "pointer",
           }}
         >
-          Opnieuw proberen
+          {t(locale, "global.error.retry")}
         </button>
       </div>
     </main>

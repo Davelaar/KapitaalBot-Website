@@ -115,7 +115,7 @@ export function HomePageContent({
           </ul>
         ) : (
           <p style={{ color: "var(--muted)", fontSize: "0.875rem", margin: 0 }}>
-            Geen recente production notes. Strategy pauses, parameter reviews en monitoring events worden intern bijgehouden.
+            {t(locale, "home.production.empty")}
           </p>
         )}
       </section>
