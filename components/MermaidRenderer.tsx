@@ -48,6 +48,10 @@ export function MermaidRenderer({ code, id }: MermaidRendererProps) {
         alt={ariaLabel}
         style={{ maxWidth: "100%", width: "100%", height: "auto", display: "block" }}
         loading="lazy"
+        onError={() => {
+          // Debug: if a mermaid hash svg is missing, log which filename was requested.
+          console.warn("MermaidRenderer missing svg:", filename);
+        }}
       />
     </div>
   );
