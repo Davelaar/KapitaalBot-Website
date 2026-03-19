@@ -249,7 +249,7 @@ const strings: Record<Locale, Record<string, string>> = {
     "metrics.awaiting": "Wacht op bot-export…",
     "metrics.awaitingExport": "Exporteer snapshots vanaf de bot om hier metriek te zien.",
     "metrics.trades24hHint":
-      "Execution orders / fills = jouw bot-orders en uitgevoerde fills in de database (24 uur). Dat is iets anders dan “Trade rows”: dat zijn markt-feed events (L1), niet jouw strategie-trades.",
+      "24 uur = UTC in de database. Fills tellen op beurstijd (`ts_exchange`) als die bekend is, anders op inserttijd. Orders tellen als ze in die 24 uur zijn aangemaakt óf voor het laatst bijgewerkt (o.a. bij fills). Dit zijn rijen in jóuw bot-DB — niet hetzelfde als elke regel in de Kraken UI of “Trade rows” (L1-marktfeed).",
     "metrics.execVsMarketCallout":
       "Je ziet wel live marktdata (ticker/trade rows), maar 0 execution orders/fills in 24 uur. Dit past bij ingest-only of geen live execution in dit venster — niet met een datafout.",
     "metrics.label.safetyHardBlocks": "Safety hard blocks",
@@ -594,7 +594,7 @@ const strings: Record<Locale, Record<string, string>> = {
     "metrics.awaiting": "Awaiting bot export…",
     "metrics.awaitingExport": "Export snapshots from the bot to see metrics here.",
     "metrics.trades24hHint":
-      "Execution orders / fills are your bot orders and executed fills in the database (24h). That is different from “Trade rows”: those are market feed events (L1), not your strategy trades.",
+      "The 24h window is UTC in the database. Fills use exchange time (`ts_exchange`) when present, otherwise insert time. Orders count if created or last updated in that window (including fill updates). These are rows in your bot DB — not the same as every line in Kraken’s UI or “Trade rows” (L1 market feed).",
     "metrics.execVsMarketCallout":
       "You see live market data (ticker/trade rows) but 0 execution orders/fills in 24h. That matches ingest-only or no live execution in this window — not a data error.",
     "metrics.label.safetyHardBlocks": "Safety hard blocks",
@@ -939,7 +939,7 @@ const strings: Record<Locale, Record<string, string>> = {
     "metrics.awaiting": "Warte auf Bot-Export…",
     "metrics.awaitingExport": "Snapshots vom Bot exportieren, um hier Metriken zu sehen.",
     "metrics.trades24hHint":
-      "Execution-Orders / Fills sind Ihre Bot-Orders und ausgeführte Fills in der Datenbank (24h). Das ist etwas anderes als „Trade rows“: das sind Markt-Feed-Events (L1), nicht Ihre Strategie-Trades.",
+      "24h-Fenster = UTC in der DB. Fills zählen nach Börsenzeit (`ts_exchange`) wenn vorhanden, sonst nach Insert-Zeit. Orders zählen, wenn sie in diesem Fenster erstellt oder zuletzt aktualisiert wurden (z. B. bei Fills). Das sind Zeilen in Ihrer Bot-DB — nicht jede Zeile in der Kraken-UI oder „Trade rows“ (L1-Marktfeed).",
     "metrics.execVsMarketCallout":
       "Sie sehen Live-Marktdaten (Ticker/Trade rows), aber 0 Execution-Orders/Fills in 24h. Das passt zu Ingest-only oder ohne Live-Execution in diesem Fenster — kein Datenfehler.",
     "metrics.label.safetyHardBlocks": "Safety hard blocks",
@@ -1284,7 +1284,7 @@ const strings: Record<Locale, Record<string, string>> = {
     "metrics.awaiting": "En attente de l'export du bot…",
     "metrics.awaitingExport": "Exportez les snapshots depuis le bot pour voir les métriques ici.",
     "metrics.trades24hHint":
-      "Les ordres d’exécution / fills sont vos ordres bot et fills exécutés en base (24h). Ce n’est pas la même chose que « Trade rows » : ce sont des événements de flux de marché (L1), pas les trades de votre stratégie.",
+      "Fenêtre 24 h = UTC en base. Les fills utilisent l’heure d’échange (`ts_exchange`) si présente, sinon l’heure d’insertion. Les ordres comptent s’ils sont créés ou mis à jour dans cette fenêtre (y compris lors des fills). Il s’agit des lignes dans la DB du bot — pas de chaque ligne de l’interface Kraken ni des « Trade rows » (flux L1).",
     "metrics.execVsMarketCallout":
       "Vous voyez des données de marché en direct (lignes ticker/trade) mais 0 ordres/fills d’exécution en 24h. Cela correspond à ingest-only ou à l’absence d’exécution live dans cette fenêtre — pas une erreur de données.",
     "metrics.label.safetyHardBlocks": "Safety hard blocks",

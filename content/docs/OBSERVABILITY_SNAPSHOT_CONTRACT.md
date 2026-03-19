@@ -77,8 +77,8 @@ DOC_ROLE: observability_contract
 ### 3.5 public_trading_snapshot
 
 - `contract_version`, `exported_at`
-- `trades_24h_count`: number
-- `orders_24h_count`: number
+- `trades_24h_count`: number — fill rows with `COALESCE(ts_exchange, ts_local)` in last 24h (UTC).
+- `orders_24h_count`: number — `GREATEST(created_at, updated_at)` in last 24h (UTC).
 - `equity_trend_delayed`: array van { ts_bucket: string, value: number } (vertraagd, optioneel)
 - `drawdown_pct`: number | null (optioneel)
 - `recent_orders` (optioneel): max 10 nieuwste `execution_orders`; `ts_bucket` 15 min; `order_ref` = suffix van client order id.
