@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocale } from "@/lib/locale";
 import { t } from "@/lib/i18n";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
@@ -12,10 +12,35 @@ export function NavBar() {
   const locale = useLocale();
   const [accountOpen, setAccountOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const headerRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const onPointerDown = (event: MouseEvent | TouchEvent) => {
+      const target = event.target as Node | null;
+      if (headerRef.current && target && !headerRef.current.contains(target)) {
+        setMobileOpen(false);
+      }
+    };
+    const onEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setMobileOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onPointerDown);
+    document.addEventListener("touchstart", onPointerDown, { passive: true });
+    document.addEventListener("keydown", onEscape);
+    return () => {
+      document.removeEventListener("mousedown", onPointerDown);
+      document.removeEventListener("touchstart", onPointerDown);
+      document.removeEventListener("keydown", onEscape);
+    };
+  }, [mobileOpen]);
 
   return (
     <header
       className="site-header"
+      ref={headerRef}
       style={{
         borderBottom: "1px solid var(--border)",
         padding: "0.75rem 1.5rem",
@@ -136,7 +161,7 @@ export function NavBar() {
       </nav>
       {mobileOpen && (
         <div
-          className="mobile-nav-panel"
+          className="mobile-nav-panel mobile-nav-panel--open"
           style={{
             display: "none",
             position: "absolute",

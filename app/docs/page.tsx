@@ -49,7 +49,7 @@ export default function DocsPage() {
         Klik op een document voor de volledige inhoud inclusief Mermaid-diagrammen.
       </p>
       <section className="card" style={{ padding: "1rem 1.25rem" }}>
-        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.9rem" }}>
+        <table className="docs-index-table" style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.9rem" }}>
           <thead>
             <tr>
               <th
@@ -88,6 +88,7 @@ export default function DocsPage() {
                   <td style={{ padding: "0.4rem 0.25rem", verticalAlign: "top" }}>
                     <Link
                       href={`/docs/${slug}`}
+                      className="docs-index-link"
                       style={{ color: "var(--accent)", textDecoration: "none", fontSize: "0.9rem" }}
                     >
                       {slug}.md
