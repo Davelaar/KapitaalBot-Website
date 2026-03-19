@@ -124,10 +124,10 @@ async function renderDiagram(code, id, outName) {
   let svgFixed = svg
     // Schaal constraint breed weghalen: ook als Mermaid ineens een andere px waarde kiest.
     .replace(/max-width:\s*\d+(\.\d+)?px;/g, "max-width: 100%;")
-    // Contrast boost: shapes/edges zichtbaar op donkere site.
+    // Basiscontrast: neutrale donkere nodes en duidelijke lijnen, onafhankelijk van site-theme.
     .replace(/fill:#1f2020/g, "fill:#2f2f2f")
-    .replace(/stroke:#ccc/g, "stroke:#ffffff")
-    .replace(/stroke:lightgrey/g, "stroke:#ffffff")
+    .replace(/stroke:#ccc/g, "stroke:#444444")
+    .replace(/stroke:lightgrey/g, "stroke:#666666")
     .replace(/stroke-width:1px/g, "stroke-width:2px")
     // Mermaid kan foreignObject voor labels genereren (div + p).
     // Safari rendert dat vaak niet/anders bij SVG-in-SVG of external SVG.
@@ -139,7 +139,7 @@ async function renderDiagram(code, id, outName) {
         const escaped = escapeXml(label);
         // Label groups zitten in een <g transform="..."> waarin (0,0) de box-center is.
         // We vermijden font-family quotes in het style attribuut; de root SVG zet al font-family.
-        return `<text x="0" y="0" text-anchor="middle" dominant-baseline="middle" style="font-size:16px;fill:#ccc;">${escaped}</text>`;
+        return `<text x="0" y="0" text-anchor="middle" dominant-baseline="middle" style="font-size:16px;fill:#222222;">${escaped}</text>`;
       }
     );
 
@@ -152,9 +152,9 @@ async function renderDiagram(code, id, outName) {
     if (vbMatch) {
       const vbWidth = parseFloat(vbMatch[3]);
       const refDisplayWidth = 1000;
-      const desiredFontPx = 14;
+      const desiredFontPx = 18;
       let baseFontPx = Math.round((desiredFontPx * vbWidth) / refDisplayWidth);
-      baseFontPx = Math.max(20, Math.min(96, baseFontPx));
+      baseFontPx = Math.max(28, Math.min(96, baseFontPx));
       const font12 = Math.round(baseFontPx * 0.75);
       const font18 = Math.round(baseFontPx * 1.125);
       const strokePx = Math.min(8, Math.max(2, Math.round(2 * (baseFontPx / 16))));
@@ -165,10 +165,20 @@ async function renderDiagram(code, id, outName) {
         .replace(/stroke-width:2px/g, `stroke-width:${strokePx}px`)
         .replace(/stroke-width:2\.0px/g, `stroke-width:${strokePx}px`);
       // Eén ding: vaste achtergrondrect direct achter de tekst in elke node (lijnen niet door tekst).
+      // Label-achtergrond: vaste donkere rect direct achter tekst, zodat lijnen nooit door tekst lopen.
       svgFixed = svgFixed.replace(
         /<g class="label" style="" transform="translate\(0, 0\)"><rect><\/rect>/g,
         '<g class="label" style="" transform="translate(0, 0)"><rect x="-260" y="-50" width="520" height="100" fill="#2f2f2f"/>'
       );
+      // Volledige achtergrond achter diagram voor goede leesbaarheid in zowel light als dark mode.
+      const parts = newViewBox.split(/\s+/).map(parseFloat);
+      if (parts.length === 4 && parts.every((v) => Number.isFinite(v))) {
+        const [minX, minY, width, height] = parts;
+        const bgRect = `<rect x="${minX}" y="${minY}" width="${width}" height="${height}" fill="#fdfaf2"/>`;
+        svgFixed = svgFixed.replace("<g>", `<g>${bgRect}`);
+        // Zorg dat eventuele globale tekstkleur niet te licht is in light mode.
+        svgFixed = svgFixed.replace(/fill:#ccc/g, "fill:#222222");
+      }
     }
   }
 

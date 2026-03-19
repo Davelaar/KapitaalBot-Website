@@ -46,29 +46,57 @@ export default function DocsPage() {
         Leidende documenten voor de engine. Single source of truth: ENGINE_SSOT; overzicht: DOC_INDEX.
         Klik op een document voor de volledige inhoud inclusief Mermaid-diagrammen.
       </p>
-      <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
-        {slugs.map((slug) => {
-          const meta = DOC_META[slug] ?? { label: slug, desc: "" };
-          return (
-            <li key={slug}>
-              <Link
-                href={`/docs/${slug}`}
-                className="card"
+      <section className="card" style={{ padding: "1rem 1.25rem" }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.9rem" }}>
+          <thead>
+            <tr>
+              <th
                 style={{
-                  display: "block",
-                  marginBottom: "0.75rem",
-                  textDecoration: "none",
-                  color: "inherit",
+                  textAlign: "left",
+                  padding: "0.4rem 0.25rem",
+                  borderBottom: "1px solid var(--border)",
+                  fontWeight: 600,
                 }}
               >
-                <strong style={{ fontSize: "1rem" }}>{meta.label}</strong>
-                <p style={{ color: "var(--muted)", fontSize: "0.875rem", margin: "0.25rem 0 0 0" }}>{meta.desc}</p>
-                <code style={{ fontSize: "0.8rem", color: "var(--accent)" }}>{slug}.md</code>
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
+                Onderwerp
+              </th>
+              <th
+                style={{
+                  textAlign: "left",
+                  padding: "0.4rem 0.25rem",
+                  borderBottom: "1px solid var(--border)",
+                  fontWeight: 600,
+                }}
+              >
+                Document
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {slugs.map((slug) => {
+              const meta = DOC_META[slug] ?? { label: slug, desc: "" };
+              return (
+                <tr key={slug}>
+                  <td style={{ padding: "0.4rem 0.25rem", verticalAlign: "top" }}>
+                    <strong>{meta.label}</strong>
+                    {meta.desc && (
+                      <p style={{ margin: "0.15rem 0 0", color: "var(--muted)", fontSize: "0.85rem" }}>{meta.desc}</p>
+                    )}
+                  </td>
+                  <td style={{ padding: "0.4rem 0.25rem", verticalAlign: "top" }}>
+                    <Link
+                      href={`/docs/${slug}`}
+                      style={{ color: "var(--accent)", textDecoration: "none", fontSize: "0.9rem" }}
+                    >
+                      {slug}.md
+                    </Link>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </section>
     </main>
   );
 }
