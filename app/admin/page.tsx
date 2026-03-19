@@ -36,7 +36,19 @@ export default async function AdminPage() {
       <p style={{ color: "var(--muted)", marginBottom: "1.5rem" }}>
         Laatste snapshot-timestamps, run_id, epoch status, aanwezigheid market/trading. Raw JSON viewer.
       </p>
-      <section className="card" style={{ marginBottom: "1.5rem", padding: "1rem 1.25rem" }}>
+      <section
+        className="card"
+        style={{
+          marginBottom: "1.5rem",
+          padding: "1rem 1.25rem",
+          display: "flex",
+          flexDirection: "column",
+          gap: "0.35rem",
+        }}
+      >
+        <Link href="/admin/access" style={{ color: "var(--accent)", textDecoration: "none", fontWeight: 600 }}>
+          → Tier 2-aanvragen & toegang
+        </Link>
         <Link href="/admin/cms" style={{ color: "var(--accent)", textDecoration: "none", fontWeight: 600 }}>
           → CMS-light editor (content + notes)
         </Link>

@@ -1,18 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
+import { readTier2Requests, writeTier2Requests, Tier2RequestRow } from "@/lib/tier2-requests";
+import { spawn } from "child_process";
 
 export const dynamic = "force-dynamic";
-
-const DATA_DIR = path.join(process.cwd(), "data");
-const DATA_FILE = path.join(DATA_DIR, "tier2_requests.json");
-
-interface Tier2RequestRow {
-  email: string;
-  reason: string;
-  created_at: string;
-  status: string;
-}
 
 const rateLimit = new Map<string, { count: number; since: number }>();
 const RATE_LIMIT_MS = 60_000; // 1 minute
@@ -33,27 +23,6 @@ function checkRateLimit(key: string): boolean {
   if (entry.count >= RATE_LIMIT_MAX) return false;
   entry.count += 1;
   return true;
-}
-
-function readRequests(): Tier2RequestRow[] {
-  try {
-    const raw = fs.readFileSync(DATA_FILE, "utf-8");
-    return JSON.parse(raw);
-  } catch {
-    return [];
-  }
-}
-
-function writeRequests(rows: Tier2RequestRow[]): void {
-  try {
-    if (!fs.existsSync(DATA_DIR)) {
-      fs.mkdirSync(DATA_DIR, { recursive: true });
-    }
-    fs.writeFileSync(DATA_FILE, JSON.stringify(rows, null, 2), "utf-8");
-  } catch (err) {
-    console.error("tier2-request write error", err);
-    throw err;
-  }
 }
 
 export async function POST(req: NextRequest) {
@@ -93,14 +62,62 @@ export async function POST(req: NextRequest) {
   };
 
   try {
-    const rows = readRequests();
+    const rows = readTier2Requests();
     rows.push(row);
-    writeRequests(rows);
+    writeTier2Requests(rows);
   } catch (err) {
     return NextResponse.json(
       { error: "Failed to save request." },
       { status: 500 }
     );
+  }
+
+  // Notify admin about new request via local Postfix (optional but enabled by default).
+  const adminTo = process.env.TIER2_ADMIN_EMAIL || "info@kapitaalbot.nl";
+  const from = process.env.TIER2_EMAIL_FROM || "KapitaalBot <info@kapitaalbot.nl>";
+  const subject = "Nieuwe KapitaalBot Tier 2-aanvraag";
+  const loginUrl =
+    process.env.TIER2_LOGIN_URL ||
+    (process.env.NEXT_PUBLIC_BASE_URL ? `${process.env.NEXT_PUBLIC_BASE_URL}/admin/access` : "/admin/access");
+  const lines = [
+    `From: ${from}`,
+    `To: ${adminTo}`,
+    `Subject: ${subject}`,
+    "MIME-Version: 1.0",
+    "Content-Type: text/plain; charset=UTF-8",
+    "",
+    "Er is een nieuwe aanvraag voor Tier 2-toegang binnengekomen:",
+    "",
+    `E-mail: ${email}`,
+    `Reden: ${reason || "(geen reden opgegeven)"}`,
+    "",
+    `Je kunt de aanvraag bekijken en goedkeuren via: ${loginUrl}`,
+    "",
+    "Deze mail is automatisch verstuurd door de KapitaalBot-website.",
+    "",
+  ].join("\n");
+
+  try {
+    await new Promise<void>((resolve, reject) => {
+      const child = spawn("/usr/sbin/sendmail", ["-t"]);
+      let errored = false;
+      child.on("error", (err) => {
+        errored = true;
+        reject(err);
+      });
+      child.stdin.write(lines);
+      child.stdin.end();
+      child.on("close", (code) => {
+        if (!errored && code === 0) {
+          resolve();
+        } else if (!errored) {
+          reject(new Error(`sendmail exited with code ${code}`));
+        }
+      });
+    });
+  } catch (err) {
+    console.error("tier2-request admin notification sendmail error", err);
+    // Niet falen richting gebruiker; aanvraag is al opgeslagen.
   }
 
   return NextResponse.json({ ok: true, message: "Request received." });
