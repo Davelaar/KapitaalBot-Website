@@ -37,8 +37,8 @@ body {
 }
 
 main {
-  width: 74%;
-  max-width: 1680px;
+  width: 100%;
+  max-width: 1440px;
   margin: 0 auto;
   padding: 1rem 1.5rem;
   padding-bottom: 2rem;
@@ -78,14 +78,7 @@ main {
 
 @media (max-width: 640px) {
   main {
-    width: 94%;
     padding: 0.75rem 1rem;
-  }
-}
-
-@media (max-width: 1200px) {
-  main {
-    width: 88%;
   }
 }
 
@@ -159,7 +152,7 @@ textarea {
 }
 
 .docs-two-col {
-  grid-template-columns: 260px minmax(0, 1fr);
+  grid-template-columns: minmax(220px, 1fr) minmax(0, 4fr);
 }
 
 @media (max-width: 960px) {

@@ -20,8 +20,8 @@ export function NavBar() {
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
-        width: "74%",
-        maxWidth: 1280,
+        width: "100%",
+        maxWidth: 1440,
         margin: "0 auto",
       }}
     >
