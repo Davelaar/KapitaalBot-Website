@@ -14,6 +14,8 @@ const DOC_META: Record<string, { label: string; desc: string }> = {
   CHANGELOG_ENGINE: { label: "Changelog engine", desc: "Technische changelog per subsystem." },
   LOGGING: { label: "Logging", desc: "Loggingstructuur en markers." },
   DB_ARCHITECTURE_STALE_EDGE_SAFE: { label: "DB-architectuur", desc: "State-first, partition, generation, stale-edge prevention." },
+  VALIDATION_REPORT_REFRESH_15MIN_RESET: { label: "15-min validatie", desc: "Proof-run met refresh/reset checks en expected outcomes." },
+  SYSTEMD_README: { label: "Systemd units", desc: "Service-overzicht voor ingest/execution/export en operationele startvolgorde." },
 };
 
 function getDocSlugs(): string[] {
