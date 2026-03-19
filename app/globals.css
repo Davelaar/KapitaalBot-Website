@@ -104,3 +104,59 @@ input,
 textarea {
   border-radius: 8px;
 }
+
+.markdown-body {
+  color: var(--fg);
+  line-height: 1.6;
+}
+
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3 {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.3em;
+}
+
+.markdown-body table {
+  width: 100%;
+}
+
+.markdown-body .mermaid-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 12px 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fdfaf2;
+}
+
+.markdown-body .mermaid-diagram {
+  min-width: max-content;
+  padding: 0 12px;
+}
+
+.markdown-body .mermaid-diagram svg {
+  max-width: none !important;
+  width: auto !important;
+  height: auto;
+  min-width: 900px;
+  display: block;
+}
+
+.markdown-body .mermaid-error {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  color: var(--freshness-stale);
+  font-size: 0.9rem;
+}
+
+.docs-two-col {
+  grid-template-columns: 260px minmax(0, 1fr);
+}
+
+@media (max-width: 960px) {
+  .docs-two-col {
+    grid-template-columns: 1fr;
+  }
+}

@@ -24,6 +24,7 @@ const strings: Record<Locale, Record<string, string>> = {
     "nav.research": "Research",
     "nav.access": "Toegang",
     "nav.login": "Log in",
+    "nav.account": "Account",
     "nav.status": "Bekijk status",
     "hero.title": "KapitaalBot",
     "hero.subtitle":
@@ -159,6 +160,7 @@ const strings: Record<Locale, Record<string, string>> = {
     "nav.research": "Research",
     "nav.access": "Access",
     "nav.login": "Log in",
+    "nav.account": "Account",
     "nav.status": "View status",
     "hero.title": "KapitaalBot",
     "hero.subtitle":
@@ -294,6 +296,7 @@ const strings: Record<Locale, Record<string, string>> = {
     "nav.research": "Recherche",
     "nav.access": "Zugang",
     "nav.login": "Anmelden",
+    "nav.account": "Konto",
     "nav.status": "Status anzeigen",
     "hero.title": "KapitaalBot",
     "hero.subtitle":
@@ -429,6 +432,7 @@ const strings: Record<Locale, Record<string, string>> = {
     "nav.research": "Recherche",
     "nav.access": "Accès",
     "nav.login": "Connexion",
+    "nav.account": "Compte",
     "nav.status": "Voir le statut",
     "hero.title": "KapitaalBot",
     "hero.subtitle":

@@ -3,7 +3,7 @@
 import React from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { MermaidRenderer } from "@/components/MermaidRenderer";
+import { MermaidLiveDiagram } from "@/components/MermaidLiveDiagram";
 
 const docViewerStyles = {
   doc: {
@@ -59,7 +59,7 @@ interface DocViewerProps {
 
 export default function DocViewer({ content }: DocViewerProps) {
   return (
-    <div style={docViewerStyles.doc} className="doc-viewer">
+    <article style={docViewerStyles.doc} className="doc-viewer markdown-body">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
@@ -80,7 +80,7 @@ export default function DocViewer({ content }: DocViewerProps) {
             const isMermaid = typeof className === "string" && className.includes("language-mermaid");
             const code = String(children ?? "").replace(/\n$/, "");
             if (isMermaid) {
-              return <MermaidRenderer code={code} />;
+              return <MermaidLiveDiagram chart={code} />;
             }
             return (
               <code style={docViewerStyles.code} {...props}>
@@ -94,7 +94,7 @@ export default function DocViewer({ content }: DocViewerProps) {
             const isMermaid = typeof className === "string" && /language-mermaid/.test(className);
             const codeStr = (child?.props?.children != null ? String(child.props.children) : "").replace(/\n$/, "");
             if (isMermaid && codeStr.trim()) {
-              return <MermaidRenderer code={codeStr} />;
+              return <MermaidLiveDiagram chart={codeStr} />;
             }
             return <pre style={docViewerStyles.pre}>{children}</pre>;
           },
@@ -103,6 +103,6 @@ export default function DocViewer({ content }: DocViewerProps) {
       >
         {content}
       </ReactMarkdown>
-    </div>
+    </article>
   );
 }

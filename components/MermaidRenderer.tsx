@@ -21,7 +21,7 @@ const MAX_ZOOM = 2;
 const ZOOM_STEP = 1.25;
 
 export function MermaidRenderer({ code, id }: MermaidRendererProps) {
-  const [zoom, setZoom] = useState(1);
+  const [zoom, setZoom] = useState(1.25);
   const [naturalSize, setNaturalSize] = useState<{ w: number; h: number } | null>(null);
 
   const trimmed = code?.trim() ?? "";
@@ -57,7 +57,7 @@ export function MermaidRenderer({ code, id }: MermaidRendererProps) {
 
   const zoomIn = () => setZoom((z) => Math.min(MAX_ZOOM, z * ZOOM_STEP));
   const zoomOut = () => setZoom((z) => Math.max(MIN_ZOOM, z / ZOOM_STEP));
-  const zoomReset = () => setZoom(1);
+  const zoomReset = () => setZoom(1.25);
 
   const w = naturalSize?.w ?? 800;
   const h = naturalSize?.h ?? 400;
@@ -141,8 +141,6 @@ export function MermaidRenderer({ code, id }: MermaidRendererProps) {
           style={{
             width: w * zoom,
             height: h * zoom,
-            transformOrigin: "0 0",
-            transform: `scale(${zoom})`,
           }}
         >
           <img
@@ -152,8 +150,8 @@ export function MermaidRenderer({ code, id }: MermaidRendererProps) {
             height={h}
             style={{
               display: "block",
-              width: w,
-              height: h,
+              width: w * zoom,
+              height: h * zoom,
               maxWidth: "none",
               verticalAlign: "top",
             }}
