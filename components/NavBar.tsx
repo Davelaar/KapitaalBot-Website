@@ -11,9 +11,11 @@ import { HeaderLogo } from "@/components/HeaderLogo";
 export function NavBar() {
   const locale = useLocale();
   const [accountOpen, setAccountOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
     <header
+      className="site-header"
       style={{
         borderBottom: "1px solid var(--border)",
         padding: "0.75rem 1.5rem",
@@ -26,7 +28,27 @@ export function NavBar() {
       }}
     >
       <HeaderLogo />
-      <nav style={{ display: "flex", alignItems: "center", gap: "1rem", position: "relative" }}>
+      <button
+        type="button"
+        className="mobile-nav-toggle"
+        onClick={() => setMobileOpen((v) => !v)}
+        aria-label={mobileOpen ? "Sluit menu" : "Open menu"}
+        aria-expanded={mobileOpen}
+        style={{
+          display: "none",
+          border: "1px solid var(--border)",
+          background: "var(--card-bg)",
+          color: "var(--fg)",
+          padding: "0.35rem 0.6rem",
+          fontSize: "1rem",
+          fontWeight: 700,
+          lineHeight: 1,
+          cursor: "pointer",
+        }}
+      >
+        {mobileOpen ? "×" : "☰"}
+      </button>
+      <nav className="desktop-nav" style={{ display: "flex", alignItems: "center", gap: "1rem", position: "relative" }}>
         <Link href="/" style={{ color: "var(--fg)", textDecoration: "none", fontSize: "0.9rem" }}>
           {t(locale, "nav.system")}
         </Link>
@@ -112,6 +134,54 @@ export function NavBar() {
         <LanguageSwitcher />
         <ThemeToggle />
       </nav>
+      {mobileOpen && (
+        <div
+          className="mobile-nav-panel"
+          style={{
+            display: "none",
+            position: "absolute",
+            left: "1rem",
+            right: "1rem",
+            top: "100%",
+            marginTop: "0.4rem",
+            border: "1px solid var(--border)",
+            borderRadius: 10,
+            background: "var(--card-bg)",
+            padding: "0.7rem",
+            zIndex: 40,
+          }}
+        >
+          <Link href="/" className="mobile-nav-link" onClick={() => setMobileOpen(false)}>
+            {t(locale, "nav.system")}
+          </Link>
+          <Link href="/dashboard" className="mobile-nav-link" onClick={() => setMobileOpen(false)}>
+            {t(locale, "nav.data")}
+          </Link>
+          <Link href="/changelog" className="mobile-nav-link" onClick={() => setMobileOpen(false)}>
+            {t(locale, "nav.notes")}
+          </Link>
+          <Link href="/contact" className="mobile-nav-link" onClick={() => setMobileOpen(false)}>
+            Contact
+          </Link>
+          <Link href="/docs" className="mobile-nav-link" onClick={() => setMobileOpen(false)}>
+            {t(locale, "nav.architecture")}
+          </Link>
+          <Link href="/faq" className="mobile-nav-link" onClick={() => setMobileOpen(false)}>
+            {t(locale, "nav.research")}
+          </Link>
+          <div className="mobile-nav-section">{t(locale, "nav.account") ?? "Account"}</div>
+          <Link href="/tier2-request" className="mobile-nav-link mobile-nav-sub" onClick={() => setMobileOpen(false)}>
+            {t(locale, "nav.access")}
+          </Link>
+          <Link href="/login" className="mobile-nav-link mobile-nav-sub" onClick={() => setMobileOpen(false)}>
+            {t(locale, "nav.login")}
+          </Link>
+          <div className="mobile-nav-tools">
+            <LanguageSwitcher />
+            <ThemeToggle />
+          </div>
+        </div>
+      )}
     </header>
   );
 }
