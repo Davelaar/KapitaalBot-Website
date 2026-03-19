@@ -121,6 +121,37 @@ async function renderDiagram(code, id, outName) {
     return `${minX} ${minY} ${maxX - minX} ${maxY - minY}`;
   }
 
+  function wrapLabelText(label, maxCharsPerLine = 24, maxLines = 4) {
+    const words = String(label || "")
+      .replace(/\s+/g, " ")
+      .trim()
+      .split(" ")
+      .filter(Boolean);
+    if (words.length === 0) return [""];
+    const lines = [];
+    let current = words[0];
+    for (let i = 1; i < words.length; i += 1) {
+      const w = words[i];
+      const candidate = `${current} ${w}`;
+      if (candidate.length <= maxCharsPerLine) {
+        current = candidate;
+      } else {
+        lines.push(current);
+        current = w;
+      }
+    }
+    lines.push(current);
+    if (lines.length > maxLines) {
+      const keep = lines.slice(0, maxLines);
+      const overflowTail = lines.slice(maxLines).join(" ");
+      if (overflowTail) {
+        keep[maxLines - 1] = `${keep[maxLines - 1]} ${overflowTail}`;
+      }
+      return keep;
+    }
+    return lines;
+  }
+
   let svgFixed = svg
     // Schaal constraint breed weghalen: ook als Mermaid ineens een andere px waarde kiest.
     .replace(/max-width:\s*\d+(\.\d+)?px;/g, "max-width: 100%;")
@@ -136,10 +167,22 @@ async function renderDiagram(code, id, outName) {
       /<foreignObject[^>]*>\s*<div[\s\S]*?<p>\s*([\s\S]*?)\s*<\/p>[\s\S]*?<\/foreignObject>/g,
       (_m, rawLabel) => {
         const label = String(rawLabel ?? "").replace(/\s+/g, " ").trim();
-        const escaped = escapeXml(label);
+        const lines = wrapLabelText(label, 24, 4);
+        const longest = lines.reduce((m, l) => Math.max(m, l.length), 0);
+        const rectWidth = Math.max(220, Math.min(900, 40 + longest * 10));
+        const rectHeight = Math.max(54, Math.min(220, 24 + lines.length * 24));
+        const rectX = -Math.round(rectWidth / 2);
+        const rectY = -Math.round(rectHeight / 2);
+        const lineOffsetEm = ((lines.length - 1) * 1.1) / 2;
+        const tspans = lines
+          .map((line, idx) => {
+            const dy = idx === 0 ? `${-lineOffsetEm}em` : "1.1em";
+            return `<tspan x="0" dy="${dy}">${escapeXml(line)}</tspan>`;
+          })
+          .join("");
         // Label groups zitten in een <g transform="..."> waarin (0,0) de box-center is.
         // We vermijden font-family quotes in het style attribuut; de root SVG zet al font-family.
-        return `<text x="0" y="0" text-anchor="middle" dominant-baseline="middle" style="font-size:16px;fill:#222222;">${escaped}</text>`;
+        return `<rect x="${rectX}" y="${rectY}" width="${rectWidth}" height="${rectHeight}" rx="8" ry="8" fill="#2f2f2f"/><text x="0" y="0" text-anchor="middle" dominant-baseline="middle" style="font-size:16px;fill:#222222;">${tspans}</text>`;
       }
     );
 
@@ -165,10 +208,10 @@ async function renderDiagram(code, id, outName) {
         .replace(/stroke-width:2px/g, `stroke-width:${strokePx}px`)
         .replace(/stroke-width:2\.0px/g, `stroke-width:${strokePx}px`);
       // Eén ding: vaste achtergrondrect direct achter de tekst in elke node (lijnen niet door tekst).
-      // Label-achtergrond: vaste donkere rect direct achter tekst, zodat lijnen nooit door tekst lopen.
+      // Verwijder lege placeholder-rects in labels; we injecteren per label al een eigen achtergrondrect.
       svgFixed = svgFixed.replace(
         /<g class="label" style="" transform="translate\(0, 0\)"><rect><\/rect>/g,
-        '<g class="label" style="" transform="translate(0, 0)"><rect x="-260" y="-50" width="520" height="100" fill="#2f2f2f"/>'
+        '<g class="label" style="" transform="translate(0, 0)">'
       );
       // Volledige achtergrond achter diagram voor goede leesbaarheid in zowel light als dark mode.
       const parts = newViewBox.split(/\s+/).map(parseFloat);
