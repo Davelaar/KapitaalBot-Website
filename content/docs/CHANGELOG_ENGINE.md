@@ -123,7 +123,7 @@
 | Commit | Subsystem | Doel | Wat veranderd | Impact |
 |--------|-----------|------|---------------|--------|
 | c2e5c8b | scripts | Server | start_live_validation_engine_server.sh executable | Server start |
-| 5191d7c | docs | Rule | Server validation steps in git-only-codeflow rule | Cursor rule |
+| 5191d7c | docs | Rule | Server validation steps in git-only-codeflow rule | Repo policy |
 
 ---
 
@@ -151,7 +151,7 @@
 |--------|------|---------------|
 | dcdf2de | Live runs | Docs: live validation runs analysis (run_id=32-34) |
 | 32aae98 | Deliverable | Deterministic engine deliverable OrderTracker wiring status |
-| e57a816 | Universe | Universe audit (200/60/50/30); Cursor rule remote-execution-ssh |
+| e57a816 | Universe | Universe audit (200/60/50/30); repo policy remote-execution-ssh |
 | 985ff06 | Audit | TDD gaps + server validation + universe audit (git-only codeflow) |
 | b183ae9 | Audit | Instrument constraints + execution pipeline funnel + EXECUTION_ENABLE |
 
