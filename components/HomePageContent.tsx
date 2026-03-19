@@ -14,7 +14,7 @@ import type { ProductionNoteRow } from "@/lib/read-cms";
 import StatusStrip from "@/components/StatusStrip";
 import MetricCardGrid from "@/components/MetricCardGrid";
 import DemoTradeTeaser from "@/components/DemoTradeTeaser";
-import { MermaidRenderer } from "@/components/MermaidRenderer";
+import { MermaidLiveDiagram } from "@/components/MermaidLiveDiagram";
 
 const HOME_ARCH_DIAGRAM = `flowchart LR
   Ingest["Ingest (ticker/trades/L2/L3)"] --> State["State-first: run_symbol_state"]
@@ -55,8 +55,8 @@ export function HomePageContent({
           {t(locale, "hero.subline")}
         </p>
 
-        <div style={{ marginTop: "1rem" }}>
-          <MermaidRenderer code={HOME_ARCH_DIAGRAM} id="home-arch-diagram" />
+        <div style={{ marginTop: "1rem" }} className="markdown-body">
+          <MermaidLiveDiagram chart={HOME_ARCH_DIAGRAM} />
         </div>
 
         <p style={{ marginTop: "1rem", fontSize: "0.8125rem", color: "var(--muted)" }}>
