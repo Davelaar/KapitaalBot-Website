@@ -155,6 +155,16 @@ textarea {
   grid-template-columns: minmax(220px, 1fr) minmax(0, 4fr);
 }
 
+.docs-file-list {
+  min-width: 0;
+}
+
+.docs-file-link {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  line-break: anywhere;
+}
+
 @media (max-width: 960px) {
   .docs-two-col {
     grid-template-columns: 1fr;

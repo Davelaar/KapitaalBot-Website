@@ -58,11 +58,15 @@ export default async function DocSlugPage({ params }: { params: Promise<{ slug: 
       <section className="docs-two-col" style={{ display: "grid", gap: "1rem", alignItems: "start" }}>
         <aside className="card" style={{ position: "sticky", top: "1rem", marginBottom: 0 }}>
           <h2 style={{ marginTop: 0, marginBottom: "0.75rem", fontSize: "1rem" }}>Files</h2>
-          <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "0.25rem" }}>
+          <ul
+            className="docs-file-list"
+            style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "0.25rem" }}
+          >
             {slugs.map((s) => (
               <li key={s}>
                 <Link
                   href={`/docs/${s}`}
+                  className="docs-file-link"
                   style={{
                     display: "block",
                     textDecoration: "none",
