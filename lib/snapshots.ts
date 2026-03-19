@@ -64,12 +64,39 @@ export interface PublicMarketSnapshot {
   symbol_count: number;
 }
 
+/** Tier 1: last-N execution orders from bot export (timestamps bucketed). */
+export interface RecentPublicOrderRow {
+  ts_bucket: string;
+  symbol: string;
+  side: string;
+  order_type: string;
+  status: string;
+  quantity_base: string;
+  limit_price_quote?: string | null;
+  regime?: string | null;
+  strategy?: string | null;
+  order_ref: string;
+}
+
+/** Tier 1: last-N fills from bot export (timestamps bucketed). */
+export interface RecentPublicFillRow {
+  ts_bucket: string;
+  symbol: string;
+  side: string;
+  fill_qty_base: string;
+  fill_price_quote: string;
+  fee_quote?: string | null;
+}
+
 export interface PublicTradingSnapshot {
   contract_version: string;
   exported_at: string;
   trades_24h_count: number;
   orders_24h_count: number;
-  drawdown_pct: number | null;
+  drawdown_pct?: number | null;
+  equity_trend_delayed?: EquityPoint[] | null;
+  recent_orders?: RecentPublicOrderRow[];
+  recent_fills?: RecentPublicFillRow[];
 }
 
 export interface DemoTradeRow {

@@ -81,6 +81,8 @@ DOC_ROLE: observability_contract
 - `orders_24h_count`: number
 - `equity_trend_delayed`: array van { ts_bucket: string, value: number } (vertraagd, optioneel)
 - `drawdown_pct`: number | null (optioneel)
+- `recent_orders` (optioneel): max 10 nieuwste `execution_orders`; `ts_bucket` 15 min; `order_ref` = suffix van client order id.
+- `recent_fills` (optioneel): max 10 nieuwste `fills`; `ts_bucket` 15 min; qty/prijs als string.
 
 ### 3.6 public_demo_trades
 
@@ -97,7 +99,7 @@ DOC_ROLE: observability_contract
 
 - **Timestamps:** Afronden naar 15 min of 1 uur voor public snapshots.
 - **Regime-switch:** Geen realtime event feed; alleen aantal per periode en dominante regimes.
-- **Strategy/regime counts:** Alleen tellers, geen koppeling naar individuele orders op Tier 1.
+- **Strategy/regime counts:** Alleen tellers; Tier 1 mag wel **samengevatte** laatste orders/fills tonen (`recent_orders` / `recent_fills`), geen realtime feed.
 
 ---
 

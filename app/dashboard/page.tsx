@@ -15,6 +15,7 @@ import MetricCardGrid from "@/components/MetricCardGrid";
 import RegimeStrategyOverview from "@/components/RegimeStrategyOverview";
 import MarketSummary from "@/components/MarketSummary";
 import DemoTradeTeaser from "@/components/DemoTradeTeaser";
+import RecentExecutionSection from "@/components/RecentExecutionSection";
 
 export const dynamic = "force-dynamic";
 
@@ -44,6 +45,7 @@ export default async function DashboardPage() {
         regime={regime}
         strategy={strategy}
       />
+      <RecentExecutionSection trading={trading} maxOrders={10} maxFills={10} />
       <RegimeStrategyOverview regime={regime} strategy={strategy} />
       <MarketSummary market={market} />
       <DemoTradeTeaser demo={demo} maxItems={8} />

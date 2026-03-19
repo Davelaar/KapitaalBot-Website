@@ -14,6 +14,7 @@ import type { ProductionNoteRow } from "@/lib/read-cms";
 import StatusStrip from "@/components/StatusStrip";
 import MetricCardGrid from "@/components/MetricCardGrid";
 import DemoTradeTeaser from "@/components/DemoTradeTeaser";
+import RecentExecutionSection from "@/components/RecentExecutionSection";
 import { MermaidLiveDiagram } from "@/components/MermaidLiveDiagram";
 
 interface HomePageContentProps {
@@ -85,6 +86,7 @@ flowchart LR
         regime={regime}
         strategy={strategy}
       />
+      <RecentExecutionSection trading={trading} maxOrders={10} maxFills={10} />
       <DemoTradeTeaser demo={demo} maxItems={3} />
 
       <section style={{ marginTop: "2rem" }} className="card">
