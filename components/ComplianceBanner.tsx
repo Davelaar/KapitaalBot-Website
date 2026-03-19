@@ -19,7 +19,7 @@ export default async function ComplianceBanner() {
   const content = override ? override : t(locale, "compliance.default");
 
   return (
-    <aside className="compliance-banner" role="note" aria-label="Crypto risk warning">
+    <aside className="compliance-banner" role="note" aria-label={t(locale, "compliance.ariaLabel")}>
       <div className="compliance-banner__inner">
         <strong>{content}</strong>
       </div>

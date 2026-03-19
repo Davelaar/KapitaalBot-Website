@@ -16,14 +16,6 @@ import MetricCardGrid from "@/components/MetricCardGrid";
 import DemoTradeTeaser from "@/components/DemoTradeTeaser";
 import { MermaidLiveDiagram } from "@/components/MermaidLiveDiagram";
 
-const HOME_ARCH_DIAGRAM = `flowchart LR
-  Ingest["Ingest (ticker/trades/L2/L3)"] --> State["State-first: run_symbol_state"]
-  State --> Route["Route engine + universe selection"]
-  Route --> Exec["Execution engine (queue-aware + safety)"]
-  State --> Snap["Observability snapshots (read-model)"]
-  Snap --> Tier1["Tier 1: public dashboards"]
-  Snap --> Tier2["Tier 2: extended dashboards"]`;
-
 interface HomePageContentProps {
   status: PublicStatusSnapshot | null;
   regime: PublicRegimeSnapshot | null;
@@ -44,6 +36,15 @@ export function HomePageContent({
   notices,
 }: HomePageContentProps) {
   const locale = useLocale();
+  const homeArchDiagram = `
+flowchart LR
+  Ingest["${t(locale, "diagram.home.arch.node.ingest")}"] --> State["${t(locale, "diagram.home.arch.node.state")}"]
+  State --> Route["${t(locale, "diagram.home.arch.node.route")}"]
+  Route --> Exec["${t(locale, "diagram.home.arch.node.exec")}"]
+  State --> Snap["${t(locale, "diagram.home.arch.node.snap")}"]
+  Snap --> Tier1["${t(locale, "diagram.home.arch.node.tier1")}"]
+  Snap --> Tier2["${t(locale, "diagram.home.arch.node.tier2")}"]
+`;
 
   return (
     <>
@@ -56,7 +57,7 @@ export function HomePageContent({
         </p>
 
         <div style={{ marginTop: "1rem" }} className="markdown-body">
-          <MermaidLiveDiagram chart={HOME_ARCH_DIAGRAM} />
+          <MermaidLiveDiagram chart={homeArchDiagram} seoKeyPrefix="diagram.home.arch" />
         </div>
 
         <p style={{ marginTop: "1rem", fontSize: "0.8125rem", color: "var(--muted)" }}>

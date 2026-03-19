@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { useLocale } from "@/lib/locale";
+import { t } from "@/lib/i18n";
 
 interface MermaidRendererProps {
   code: string;
@@ -21,6 +23,7 @@ const MAX_ZOOM = 2;
 const ZOOM_STEP = 1.25;
 
 export function MermaidRenderer({ code, id }: MermaidRendererProps) {
+  const locale = useLocale();
   const [zoom, setZoom] = useState(1.25);
   const [naturalSize, setNaturalSize] = useState<{ w: number; h: number } | null>(null);
 
@@ -41,12 +44,12 @@ export function MermaidRenderer({ code, id }: MermaidRendererProps) {
 
   const ariaLabel =
     id === "home-arch-diagram"
-      ? "Architectuur van KapitaalBot observability en dataflow"
+      ? t(locale, "mermaid.alt.homeArch")
       : id === "tier-flow"
-        ? "Tier-model van observability (Tier 1, Tier 2, Tier 3)"
+        ? t(locale, "mermaid.alt.tierFlow")
         : id === "bot-flow"
-          ? "Data-exportpijplijn van bot naar observability-website"
-          : "Mermaid diagram";
+          ? t(locale, "mermaid.alt.botFlow")
+          : t(locale, "mermaid.alt.generic");
 
   const onLoad = useCallback((e: React.SyntheticEvent<HTMLImageElement>) => {
     const img = e.currentTarget;
@@ -73,12 +76,12 @@ export function MermaidRenderer({ code, id }: MermaidRendererProps) {
           flexWrap: "wrap",
         }}
       >
-        <span style={{ fontSize: "0.8125rem", color: "var(--muted)" }}>Diagram:</span>
+        <span style={{ fontSize: "0.8125rem", color: "var(--muted)" }}>{t(locale, "mermaid.control.label")}</span>
         <button
           type="button"
           onClick={zoomOut}
           disabled={zoom <= MIN_ZOOM}
-          aria-label="Uitzoomen"
+          aria-label={t(locale, "mermaid.control.zoomOut")}
           style={{
             padding: "0.25rem 0.5rem",
             fontSize: "0.875rem",
@@ -95,7 +98,7 @@ export function MermaidRenderer({ code, id }: MermaidRendererProps) {
         <button
           type="button"
           onClick={zoomReset}
-          aria-label="Reset zoom naar 100%"
+          aria-label={t(locale, "mermaid.control.zoomReset")}
           style={{
             padding: "0.25rem 0.5rem",
             fontSize: "0.8125rem",
@@ -112,7 +115,7 @@ export function MermaidRenderer({ code, id }: MermaidRendererProps) {
           type="button"
           onClick={zoomIn}
           disabled={zoom >= MAX_ZOOM}
-          aria-label="Inzoomen"
+          aria-label={t(locale, "mermaid.control.zoomIn")}
           style={{
             padding: "0.25rem 0.5rem",
             fontSize: "0.875rem",

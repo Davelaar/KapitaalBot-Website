@@ -2,14 +2,22 @@ import fs from "fs";
 import path from "path";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { cookies } from "next/headers";
+import { defaultLocale, t, type Locale } from "@/lib/i18n";
 import DocViewer from "@/components/DocViewer";
 
 const DOCS_DIR = path.join(process.cwd(), "content", "docs");
 
-const DOC_META: Record<string, { label: string }> = {
-  ENGINE_SSOT: { label: "Engine SSOT" },
-  DOC_INDEX: { label: "Document index" },
+const DOC_META: Record<string, { labelKey: string }> = {
+  ENGINE_SSOT: { labelKey: "docs.meta.ENGINE_SSOT.label" },
+  DOC_INDEX: { labelKey: "docs.meta.DOC_INDEX.label" },
 };
+
+function getLocaleFromCookieStore(cookieStore: Awaited<ReturnType<typeof cookies>>): Locale {
+  const raw = cookieStore.get("NEXT_LOCALE")?.value;
+  if (raw && ["nl", "en", "de", "fr"].includes(raw)) return raw as Locale;
+  return defaultLocale;
+}
 
 function getDocSlugs(): string[] {
   if (!fs.existsSync(DOCS_DIR)) return [];
@@ -28,15 +36,20 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const label = DOC_META[slug]?.label ?? slug;
+  const cookieStore = await cookies();
+  const locale = getLocaleFromCookieStore(cookieStore);
+  const label = slug && DOC_META[slug]?.labelKey ? t(locale, DOC_META[slug].labelKey) : slug;
+  const docsTitle = t(locale, "docs.title");
   return {
-    title: `${label} — Documentatie`,
-    description: `Documentatie: ${label}. KapitaalBot-engine.`,
+    title: `${label} — ${docsTitle}`,
+    description: `${docsTitle}: ${label}. KapitaalBot-engine.`,
   };
 }
 
 export default async function DocSlugPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
+  const cookieStore = await cookies();
+  const locale = getLocaleFromCookieStore(cookieStore);
   const slugs = getDocSlugs();
   if (!slugs.includes(slug)) notFound();
 
@@ -52,12 +65,12 @@ export default async function DocSlugPage({ params }: { params: Promise<{ slug: 
     <main>
       <nav style={{ marginBottom: "1.5rem" }}>
         <Link href="/docs" style={{ color: "var(--accent)", textDecoration: "none" }}>
-          ← Documentatie
+          ← {t(locale, "docs.title")}
         </Link>
       </nav>
       <section className="docs-two-col" style={{ display: "grid", gap: "1rem", alignItems: "start" }}>
         <aside className="card" style={{ position: "sticky", top: "1rem", marginBottom: 0 }}>
-          <h2 style={{ marginTop: 0, marginBottom: "0.75rem", fontSize: "1rem" }}>Files</h2>
+          <h2 style={{ marginTop: 0, marginBottom: "0.75rem", fontSize: "1rem" }}>{t(locale, "docs.slug.files")}</h2>
           <ul
             className="docs-file-list"
             style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "0.25rem" }}

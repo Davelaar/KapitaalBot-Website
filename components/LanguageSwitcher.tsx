@@ -2,13 +2,7 @@
 
 import { useCallback } from "react";
 import { locales, type Locale } from "@/lib/i18n";
-
-const LABELS: Record<Locale, string> = {
-  nl: "Nederlands",
-  en: "English",
-  de: "Deutsch",
-  fr: "Français",
-};
+import { useLocale } from "@/lib/locale";
 
 function FlagNL() {
   /* NL: rood (boven), wit (midden), blauw (onder) */
@@ -60,6 +54,7 @@ const FLAG_ICON: Record<Locale, () => JSX.Element> = {
 };
 
 export function LanguageSwitcher() {
+  const currentLocale = useLocale();
   const setLocale = useCallback((locale: Locale) => {
     if (typeof window !== "undefined" && (window as any).plausible) {
       // Plausible supports simple event names; payloads are optional.
@@ -70,7 +65,19 @@ export function LanguageSwitcher() {
   }, []);
 
   return (
-    <span style={{ display: "flex", alignItems: "center", gap: "0.2rem" }} role="group" aria-label="Taal kiezen">
+    <span
+      style={{ display: "flex", alignItems: "center", gap: "0.2rem" }}
+      role="group"
+      aria-label={
+        currentLocale === "en"
+          ? "Choose language"
+          : currentLocale === "de"
+          ? "Sprache wählen"
+          : currentLocale === "fr"
+          ? "Choisir la langue"
+          : "Taal kiezen"
+      }
+    >
       {locales.map((locale) => {
         const Icon = FLAG_ICON[locale];
         return (
@@ -78,8 +85,8 @@ export function LanguageSwitcher() {
             key={locale}
             type="button"
             onClick={() => setLocale(locale)}
-            aria-label={LABELS[locale]}
-            title={LABELS[locale]}
+            aria-label={locale === "nl" ? "Nederlands" : locale === "en" ? "English" : locale === "de" ? "Deutsch" : "Français"}
+            title={locale === "nl" ? "Nederlands" : locale === "en" ? "English" : locale === "de" ? "Deutsch" : "Français"}
             style={{
               display: "inline-flex",
               alignItems: "center",

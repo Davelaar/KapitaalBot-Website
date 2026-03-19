@@ -1,33 +1,40 @@
 import Link from "next/link";
+import { useLocale } from "@/lib/locale";
+import { t } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = {
-  title: "Contact — KapitaalBot",
-  description: "Contact en toegang tot KapitaalBot observability.",
-};
+export function generateMetadata() {
+  const title = "KapitaalBot — Contact";
+  const description = "KapitaalBot contact & access.";
+  return {
+    title,
+    description,
+  };
+}
 
 export default function ContactPage() {
+  const locale = useLocale();
   return (
     <main>
       <nav style={{ marginBottom: "1.5rem" }}>
         <Link href="/" style={{ color: "var(--accent)", textDecoration: "none" }}>
-          ← Home
+          ← {t(locale, "nav.home")}
         </Link>
       </nav>
-      <h1 style={{ fontSize: "1.75rem", marginBottom: "0.5rem" }}>Contact</h1>
+      <h1 style={{ fontSize: "1.75rem", marginBottom: "0.5rem" }}>{t(locale, "contact.title")}</h1>
       <p style={{ color: "var(--muted)", marginBottom: "1.5rem" }}>
-        Voor een privé-aanvraag of technische dialoog: gebruik het Access-formulier. Geen performance claims; toegang wordt handmatig beoordeeld.
+        {t(locale, "contact.intro")}
       </p>
       <section className="card" style={{ marginBottom: "1rem" }}>
         <p style={{ margin: 0 }}>
           <Link href="/tier2-request" style={{ color: "var(--accent)", textDecoration: "none", fontWeight: 500 }}>
-            → Access (Tier 2-aanvraag)
+            → {t(locale, "contact.accessLink")}
           </Link>
         </p>
       </section>
       <p style={{ fontSize: "0.875rem", color: "var(--muted)" }}>
-        Data, Changelog en FAQ staan in de navigatie. Voor compliance en disclaimer: zie de footer en de Access-pagina.
+        {t(locale, "contact.footer")}
       </p>
     </main>
   );

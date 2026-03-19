@@ -1,7 +1,7 @@
-# Chatbot / RAG – environment placeholders
+# Chatbot / RAG – production configuratie
 
-De FAQ-chatbot gebruikt nu een kleine ingebouwde knowledge base. In een volgende iteratie kan de API-route
-`/api/faq-chat` worden omgezet naar een echte RAG-backend. Hiervoor reserveren we alvast env-plaatsen.
+De FAQ-chatbot gebruikt een aparte RAG-backendservice. De website-route `/api/faq-chat`
+fungeert als proxy en verwacht dat de backend actief is.
 
 ## Website (.env.local of server-env)
 
@@ -11,42 +11,25 @@ De FAQ-chatbot gebruikt nu een kleine ingebouwde knowledge base. In een volgende
   - Huidige implementatie leest deze nog niet, maar kan eenvoudig worden toegevoegd.
 
 - `FAQ_CHAT_BACKEND_URL`  
-  - Type: URL (bijv. `https://rag-backend.internal/faq`)  
-  - Doel: optionele externe backend voor de FAQ-chat (bijv. eigen RAG-service).  
-  - Huidig gedrag: niet gebruikt; `/api/faq-chat` beantwoordt lokaal.  
-  - Toekomst: `/api/faq-chat` kan dit als upstream endpoint gebruiken.
+  - Type: URL (bijv. `http://127.0.0.1:8097/rag/faq`)  
+  - Doel: verplichte upstream RAG-endpoint voor de FAQ-chat.  
+  - Huidig gedrag: `/api/faq-chat` stuurt `question`, `locale`, `tier` naar deze URL.
+  - Bij ontbrekende of niet-bereikbare URL geeft de website-API een `503`.
 
-### OpenAI RAG-light (huidige implementatie)
+## RAG-backend env
 
-De huidige `/api/faq-chat`-route kan een eenvoudige RAG-light call naar OpenAI gebruiken als
-de volgende env-variabelen gezet zijn (op server):
+Deze staan op de RAG-backendservice (niet in de website-app):
 
 - `OPENAI_API_KEY`  
-  - Vereist. Geheim; niet in de repo commiten.
+  - Vereist. Geheim; niet in Git.
 - `OPENAI_MODEL`  
   - Optioneel. Default: `gpt-4.1-mini`.
 - `OPENAI_BASE_URL`  
   - Optioneel. Default: `https://api.openai.com/v1`.
+- `RAG_DATABASE_URL`  
+  - Vereist. PostgreSQL DSN met `pgvector` extension.
+- `RAG_EMBEDDING_MODEL`  
+  - Optioneel. Default: `text-embedding-3-small`.
 
-Gedrag:
-
-- Zonder `OPENAI_API_KEY`: endpoint gebruikt alleen de interne KB-antwoorden.
-- Met `OPENAI_API_KEY`: OpenAI wordt gebruikt om het KB-antwoord uit te breiden/herformuleren met extra context,
-  onder strikte instructies:
-  - geen letterlijke code,
-  - geen copy/pastebare strategieën of thresholds,
-  - uitleg in hoofdlijnen,
-  - antwoorden in dezelfde taal als de vraag (NL/EN/DE/FR).
-
-## Backend / RAG-service (niet in deze repo)
-
-Eventuele secrets voor een RAG-backend (bijv. OpenAI, eigen vectorstore) horen **niet** in deze repo thuis.
-Voorbeelden van env-namen bij een externe service:
-
-- `RAG_OPENAI_API_KEY`
-- `RAG_OPENAI_MODEL`
-- `RAG_KNOWLEDGE_BASE_URL`
-
-Deze worden later in de RAG-service zelf geconfigureerd; de website praat alleen met de RAG-service via
-`FAQ_CHAT_BACKEND_URL` of een soortgelijk endpoint en bewaart geen secrets in de codebase.
+De backend indexeert docs naar schema `rag` en beantwoordt FAQ-vragen via vector retrieval + guardrailed completion.
 

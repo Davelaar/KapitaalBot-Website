@@ -1,10 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useLocale } from "@/lib/locale";
+import { t } from "@/lib/i18n";
 import mermaid from "mermaid";
 
 interface MermaidLiveDiagramProps {
   chart: string;
+  /** Optional i18n key prefix, e.g. 'diagram.home.arch'. */
+  seoKeyPrefix?: string;
 }
 
 let mermaidInitialized = false;
@@ -18,10 +22,11 @@ function hashText(input: string): string {
   return hash.toString(16);
 }
 
-export function MermaidLiveDiagram({ chart }: MermaidLiveDiagramProps) {
+export function MermaidLiveDiagram({ chart, seoKeyPrefix }: MermaidLiveDiagramProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
   const chartId = useMemo(() => `mermaid-live-${hashText(chart)}`, [chart]);
+  const locale = useLocale();
 
   useEffect(() => {
     let cancelled = false;
@@ -48,7 +53,7 @@ export function MermaidLiveDiagram({ chart }: MermaidLiveDiagramProps) {
         }
       } catch (err) {
         if (!cancelled) {
-          setError("Diagram kon niet worden gerenderd.");
+          setError(t(locale, "mermaid.error.render_failed"));
           if (ref.current) {
             ref.current.innerHTML = "";
           }
@@ -63,14 +68,31 @@ export function MermaidLiveDiagram({ chart }: MermaidLiveDiagramProps) {
     };
   }, [chart, chartId]);
 
+  const title = seoKeyPrefix ? t(locale, `${seoKeyPrefix}.title`) : undefined;
+  const caption = seoKeyPrefix ? t(locale, `${seoKeyPrefix}.caption`) : undefined;
+  const desc = seoKeyPrefix ? t(locale, `${seoKeyPrefix}.desc`) : undefined;
+
   return (
-    <div className="mermaid-wrapper">
+    <figure className="mermaid-wrapper">
       {error ? (
         <p className="mermaid-error">{error}</p>
       ) : (
-        <div ref={ref} className="mermaid-diagram" />
+        <div ref={ref} className="mermaid-diagram" aria-label={title} />
       )}
-    </div>
+      {(title || caption) && (
+        <figcaption className="mermaid-caption">
+          {title && <strong>{title}</strong>}
+          {caption && (
+            <span style={{ marginLeft: title ? "0.35rem" : 0, fontSize: "0.9em" }}>{caption}</span>
+          )}
+        </figcaption>
+      )}
+      {desc && (
+        <p className="mermaid-longdesc">
+          {desc}
+        </p>
+      )}
+    </figure>
   );
 }
 

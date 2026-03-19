@@ -12,6 +12,11 @@ interface ChatMessage {
   sources?: string[];
 }
 
+function sourceToDocSlug(source: string): string {
+  const cleaned = source.replace(/^docs\//, "").replace(/\.md$/i, "");
+  return cleaned;
+}
+
 export function FaqChatbot() {
   const locale = useLocale();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -33,7 +38,7 @@ export function FaqChatbot() {
       const res = await fetch("/api/faq-chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question }),
+        body: JSON.stringify({ question, locale }),
       });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
@@ -102,9 +107,12 @@ export function FaqChatbot() {
               <div style={{ marginTop: "0.35rem", color: "var(--muted)", fontSize: "0.8rem" }}>
                 Bronnen:{" "}
                 {m.sources.map((slug, i) => (
-                  <span key={slug}>
-                    <Link href={`/docs/${slug}`} style={{ color: "var(--accent)", textDecoration: "none" }}>
-                      {slug}
+                  <span key={`${slug}-${i}`}>
+                    <Link
+                      href={`/docs/${sourceToDocSlug(slug)}`}
+                      style={{ color: "var(--accent)", textDecoration: "none" }}
+                    >
+                      {sourceToDocSlug(slug)}
                     </Link>
                     {i < m.sources!.length - 1 ? ", " : ""}
                   </span>

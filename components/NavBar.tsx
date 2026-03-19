@@ -57,7 +57,7 @@ export function NavBar() {
         type="button"
         className="mobile-nav-toggle"
         onClick={() => setMobileOpen((v) => !v)}
-        aria-label={mobileOpen ? "Sluit menu" : "Open menu"}
+        aria-label={mobileOpen ? t(locale, "nav.menu.close") : t(locale, "nav.menu.open")}
         aria-expanded={mobileOpen}
         style={{
           display: "none",
@@ -84,7 +84,7 @@ export function NavBar() {
           {t(locale, "nav.notes")}
         </Link>
         <Link href="/contact" style={{ color: "var(--fg)", textDecoration: "none", fontSize: "0.9rem" }}>
-          Contact
+          {t(locale, "nav.contact")}
         </Link>
         <Link href="/docs" style={{ color: "var(--fg)", textDecoration: "none", fontSize: "0.9rem" }}>
           {t(locale, "nav.architecture")}
@@ -186,7 +186,7 @@ export function NavBar() {
             {t(locale, "nav.notes")}
           </Link>
           <Link href="/contact" className="mobile-nav-link" onClick={() => setMobileOpen(false)}>
-            Contact
+            {t(locale, "nav.contact")}
           </Link>
           <Link href="/docs" className="mobile-nav-link" onClick={() => setMobileOpen(false)}>
             {t(locale, "nav.architecture")}

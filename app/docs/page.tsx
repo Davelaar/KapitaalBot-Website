@@ -1,22 +1,45 @@
 import Link from "next/link";
 import fs from "fs";
 import path from "path";
+import { cookies } from "next/headers";
+import { defaultLocale, t, type Locale } from "@/lib/i18n";
 
 const DOCS_DIR = path.join(process.cwd(), "content", "docs");
 
-const DOC_META: Record<string, { label: string; desc: string }> = {
-  ENGINE_SSOT: { label: "Engine SSOT", desc: "Engine-status, statusmatrix, runtime-topology (incl. Mermaid-diagram)." },
-  DOC_INDEX: { label: "Document index", desc: "Welke documenten leidend zijn, welke historisch." },
-  ARCHITECTURE_ENGINE_CURRENT: { label: "Architectuur", desc: "Huidige architectuur — modules, dataflow, execution lifecycle." },
-  LIVE_RUNBOOK_CURRENT: { label: "Runbook", desc: "Operationeel runbook — ingest, execution attach, markers." },
-  VALIDATION_MODEL_CURRENT: { label: "Validatiemodel", desc: "Bootstrap/attach/evaluation/lifecycle proof." },
-  OBSERVABILITY_SNAPSHOT_CONTRACT: { label: "Observability-contract", desc: "Contract tussen bot en website (snapshots)." },
-  CHANGELOG_ENGINE: { label: "Changelog engine", desc: "Technische changelog per subsystem." },
-  LOGGING: { label: "Logging", desc: "Loggingstructuur en markers." },
-  DB_ARCHITECTURE_STALE_EDGE_SAFE: { label: "DB-architectuur", desc: "State-first, partition, generation, stale-edge prevention." },
-  VALIDATION_REPORT_REFRESH_15MIN_RESET: { label: "15-min validatie", desc: "Proof-run met refresh/reset checks en expected outcomes." },
-  SYSTEMD_README: { label: "Systemd units", desc: "Service-overzicht voor ingest/execution/export en operationele startvolgorde." },
+const DOC_META: Record<string, { labelKey: string; descKey: string }> = {
+  ENGINE_SSOT: { labelKey: "docs.meta.ENGINE_SSOT.label", descKey: "docs.meta.ENGINE_SSOT.desc" },
+  DOC_INDEX: { labelKey: "docs.meta.DOC_INDEX.label", descKey: "docs.meta.DOC_INDEX.desc" },
+  ARCHITECTURE_ENGINE_CURRENT: {
+    labelKey: "docs.meta.ARCHITECTURE_ENGINE_CURRENT.label",
+    descKey: "docs.meta.ARCHITECTURE_ENGINE_CURRENT.desc",
+  },
+  LIVE_RUNBOOK_CURRENT: { labelKey: "docs.meta.LIVE_RUNBOOK_CURRENT.label", descKey: "docs.meta.LIVE_RUNBOOK_CURRENT.desc" },
+  VALIDATION_MODEL_CURRENT: {
+    labelKey: "docs.meta.VALIDATION_MODEL_CURRENT.label",
+    descKey: "docs.meta.VALIDATION_MODEL_CURRENT.desc",
+  },
+  OBSERVABILITY_SNAPSHOT_CONTRACT: {
+    labelKey: "docs.meta.OBSERVABILITY_SNAPSHOT_CONTRACT.label",
+    descKey: "docs.meta.OBSERVABILITY_SNAPSHOT_CONTRACT.desc",
+  },
+  CHANGELOG_ENGINE: { labelKey: "docs.meta.CHANGELOG_ENGINE.label", descKey: "docs.meta.CHANGELOG_ENGINE.desc" },
+  LOGGING: { labelKey: "docs.meta.LOGGING.label", descKey: "docs.meta.LOGGING.desc" },
+  DB_ARCHITECTURE_STALE_EDGE_SAFE: {
+    labelKey: "docs.meta.DB_ARCHITECTURE_STALE_EDGE_SAFE.label",
+    descKey: "docs.meta.DB_ARCHITECTURE_STALE_EDGE_SAFE.desc",
+  },
+  VALIDATION_REPORT_REFRESH_15MIN_RESET: {
+    labelKey: "docs.meta.VALIDATION_REPORT_REFRESH_15MIN_RESET.label",
+    descKey: "docs.meta.VALIDATION_REPORT_REFRESH_15MIN_RESET.desc",
+  },
+  SYSTEMD_README: { labelKey: "docs.meta.SYSTEMD_README.label", descKey: "docs.meta.SYSTEMD_README.desc" },
 };
+
+function getLocaleFromCookieStore(cookieStore: Awaited<ReturnType<typeof cookies>>): Locale {
+  const raw = cookieStore.get("NEXT_LOCALE")?.value;
+  if (raw && ["nl", "en", "de", "fr"].includes(raw)) return raw as Locale;
+  return defaultLocale;
+}
 
 function getDocSlugs(): string[] {
   if (!fs.existsSync(DOCS_DIR)) return [];
@@ -28,25 +51,29 @@ function getDocSlugs(): string[] {
 
 export const dynamic = "force-dynamic";
 
-export const metadata = {
-  title: "Documentation — KapitaalBot",
-  description: "Leidende documentatie voor de KapitaalBot-engine. SSOT, overzicht en Mermaid-diagrammen.",
-};
+export async function generateMetadata() {
+  const cookieStore = await cookies();
+  const locale = getLocaleFromCookieStore(cookieStore);
+  const title = `${t(locale, "docs.title")} — KapitaalBot`;
+  const description = `${t(locale, "docs.intro")} ${t(locale, "docs.page.introExtra")}`;
+  return { title, description };
+}
 
-export default function DocsPage() {
+export default async function DocsPage() {
+  const cookieStore = await cookies();
+  const locale = getLocaleFromCookieStore(cookieStore);
   const slugs = getDocSlugs();
 
   return (
     <main>
       <nav style={{ marginBottom: "1.5rem" }}>
         <Link href="/" style={{ color: "var(--accent)", textDecoration: "none" }}>
-          ← Home
+          ← {t(locale, "nav.home")}
         </Link>
       </nav>
-      <h1 style={{ fontSize: "1.75rem", marginBottom: "0.5rem" }}>Documentatie</h1>
+      <h1 style={{ fontSize: "1.75rem", marginBottom: "0.5rem" }}>{t(locale, "docs.title")}</h1>
       <p style={{ color: "var(--muted)", marginBottom: "1.5rem" }}>
-        Leidende documenten voor de engine. Single source of truth: ENGINE_SSOT; overzicht: DOC_INDEX.
-        Klik op een document voor de volledige inhoud inclusief Mermaid-diagrammen.
+        {t(locale, "docs.intro")} {t(locale, "docs.page.introExtra")}
       </p>
       <section className="card" style={{ padding: "1rem 1.25rem" }}>
         <table className="docs-index-table" style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.9rem" }}>
@@ -60,7 +87,7 @@ export default function DocsPage() {
                   fontWeight: 600,
                 }}
               >
-                Onderwerp
+                {t(locale, "docs.table.topic")}
               </th>
               <th
                 style={{
@@ -70,19 +97,19 @@ export default function DocsPage() {
                   fontWeight: 600,
                 }}
               >
-                Document
+                {t(locale, "docs.table.doc")}
               </th>
             </tr>
           </thead>
           <tbody>
             {slugs.map((slug) => {
-              const meta = DOC_META[slug] ?? { label: slug, desc: "" };
+              const meta = DOC_META[slug] ?? { labelKey: slug, descKey: "" };
               return (
                 <tr key={slug}>
                   <td style={{ padding: "0.4rem 0.25rem", verticalAlign: "top" }}>
-                    <strong>{meta.label}</strong>
-                    {meta.desc && (
-                      <p style={{ margin: "0.15rem 0 0", color: "var(--muted)", fontSize: "0.85rem" }}>{meta.desc}</p>
+                    <strong>{typeof meta.labelKey === "string" ? t(locale, meta.labelKey) : slug}</strong>
+                    {meta.descKey && (
+                      <p style={{ margin: "0.15rem 0 0", color: "var(--muted)", fontSize: "0.85rem" }}>{t(locale, meta.descKey)}</p>
                     )}
                   </td>
                   <td style={{ padding: "0.4rem 0.25rem", verticalAlign: "top" }}>
