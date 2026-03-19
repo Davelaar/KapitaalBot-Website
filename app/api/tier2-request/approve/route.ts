@@ -60,9 +60,9 @@ export async function POST(req: NextRequest) {
         { status: 500 }
       );
     }
-  } else if (process.env.TIER2_EMAIL_FROM) {
+  } else {
     // Fallback: lokale Postfix via sendmail, gebruikmakend van TIER2_EMAIL_FROM als afzender.
-    const from = process.env.TIER2_EMAIL_FROM;
+    const from = process.env.TIER2_EMAIL_FROM || "KapitaalBot <info@kapitaalbot.nl>";
     const subject = "Je KapitaalBot Tier 2-toegangscode";
     const lines = [
       `From: ${from}`,
