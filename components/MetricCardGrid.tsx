@@ -170,6 +170,11 @@ export default function MetricCardGrid({
       : null;
   const regimeSwitches1h = regime?.regime_switches_last_hour ?? null;
 
+  const execQuiet =
+    orders24h === 0 &&
+    trades24h === 0 &&
+    (tickerCount >= 50 || tradeCountRaw >= 50);
+
   return (
     <section>
       <h2 style={{ fontSize: "1.25rem", marginBottom: "1rem" }}>
@@ -183,32 +188,63 @@ export default function MetricCardGrid({
           gap: "1rem",
         }}
       >
-        <MetricCard label="Safety Hard Blocks" value={safetyBlocked} chip={safetyBlocked > 0 ? "warn" : "good"} />
-        <MetricCard label="Active Symbols" value={symbolCount} />
         <MetricCard
-          label="L3 Availability %"
+          label={t(locale, "metrics.label.safetyHardBlocks")}
+          value={safetyBlocked}
+          chip={safetyBlocked > 0 ? "warn" : "good"}
+        />
+        <MetricCard label={t(locale, "metrics.label.activeSymbols")} value={symbolCount} />
+        <MetricCard
+          label={t(locale, "metrics.label.l3Availability")}
           value={l3Pct != null ? `${Math.min(100, Math.max(0, l3Pct))}%` : "—"}
           progress={l3Pct != null ? Math.min(100, Math.max(0, l3Pct)) : undefined}
         />
-        <MetricCard label="Regime Switches (1h)" value={regimeSwitches1h ?? "—"} />
-        <MetricCard label="Strategy Count" value={activeStrategies} />
         <MetricCard
-          label="Drawdown"
+          label={t(locale, "metrics.label.regimeSwitches1h")}
+          value={regimeSwitches1h ?? "—"}
+        />
+        <MetricCard label={t(locale, "metrics.label.strategyCount")} value={activeStrategies} />
+        <MetricCard
+          label={t(locale, "metrics.label.drawdown")}
           value={drawdown}
           chip={drawdownSeverity(drawdownPct)}
         />
-        <MetricCard label="Active Regimes" value={activeRegimes} />
-        <MetricCard label="Guard Interventions" value={guardInterventions} />
-        <MetricCard label="Data Freshness (s)" value={freshnessVal} />
-        <MetricCard label="Trades (24h)" value={trades24h} />
-        <MetricCard label="Orders (24h)" value={orders24h} />
-        <MetricCard label="Ticker rows" value={tickerCount} />
-        <MetricCard label="Trade rows" value={tradeCountRaw} />
-        <MetricCard label="L2 rows" value={l2Count} />
-        <MetricCard label="L3 rows" value={l3CountRaw} />
-        <MetricCard label="Safety normal" value={safetyNormal} chip={safetyNormal > 0 ? "good" : undefined} />
-        <MetricCard label="Safety exit-only" value={safetyExitOnly} chip={safetyExitOnly > 0 ? "warn" : undefined} />
+        <MetricCard label={t(locale, "metrics.label.activeRegimes")} value={activeRegimes} />
+        <MetricCard
+          label={t(locale, "metrics.label.guardInterventions")}
+          value={guardInterventions}
+        />
+        <MetricCard label={t(locale, "metrics.label.dataFreshnessSecs")} value={freshnessVal} />
+        <MetricCard label={t(locale, "metrics.label.executedFills24h")} value={trades24h} />
+        <MetricCard label={t(locale, "metrics.label.executionOrders24h")} value={orders24h} />
+        <MetricCard label={t(locale, "metrics.label.tickerRows")} value={tickerCount} />
+        <MetricCard label={t(locale, "metrics.label.marketTradeFeedRows")} value={tradeCountRaw} />
+        <MetricCard label={t(locale, "metrics.label.l2Rows")} value={l2Count} />
+        <MetricCard label={t(locale, "metrics.label.l3Rows")} value={l3CountRaw} />
+        <MetricCard
+          label={t(locale, "metrics.label.safetyNormal")}
+          value={safetyNormal}
+          chip={safetyNormal > 0 ? "good" : undefined}
+        />
+        <MetricCard
+          label={t(locale, "metrics.label.safetyExitOnly")}
+          value={safetyExitOnly}
+          chip={safetyExitOnly > 0 ? "warn" : undefined}
+        />
       </div>
+      {execQuiet && (
+        <p
+          style={{
+            marginTop: "0.75rem",
+            fontSize: "0.8125rem",
+            color: "var(--muted)",
+            borderLeft: "3px solid var(--accent)",
+            paddingLeft: "0.75rem",
+          }}
+        >
+          {t(locale, "metrics.execVsMarketCallout")}
+        </p>
+      )}
       <p style={{ marginTop: "0.75rem", fontSize: "0.8125rem", color: "var(--muted)" }}>
         {t(locale, "metrics.trades24hHint")}
       </p>

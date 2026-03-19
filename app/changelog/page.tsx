@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
 import type { Locale } from "@/lib/i18n";
-import { defaultLocale } from "@/lib/i18n";
+import { defaultLocale, t } from "@/lib/i18n";
+import { readBotChangelog, type BotChangelogEntry } from "@/lib/read-bot-changelog";
 
 export const dynamic = "force-dynamic";
 
@@ -13,130 +14,118 @@ function getLocaleFromCookieStore(
   return defaultLocale;
 }
 
+function localeToBcp47(locale: Locale): string {
+  const m: Record<Locale, string> = {
+    nl: "nl-NL",
+    en: "en-GB",
+    de: "de-DE",
+    fr: "fr-FR",
+  };
+  return m[locale];
+}
+
+function formatCommittedAt(iso: string, locale: Locale): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  return new Intl.DateTimeFormat(localeToBcp47(locale), {
+    dateStyle: "full",
+    timeStyle: "medium",
+  }).format(d);
+}
+
+function entrySummary(entry: BotChangelogEntry, locale: Locale): string {
+  const s = entry.summary[locale] ?? entry.summary.en ?? entry.subject;
+  return s || entry.short;
+}
+
 export async function generateMetadata() {
-  // Intentionally omitted to avoid hardcoding metadata titles in the wrong language.
-  // The visible UI strings on this page are localized via `ui` below.
   return {};
 }
 
 export default async function ChangelogPage() {
   const cookieStore = await cookies();
   const locale = getLocaleFromCookieStore(cookieStore);
+  const bot = readBotChangelog();
+  const entriesNewestFirst = bot ? [...bot.entries].reverse() : [];
 
   const ui = {
     nl: {
       sectionWebsite: "Website (maart 2026)",
-      sectionEngine: "Engine / Bot (technische highlights)",
       navBack: "Home",
       title: "Changelog",
-      intro: "Laatste wijzigingen aan de observability-site en de engine (samenvatting).",
+      intro: "Website-updates en volledige bot-historie (Git).",
       bulletsWebsite: [
-        "Changelog-pagina toegevoegd; link in navigatie.",
-        "Finalisatie: freshness-indicator (GOOD/WARN/STALE), null handling (Awaiting bot export…).",
-        "Dashboard: extra metric cards (Safety Hard Blocks, L3 %, Regime Switches 1h, Drawdown severity), sorteerbare markttabel, regime stacked bar.",
-        'Homepage: hero “Live Trading Observability Engine”, secties Waarom KapitaalBot, Hoe Observability Werkt, Tier-toegangsmodel.',
-        "Tier2-aanvraag: POST /api/tier2-request → data/tier2_requests.json, rate limit, form loading/success.",
-        "Compliance-banner vertaald via cookie (NL/EN/DE/FR).",
-        "Admin: snapshot-status + raw JSON viewer (Tier 3).",
-        "SEO: OG/twitter, robots.txt, sitemap.xml, JSON-LD. Analytics (Plausible/Umami via env).",
+        "Changelog-pagina; navigatie.",
+        "Freshness-indicator (GOOD/WARN/STALE), null handling.",
+        "Dashboard: metric cards, sorteerbare markttabel, regime stacked bar.",
+        'Homepage: hero, Waarom / Hoe observability, Tier-model.',
+        "Tier2-aanvraag: POST /api/tier2-request, rate limit.",
+        "Compliance-banner per taal (cookie).",
+        "Admin: snapshot-status + raw JSON (Tier 3).",
+        "SEO: OG/twitter, robots, sitemap, JSON-LD.",
         "Error boundaries (error.tsx, global-error.tsx).",
       ],
-      bulletsEngine: [
-        { head: "Route Decision Engine v2", body: "Market-first route engine: market features → expected path → route expectancy → winner (route×horizon×entry×exit) of NoTrade; shadow/counterfactual logging." },
-        { head: "Observability export", body: "JSON-snapshots voor website BFF (geen directe DB); OBSERVABILITY_SNAPSHOT_CONTRACT." },
-        { head: "Safety", body: "WS-native safety (latency, watchdog, exit-only, hard-block); symbol_safety_state; ws_safety_report." },
-        { head: "Epoch / Ingest", body: "Lineage, execution_universe_snapshots, ingest/execution split (EXECUTION_ONLY)." },
-        { head: "Deterministic lifecycle", body: "DB-first, OrderTracker, fills_ledger, 13 states." },
-      ],
-      foot: "Volledige website-changelog: docs/CHANGELOG_FINALISATIE.md in de repo.",
-      summaryNote:
-        "Samenvatting op basis van KRAKENBOTMAART docs; voor volledige technische changelog zie de bot-repository.",
+      foot: "Website-detailchangelog:",
     },
     en: {
       sectionWebsite: "Website (March 2026)",
-      sectionEngine: "Engine / Bot (technical highlights)",
       navBack: "Home",
       title: "Changelog",
-      intro: "Recent updates to the observability website and the trading engine (summary).",
+      intro: "Website updates and full bot history (Git).",
       bulletsWebsite: [
-        "Changelog page added; link in navigation.",
-        "Finalization: freshness indicator (GOOD/WARN/STALE), null handling (Awaiting bot export…).",
-        "Dashboard: extra metric cards (Safety Hard Blocks, L3 %, Regime Switches 1h, Drawdown severity), sortable market table, regime stacked bar.",
-        'Homepage: hero “Live Trading Observability Engine”, sections Why KapitaalBot, How Observability Works, Tier Access Model.',
-        "Tier2 request: POST /api/tier2-request → data/tier2_requests.json, rate limit, form loading/success.",
-        "Compliance banner translated via cookie (NL/EN/DE/FR).",
-        "Admin: snapshot status + raw JSON viewer (Tier 3).",
-        "SEO: OG/twitter, robots.txt, sitemap.xml, JSON-LD. Analytics (Plausible/Umami via env).",
+        "Changelog page; navigation.",
+        "Freshness indicator (GOOD/WARN/STALE), null handling.",
+        "Dashboard: metric cards, sortable market table, regime stacked bar.",
+        "Homepage: hero, Why / How observability, Tier model.",
+        "Tier2 request: POST /api/tier2-request, rate limit.",
+        "Compliance banner per language (cookie).",
+        "Admin: snapshot status + raw JSON (Tier 3).",
+        "SEO: OG/twitter, robots, sitemap, JSON-LD.",
         "Error boundaries (error.tsx, global-error.tsx).",
       ],
-      bulletsEngine: [
-        { head: "Route Decision Engine v2", body: "Market-first route engine: market features → expected path → route expectancy → winner (route×horizon×entry×exit) or NoTrade; shadow/counterfactual logging." },
-        { head: "Observability export", body: "JSON snapshots for the website BFF (no direct DB); OBSERVABILITY_SNAPSHOT_CONTRACT." },
-        { head: "Safety", body: "WS-native safety (latency, watchdog, exit-only, hard-block); symbol_safety_state; ws_safety_report." },
-        { head: "Epoch / Ingest", body: "Lineage, execution_universe_snapshots, ingest/execution split (EXECUTION_ONLY)." },
-        { head: "Deterministic lifecycle", body: "DB-first, OrderTracker, fills_ledger, 13 states." },
-      ],
-      foot: "Full website changelog: docs/CHANGELOG_FINALISATIE.md in the repo.",
-      summaryNote:
-        "Summary based on KRAKENBOTMAART docs; for the full technical changelog see the bot repository.",
+      foot: "Full website changelog:",
     },
     de: {
       sectionWebsite: "Website (März 2026)",
-      sectionEngine: "Engine / Bot (technische Highlights)",
       navBack: "Start",
       title: "Changelog",
-      intro: "Aktuelle Änderungen an der Observability-Website und der Trading-Engine (Zusammenfassung).",
+      intro: "Website-Updates und vollständige Bot-Historie (Git).",
       bulletsWebsite: [
-        "Changelog-Seite hinzugefügt; Link in der Navigation.",
-        "Finalisierung: Freshness-Indikator (GOOD/WARN/STALE), Null-Handling (Awaiting bot export…).",
-        "Dashboard: zusätzliche Metrik-Karten (Safety Hard Blocks, L3 %, Regime Switches 1h, Drawdown severity), sortierbare Markttabelle, Regime-Stacked-Bar.",
-        'Homepage: Hero “Live Trading Observability Engine”, Bereiche Warum KapitaalBot, Wie Observability funktioniert, Tier-Zugangsmodell.',
-        "Tier2-Anfrage: POST /api/tier2-request → data/tier2_requests.json, Rate-Limit, Form Loading/Success.",
-        "Compliance-Banner über Cookie übersetzt (NL/EN/DE/FR).",
-        "Admin: Snapshot-Status + einfacher Raw-JSON-Viewer (Tier 3).",
-        "SEO: OG/Twitter, robots.txt, sitemap.xml, JSON-LD. Analytics (Plausible/Umami über env).",
+        "Changelog-Seite; Navigation.",
+        "Freshness-Indikator (GOOD/WARN/STALE), Null-Handling.",
+        "Dashboard: Metrik-Karten, sortierbare Markttabelle, Regime-Stacked-Bar.",
+        "Homepage: Hero, Warum / Wie Observability, Tier-Modell.",
+        "Tier2-Anfrage: POST /api/tier2-request, Rate-Limit.",
+        "Compliance-Banner pro Sprache (Cookie).",
+        "Admin: Snapshot-Status + Raw-JSON (Tier 3).",
+        "SEO: OG/Twitter, robots, Sitemap, JSON-LD.",
         "Error Boundaries (error.tsx, global-error.tsx).",
       ],
-      bulletsEngine: [
-        { head: "Route Decision Engine v2", body: "Market-first Route-Engine: market features → expected path → route expectancy → winner (route×horizon×entry×exit) oder NoTrade; Shadow/Counterfactual-Logging." },
-        { head: "Observability export", body: "JSON-Snapshots für die Website-BFF (keine direkte DB); OBSERVABILITY_SNAPSHOT_CONTRACT." },
-        { head: "Safety", body: "WS-natives Safety (latency, watchdog, exit-only, hard-block); symbol_safety_state; ws_safety_report." },
-        { head: "Epoch / Ingest", body: "Lineage, execution_universe_snapshots, ingest/execution split (EXECUTION_ONLY)." },
-        { head: "Deterministic lifecycle", body: "DB-first, OrderTracker, fills_ledger, 13 Zustände." },
-      ],
-      foot: "Vollständiger Website-Changelog: docs/CHANGELOG_FINALISATIE.md im Repo.",
-      summaryNote:
-        "Zusammenfassung basierend auf KRAKENBOTMAART-Dokumenten; für den vollständigen technischen Changelog siehe das Bot-Repository.",
+      foot: "Vollständiger Website-Changelog:",
     },
     fr: {
       sectionWebsite: "Site (mars 2026)",
-      sectionEngine: "Engine / Bot (points techniques)",
       navBack: "Accueil",
       title: "Changelog",
-      intro: "Mises à jour récentes du site d’observabilité et du moteur de trading (résumé).",
+      intro: "Mises à jour du site et historique complet du bot (Git).",
       bulletsWebsite: [
-        "Page Changelog ajoutée ; lien dans la navigation.",
-        "Finalisation : indicateur de fraîcheur (GOOD/WARN/STALE), gestion des valeurs null (Awaiting bot export…).",
-        "Dashboard : cartes de métriques supplémentaires (Safety Hard Blocks, L3 %, Regime Switches 1h, Drawdown severity), tableau marché triable, barres empilées par régime.",
-        'Accueil : hero “Live Trading Observability Engine”, sections Pourquoi KapitaalBot, Comment fonctionne l’observabilité, Modèle d’accès par tier.',
-        "Demande Tier2 : POST /api/tier2-request → data/tier2_requests.json, rate limit, chargement/succès du formulaire.",
-        "Bannière compliance traduite via cookie (NL/EN/DE/FR).",
-        "Admin : statut de snapshot + visualiseur JSON brut (Tier 3).",
-        "SEO : OG/twitter, robots.txt, sitemap.xml, JSON-LD. Analytics (Plausible/Umami via env).",
+        "Page Changelog ; navigation.",
+        "Indicateur de fraîcheur (GOOD/WARN/STALE), gestion des null.",
+        "Dashboard : cartes métriques, tableau marché triable, barres par régime.",
+        "Accueil : hero, Pourquoi / Comment l’observabilité, modèle par tier.",
+        "Demande Tier2 : POST /api/tier2-request, rate limit.",
+        "Bannière compliance par langue (cookie).",
+        "Admin : statut snapshot + JSON brut (Tier 3).",
+        "SEO : OG/twitter, robots, sitemap, JSON-LD.",
         "Error boundaries (error.tsx, global-error.tsx).",
       ],
-      bulletsEngine: [
-        { head: "Route Decision Engine v2", body: "Moteur de décision orienté marché : market features → expected path → route expectancy → winner (route×horizon×entry×exit) ou NoTrade ; logging shadow/counterfactual." },
-        { head: "Observability export", body: "Snapshots JSON pour le site BFF (pas de DB directe) ; OBSERVABILITY_SNAPSHOT_CONTRACT." },
-        { head: "Safety", body: "Safety native WS (latency, watchdog, exit-only, hard-block) ; symbol_safety_state ; ws_safety_report." },
-        { head: "Epoch / Ingest", body: "Lineage, execution_universe_snapshots, split ingest/execution (EXECUTION_ONLY)." },
-        { head: "Deterministic lifecycle", body: "DB-first, OrderTracker, fills_ledger, 13 états." },
-      ],
-      foot: "Changelog complet du site : docs/CHANGELOG_FINALISATIE.md dans le repo.",
-      summaryNote:
-        "Résumé basé sur les docs KRAKENBOTMAART ; pour le changelog technique complet voir le dépôt du bot.",
+      foot: "Changelog complet du site :",
     },
   }[locale];
+
+  const generatedLabel = bot
+    ? `${t(locale, "changelog.bot.generated")}: ${formatCommittedAt(bot.generated_at, locale)}`
+    : null;
 
   return (
     <main>
@@ -158,21 +147,71 @@ export default async function ChangelogPage() {
       </section>
 
       <section className="card" style={{ marginBottom: "1.5rem" }}>
-        <h2 style={{ fontSize: "1.25rem", marginBottom: "0.75rem" }}>{ui.sectionEngine}</h2>
-        <p style={{ color: "var(--muted)", fontSize: "0.875rem", marginBottom: "0.75rem" }}>
-          {ui.summaryNote}
+        <h2 style={{ fontSize: "1.25rem", marginBottom: "0.75rem" }}>{t(locale, "changelog.bot.title")}</h2>
+        <p style={{ color: "var(--muted)", fontSize: "0.9375rem", marginBottom: "0.75rem", lineHeight: 1.6 }}>
+          {t(locale, "changelog.bot.intro")}
         </p>
-        <ul style={{ margin: 0, paddingLeft: "1.25rem", lineHeight: 1.7, color: "var(--muted)", fontSize: "0.9375rem" }}>
-          {ui.bulletsEngine.map((b, i) => (
-            <li key={i}>
-              <strong style={{ color: "var(--fg)" }}>{b.head}</strong> — {b.body}
-            </li>
-          ))}
-        </ul>
+        {bot ? (
+          <p style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1rem" }}>
+            {generatedLabel}
+            <br />
+            {bot.commit_count} {t(locale, "changelog.bot.commits")}
+            {bot.source_repo ? (
+              <>
+                <br />
+                <span style={{ wordBreak: "break-all" }}>{bot.source_repo}</span>
+              </>
+            ) : null}
+          </p>
+        ) : (
+          <p style={{ color: "var(--warn, #c9a227)", fontSize: "0.9375rem" }}>{t(locale, "changelog.bot.empty")}</p>
+        )}
+
+        {entriesNewestFirst.length > 0 && (
+          <ol
+            style={{
+              margin: 0,
+              paddingLeft: "1.1rem",
+              lineHeight: 1.55,
+              color: "var(--muted)",
+              fontSize: "0.875rem",
+              maxHeight: "min(70vh, 1200px)",
+              overflowY: "auto",
+            }}
+          >
+            {entriesNewestFirst.map((e) => (
+              <li key={e.hash} style={{ marginBottom: "0.85rem" }}>
+                <time dateTime={e.committed_at} style={{ color: "var(--fg)" }}>
+                  {formatCommittedAt(e.committed_at, locale)}
+                </time>{" "}
+                <code style={{ fontSize: "0.8em" }}>{e.short}</code>
+                <div style={{ marginTop: "0.2rem", color: "var(--fg)" }}>{entrySummary(e, locale)}</div>
+                {e.body && e.body.replace(/\s+/g, " ").trim().length > 0 ? (
+                  <details style={{ marginTop: "0.35rem" }}>
+                    <summary style={{ cursor: "pointer", color: "var(--accent)" }}>
+                      {t(locale, "changelog.bot.moreBody")}
+                    </summary>
+                    <pre
+                      style={{
+                        whiteSpace: "pre-wrap",
+                        fontSize: "0.78rem",
+                        margin: "0.5rem 0 0",
+                        color: "var(--muted)",
+                      }}
+                    >
+                      {e.body}
+                    </pre>
+                  </details>
+                ) : null}
+              </li>
+            ))}
+          </ol>
+        )}
       </section>
 
       <p style={{ fontSize: "0.875rem", color: "var(--muted)" }}>
-        {ui.foot} <code style={{ fontSize: "0.875em" }}>docs/CHANGELOG_FINALISATIE.md</code>
+        {ui.foot}{" "}
+        <code style={{ fontSize: "0.875em" }}>docs/CHANGELOG_FINALISATIE.md</code>
       </p>
     </main>
   );
