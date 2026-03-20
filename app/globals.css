@@ -123,25 +123,32 @@ textarea {
 
 .markdown-body .mermaid-wrapper {
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   overflow-x: auto;
   overflow-y: hidden;
-  padding: 12px 0;
+  -webkit-overflow-scrolling: touch;
+  padding: 12px 16px;
   border: 1px solid var(--border);
   border-radius: 10px;
   background: #fdfaf2;
 }
 
 .markdown-body .mermaid-diagram {
-  min-width: max-content;
-  padding: 0 12px;
+  min-width: 0;
+  max-width: 100%;
+  padding: 0;
+  box-sizing: border-box;
 }
 
+/* Scale diagram to the beige block; wide charts scroll inside the wrapper only */
 .markdown-body .mermaid-diagram svg {
-  max-width: none !important;
-  width: auto !important;
-  height: auto;
-  min-width: 900px;
+  max-width: 100% !important;
+  width: 100% !important;
+  height: auto !important;
+  min-width: 0;
   display: block;
+  box-sizing: border-box;
 }
 
 .markdown-body .mermaid-error {

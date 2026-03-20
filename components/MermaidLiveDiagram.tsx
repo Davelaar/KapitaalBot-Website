@@ -39,7 +39,8 @@ export function MermaidLiveDiagram({ chart, seoKeyPrefix }: MermaidLiveDiagramPr
           theme: "default",
           flowchart: {
             htmlLabels: false,
-            useMaxWidth: false,
+            /* true = SVG scales to container so diagrams stay inside the card */
+            useMaxWidth: true,
           },
         });
         mermaidInitialized = true;
