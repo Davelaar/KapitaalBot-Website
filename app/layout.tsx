@@ -5,6 +5,7 @@ import ComplianceBanner from "@/components/ComplianceBanner";
 import { NavBar } from "@/components/NavBar";
 import { Footer } from "@/components/Footer";
 import { Analytics } from "@/components/Analytics";
+import { getKapitaalbotGaMeasurementId } from "@/lib/analytics";
 import { defaultLocale, t, type Locale } from "@/lib/i18n";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -40,31 +41,37 @@ export default async function RootLayout({
   const cookieStore = await cookies();
   const raw = cookieStore.get("NEXT_LOCALE")?.value;
   const lang = (raw && ["nl", "en", "de", "fr"].includes(raw) ? raw : defaultLocale) as Locale;
+  const gaId = getKapitaalbotGaMeasurementId();
 
   return (
     <html lang={lang} suppressHydrationWarning>
       <body>
-        <NavBar />
-        <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-          {children}
-          <Footer />
-          <ComplianceBanner />
+        {gaId ? (
+          <link rel="stylesheet" href="/analytics/kapitaalbot-analytics.css" />
+        ) : null}
+        <div data-kapitaalbot-site-root>
+          <NavBar />
+          <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+            {children}
+            <Footer />
+            <ComplianceBanner />
+          </div>
+          <script
+            type="application/ld+json"
+            // Important: use an explicit closing tag (no children) to avoid
+            // React error #60 in some runtimes.
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "SoftwareApplication",
+                name: "KapitaalBot",
+                applicationCategory: "FinanceApplication",
+                description: t(lang, "hero.subline"),
+              }),
+            }}
+          ></script>
         </div>
-        <script
-          type="application/ld+json"
-          // Important: use an explicit closing tag (no children) to avoid
-          // React error #60 in some runtimes.
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "SoftwareApplication",
-              name: "KapitaalBot",
-              applicationCategory: "FinanceApplication",
-              description: t(lang, "hero.subline"),
-            }),
-          }}
-        ></script>
-        <Analytics />
+        <Analytics locale={lang} />
       </body>
     </html>
   );

@@ -1,0 +1,70 @@
+/* KapitaalBot — analytics consent overlay (minimal, no framework) */
+#kapitaalbot-analytics-overlay,
+#kapitaalbot-analytics-blocked {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  box-sizing: border-box;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+}
+
+#kapitaalbot-analytics-overlay {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+#kapitaalbot-analytics-overlay[hidden],
+#kapitaalbot-analytics-blocked[hidden] {
+  display: none !important;
+}
+
+.kapitaalbot-analytics-card {
+  max-width: 28rem;
+  width: 100%;
+  background: #fff;
+  color: #111;
+  padding: 1.25rem 1.25rem 1rem;
+  border-radius: 10px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.kapitaalbot-analytics-card p {
+  margin: 0 0 1rem;
+}
+
+.kapitaalbot-analytics-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.kapitaalbot-analytics-actions button {
+  font: inherit;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid #ccc;
+  background: #f5f5f5;
+}
+
+.kapitaalbot-analytics-actions button[type="button"].kapitaalbot-analytics-primary {
+  background: #111;
+  color: #fff;
+  border-color: #111;
+}
+
+#kapitaalbot-analytics-blocked {
+  background: #fafafa;
+  color: #111;
+}
+
+#kapitaalbot-analytics-blocked .kapitaalbot-analytics-card {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  text-align: center;
+}
