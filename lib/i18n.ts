@@ -50,6 +50,8 @@ const strings: Record<Locale, Record<string, string>> = {
     "faq.chat.sending": "Bezig...",
     "faq.chat.send": "Stuur",
     "faq.chat.error": "Onbekende fout",
+    "faq.chat.fallbackNoMatch":
+      "Ik vind geen duidelijke match in de FAQ op deze pagina. Scroll omhoog naar de uitklapsecties of gebruik het contactformulier voor een specifieke vraag.",
     "faq.section.overview.title": "Overzicht & scope",
     "faq.overview.q1": "Wat is KapitaalBot?",
     "faq.overview.a1": "KapitaalBot is een autonoom crypto trading systeem dat op ruim 600 spotmarkten draait. De engine is multi-regime (bijv. range, trend, high-volatility, low-liquidity) en multi-strategy (bijv. liquidity-, momentum- en volumegerichte strategieën). Deze site toont alleen observability-data over die runtime, geen live orders of realtime signalen.",
@@ -400,6 +402,8 @@ const strings: Record<Locale, Record<string, string>> = {
     "faq.chat.sending": "Sending...",
     "faq.chat.send": "Send",
     "faq.chat.error": "Unknown error",
+    "faq.chat.fallbackNoMatch":
+      "I can’t find a clear match in the FAQ on this page. Scroll up to the sections or use the contact form for a specific question.",
     "faq.section.overview.title": "Overview & scope",
     "faq.overview.q1": "What is KapitaalBot?",
     "faq.overview.a1": "KapitaalBot is an autonomous crypto trading system running on 600+ spot markets. The engine is multi-regime (e.g. range, trend, high-volatility, low-liquidity) and multi-strategy (e.g. liquidity-, momentum- and volume-oriented strategies). This site shows only observability data about that runtime, no live orders or real-time signals.",
@@ -749,6 +753,8 @@ const strings: Record<Locale, Record<string, string>> = {
     "faq.chat.sending": "Wird gesendet...",
     "faq.chat.send": "Senden",
     "faq.chat.error": "Unbekannter Fehler",
+    "faq.chat.fallbackNoMatch":
+      "Kein klarer Treffer in der FAQ auf dieser Seite. Nach oben scrollen zu den Abschnitten oder das Kontaktformular für eine konkrete Frage nutzen.",
     "faq.section.overview.title": "Überblick & Umfang",
     "faq.overview.q1": "Was ist KapitaalBot?",
     "faq.overview.a1": "KapitaalBot ist ein autonomes Krypto-Trading-System, das auf über 600 Spotmärkten läuft. Die Engine ist multi-regime (z. B. Range, Trend, High-Volatility, Low-Liquidity) und multi-strategy (z. B. Liquiditäts-, Momentum- und volumenorientierte Strategien). Diese Seite zeigt nur Observability-Daten zu dieser Runtime, keine Live-Orders oder Echtzeit-Signale.",
@@ -1098,6 +1104,8 @@ const strings: Record<Locale, Record<string, string>> = {
     "faq.chat.sending": "Envoi...",
     "faq.chat.send": "Envoyer",
     "faq.chat.error": "Erreur inconnue",
+    "faq.chat.fallbackNoMatch":
+      "Aucune correspondance claire dans la FAQ de cette page. Remontez vers les sections ou utilisez le formulaire de contact pour une question précise.",
     "faq.section.overview.title": "Aperçu et périmètre",
     "faq.overview.q1": "Qu'est-ce que KapitaalBot ?",
     "faq.overview.a1": "KapitaalBot est un système de trading crypto autonome qui tourne sur plus de 600 marchés au comptant. Le moteur est multi-régime (ex. range, tendance, haute volatilité, faible liquidité) et multi-stratégie (ex. liquidité, momentum, volume). Ce site n'affiche que des données d'observability sur cette runtime, pas d'ordres en direct ni de signaux en temps réel.",

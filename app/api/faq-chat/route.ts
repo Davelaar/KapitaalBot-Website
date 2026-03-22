@@ -3,6 +3,14 @@ import fs from "fs";
 import path from "path";
 
 import { getSessionTier } from "@/lib/auth";
+import type { Locale } from "@/lib/i18n";
+import { t } from "@/lib/i18n";
+import { matchLocalFaq } from "@/lib/faq-local-fallback";
+
+function parseLocale(raw: string): Locale {
+  if (raw === "en" || raw === "de" || raw === "fr") return raw;
+  return "nl";
+}
 
 /**
  * FAQ endpoint (website) -> externe RAG backend.
@@ -38,17 +46,29 @@ async function logFaq(question: string, answer: string, sources: string[]) {
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
   const question = typeof body?.question === "string" ? body.question.trim() : "";
-  const locale = typeof body?.locale === "string" ? body.locale : "nl";
+  const locale = parseLocale(typeof body?.locale === "string" ? body.locale : "nl");
   if (!question) {
     return NextResponse.json({ error: "Vraag ontbreekt." }, { status: 400 });
   }
 
-  const backendUrl = process.env.FAQ_CHAT_BACKEND_URL;
+  const backendUrl = process.env.FAQ_CHAT_BACKEND_URL?.trim();
   if (!backendUrl) {
-    return NextResponse.json(
-      { error: "RAG backend niet geconfigureerd (FAQ_CHAT_BACKEND_URL ontbreekt)." },
-      { status: 503 }
-    );
+    const local = matchLocalFaq(question, locale);
+    if (local) {
+      await logFaq(question, local.answer, local.sources);
+      return NextResponse.json({
+        answer: local.answer,
+        sources: local.sources,
+        mode: "local_faq" as const,
+      });
+    }
+    const fallbackMsg = t(locale, "faq.chat.fallbackNoMatch");
+    await logFaq(question, fallbackMsg, []);
+    return NextResponse.json({
+      answer: fallbackMsg,
+      sources: [],
+      mode: "local_faq" as const,
+    });
   }
 
   const tierNum = await getSessionTier();
@@ -84,6 +104,7 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({
     answer: finalAnswer,
     sources,
+    mode: "rag" as const,
   });
 }
 

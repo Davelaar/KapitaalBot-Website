@@ -12,9 +12,10 @@ fungeert als proxy en verwacht dat de backend actief is.
 
 - `FAQ_CHAT_BACKEND_URL`  
   - Type: URL (bijv. `http://127.0.0.1:8097/rag/faq`)  
-  - Doel: verplichte upstream RAG-endpoint voor de FAQ-chat.  
+  - Doel: upstream RAG-endpoint voor de FAQ-chat (productie / volledige documentatie-index).  
   - Huidig gedrag: `/api/faq-chat` stuurt `question`, `locale`, `tier` naar deze URL.
-  - Bij ontbrekende of niet-bereikbare URL geeft de website-API een `503`.
+  - **Als deze variabele ontbreekt of leeg is:** er is geen `503` meer. De route valt terug op een **lokale FAQ-match** (zelfde Q/A als op de FAQ-pagina: token-overlap). Antwoord bevat dan `mode: "local_faq"`. Geen OpenAI/pgvector nodig voor basisgebruik.
+  - Als de URL wél gezet is maar de upstream faalt: `503` met fouttekst (zoals voorheen).
 
 ## RAG-backend env
 
