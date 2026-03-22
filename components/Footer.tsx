@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useLocale } from "@/lib/locale";
+import { withLocale } from "@/lib/locale-path";
 import { t } from "@/lib/i18n";
 
 export function Footer() {
@@ -22,19 +23,19 @@ export function Footer() {
         alignItems: "center",
       }}
     >
-      <Link href="/kennis" style={linkStyle}>
+      <Link href={withLocale(locale, "/kennis")} style={linkStyle}>
         {t(locale, "nav.kennis")}
       </Link>
-      <Link href="/over" style={linkStyle}>
+      <Link href={withLocale(locale, "/over")} style={linkStyle}>
         {t(locale, "nav.about")}
       </Link>
-      <Link href="/faq" style={linkStyle}>
+      <Link href={withLocale(locale, "/faq")} style={linkStyle}>
         {t(locale, "nav.research")}
       </Link>
-      <Link href="/docs" style={linkStyle}>
+      <Link href={withLocale(locale, "/docs")} style={linkStyle}>
         {t(locale, "nav.architecture")}
       </Link>
-      <Link href="/tier2-request" style={linkStyle}>
+      <Link href={withLocale(locale, "/tier2-request")} style={linkStyle}>
         {t(locale, "nav.access")}
       </Link>
     </footer>

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useLocale } from "@/lib/locale";
+import { withLocale } from "@/lib/locale-path";
 import { t } from "@/lib/i18n";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -74,28 +75,28 @@ export function NavBar() {
         {mobileOpen ? "×" : "☰"}
       </button>
       <nav className="desktop-nav" style={{ display: "flex", alignItems: "center", gap: "1rem", position: "relative" }}>
-        <Link href="/" style={{ color: "var(--fg)", textDecoration: "none", fontSize: "0.9rem" }}>
+        <Link href={withLocale(locale, "/")} style={{ color: "var(--fg)", textDecoration: "none", fontSize: "0.9rem" }}>
           {t(locale, "nav.system")}
         </Link>
-        <Link href="/dashboard" style={{ color: "var(--fg)", textDecoration: "none", fontSize: "0.9rem" }}>
+        <Link href={withLocale(locale, "/dashboard")} style={{ color: "var(--fg)", textDecoration: "none", fontSize: "0.9rem" }}>
           {t(locale, "nav.data")}
         </Link>
-        <Link href="/kennis" style={{ color: "var(--fg)", textDecoration: "none", fontSize: "0.9rem" }}>
+        <Link href={withLocale(locale, "/kennis")} style={{ color: "var(--fg)", textDecoration: "none", fontSize: "0.9rem" }}>
           {t(locale, "nav.kennis")}
         </Link>
-        <Link href="/over" style={{ color: "var(--fg)", textDecoration: "none", fontSize: "0.9rem" }}>
+        <Link href={withLocale(locale, "/over")} style={{ color: "var(--fg)", textDecoration: "none", fontSize: "0.9rem" }}>
           {t(locale, "nav.about")}
         </Link>
-        <Link href="/changelog" style={{ color: "var(--fg)", textDecoration: "none", fontSize: "0.9rem" }}>
+        <Link href={withLocale(locale, "/changelog")} style={{ color: "var(--fg)", textDecoration: "none", fontSize: "0.9rem" }}>
           {t(locale, "nav.notes")}
         </Link>
-        <Link href="/contact" style={{ color: "var(--fg)", textDecoration: "none", fontSize: "0.9rem" }}>
+        <Link href={withLocale(locale, "/contact")} style={{ color: "var(--fg)", textDecoration: "none", fontSize: "0.9rem" }}>
           {t(locale, "nav.contact")}
         </Link>
-        <Link href="/docs" style={{ color: "var(--fg)", textDecoration: "none", fontSize: "0.9rem" }}>
+        <Link href={withLocale(locale, "/docs")} style={{ color: "var(--fg)", textDecoration: "none", fontSize: "0.9rem" }}>
           {t(locale, "nav.architecture")}
         </Link>
-        <Link href="/faq" style={{ color: "var(--fg)", textDecoration: "none", fontSize: "0.9rem" }}>
+        <Link href={withLocale(locale, "/faq")} style={{ color: "var(--fg)", textDecoration: "none", fontSize: "0.9rem" }}>
           {t(locale, "nav.research")}
         </Link>
         <div style={{ position: "relative" }}>
@@ -132,7 +133,7 @@ export function NavBar() {
               role="menu"
             >
               <Link
-                href="/tier2-request"
+                href={withLocale(locale, "/tier2-request")}
                 style={{
                   display: "block",
                   padding: "0.4rem 0.9rem",
@@ -146,7 +147,7 @@ export function NavBar() {
                 {t(locale, "nav.access")}
               </Link>
               <Link
-                href="/login"
+                href={withLocale(locale, "/login")}
                 style={{
                   display: "block",
                   padding: "0.4rem 0.9rem",
@@ -182,35 +183,35 @@ export function NavBar() {
             zIndex: 40,
           }}
         >
-          <Link href="/" className="mobile-nav-link" onClick={() => setMobileOpen(false)}>
+          <Link href={withLocale(locale, "/")} className="mobile-nav-link" onClick={() => setMobileOpen(false)}>
             {t(locale, "nav.system")}
           </Link>
-          <Link href="/dashboard" className="mobile-nav-link" onClick={() => setMobileOpen(false)}>
+          <Link href={withLocale(locale, "/dashboard")} className="mobile-nav-link" onClick={() => setMobileOpen(false)}>
             {t(locale, "nav.data")}
           </Link>
-          <Link href="/kennis" className="mobile-nav-link" onClick={() => setMobileOpen(false)}>
+          <Link href={withLocale(locale, "/kennis")} className="mobile-nav-link" onClick={() => setMobileOpen(false)}>
             {t(locale, "nav.kennis")}
           </Link>
-          <Link href="/over" className="mobile-nav-link" onClick={() => setMobileOpen(false)}>
+          <Link href={withLocale(locale, "/over")} className="mobile-nav-link" onClick={() => setMobileOpen(false)}>
             {t(locale, "nav.about")}
           </Link>
-          <Link href="/changelog" className="mobile-nav-link" onClick={() => setMobileOpen(false)}>
+          <Link href={withLocale(locale, "/changelog")} className="mobile-nav-link" onClick={() => setMobileOpen(false)}>
             {t(locale, "nav.notes")}
           </Link>
-          <Link href="/contact" className="mobile-nav-link" onClick={() => setMobileOpen(false)}>
+          <Link href={withLocale(locale, "/contact")} className="mobile-nav-link" onClick={() => setMobileOpen(false)}>
             {t(locale, "nav.contact")}
           </Link>
-          <Link href="/docs" className="mobile-nav-link" onClick={() => setMobileOpen(false)}>
+          <Link href={withLocale(locale, "/docs")} className="mobile-nav-link" onClick={() => setMobileOpen(false)}>
             {t(locale, "nav.architecture")}
           </Link>
-          <Link href="/faq" className="mobile-nav-link" onClick={() => setMobileOpen(false)}>
+          <Link href={withLocale(locale, "/faq")} className="mobile-nav-link" onClick={() => setMobileOpen(false)}>
             {t(locale, "nav.research")}
           </Link>
           <div className="mobile-nav-section">{t(locale, "nav.account") ?? "Account"}</div>
-          <Link href="/tier2-request" className="mobile-nav-link mobile-nav-sub" onClick={() => setMobileOpen(false)}>
+          <Link href={withLocale(locale, "/tier2-request")} className="mobile-nav-link mobile-nav-sub" onClick={() => setMobileOpen(false)}>
             {t(locale, "nav.access")}
           </Link>
-          <Link href="/login" className="mobile-nav-link mobile-nav-sub" onClick={() => setMobileOpen(false)}>
+          <Link href={withLocale(locale, "/login")} className="mobile-nav-link mobile-nav-sub" onClick={() => setMobileOpen(false)}>
             {t(locale, "nav.login")}
           </Link>
           <div className="mobile-nav-tools">

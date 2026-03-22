@@ -1,8 +1,10 @@
 "use client";
 
 import { useCallback } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import { locales, type Locale } from "@/lib/i18n";
 import { useLocale } from "@/lib/locale";
+import { stripLocalePathname, withLocale } from "@/lib/locale-path";
 
 function FlagNL() {
   /* NL: rood (boven), wit (midden), blauw (onder) */
@@ -54,15 +56,22 @@ const FLAG_ICON: Record<Locale, () => JSX.Element> = {
 };
 
 export function LanguageSwitcher() {
+  const router = useRouter();
+  const pathname = usePathname();
   const currentLocale = useLocale();
-  const setLocale = useCallback((locale: Locale) => {
-    if (typeof window !== "undefined" && (window as any).plausible) {
-      // Plausible supports simple event names; payloads are optional.
-      (window as any).plausible("language_switch");
-    }
-    document.cookie = `NEXT_LOCALE=${locale};path=/;max-age=31536000`;
-    window.location.reload();
-  }, []);
+
+  const setLocale = useCallback(
+    (locale: Locale) => {
+      if (typeof window !== "undefined" && (window as any).plausible) {
+        (window as any).plausible("language_switch");
+      }
+      const rest = stripLocalePathname(pathname);
+      const target = withLocale(locale, rest);
+      document.cookie = `NEXT_LOCALE=${locale};path=/;max-age=31536000`;
+      router.push(target);
+    },
+    [router, pathname],
+  );
 
   return (
     <span
@@ -72,10 +81,10 @@ export function LanguageSwitcher() {
         currentLocale === "en"
           ? "Choose language"
           : currentLocale === "de"
-          ? "Sprache wählen"
-          : currentLocale === "fr"
-          ? "Choisir la langue"
-          : "Taal kiezen"
+            ? "Sprache wählen"
+            : currentLocale === "fr"
+              ? "Choisir la langue"
+              : "Taal kiezen"
       }
     >
       {locales.map((locale) => {

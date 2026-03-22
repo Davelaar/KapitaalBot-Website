@@ -61,13 +61,13 @@
       var o = window.__KAPITAALBOT_LOCALE__.toLowerCase().split('-')[0];
       if (MESSAGES[o]) return o;
     }
+    var path = typeof location.pathname === 'string' ? location.pathname : '';
+    var seg = path.split('/').filter(Boolean)[0];
+    if (seg && MESSAGES[seg]) return seg;
     var htmlLang = (document.documentElement.getAttribute('lang') || '')
       .toLowerCase()
       .split('-')[0];
     if (MESSAGES[htmlLang]) return htmlLang;
-    var path = typeof location.pathname === 'string' ? location.pathname : '';
-    var m = path.match(/^\/(nl|en|de|fr)(\/|$)/);
-    if (m && MESSAGES[m[1]]) return m[1];
     return 'nl';
   }
 

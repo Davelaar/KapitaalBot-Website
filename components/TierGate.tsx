@@ -1,25 +1,20 @@
 import Link from "next/link";
-import { cookies } from "next/headers";
 import { t, type Locale } from "@/lib/i18n";
-import { defaultLocale } from "@/lib/i18n";
+import { withLocale } from "@/lib/locale-path";
 
 type TierGateKind = "tier2" | "tier3";
 
 interface TierGateProps {
   kind: TierGateKind;
+  locale: Locale;
 }
 
-function getLocaleFromCookies(cookieStore: Awaited<ReturnType<typeof cookies>>): Locale {
-  const raw = cookieStore.get("NEXT_LOCALE")?.value;
-  if (raw && ["nl", "en", "de", "fr"].includes(raw)) return raw as Locale;
-  return defaultLocale;
-}
-
-export async function TierGate({ kind }: TierGateProps) {
-  const cookieStore = await cookies();
-  const locale = getLocaleFromCookies(cookieStore);
+export async function TierGate({ kind, locale }: TierGateProps) {
   const titleKey = kind === "tier2" ? "tier_gate.tier2.title" : "tier_gate.tier3.title";
   const messageKey = kind === "tier2" ? "tier_gate.tier2.message" : "tier_gate.tier3.message";
+
+  const nextPath = kind === "tier2" ? "/dashboard/tier2" : "/admin";
+  const loginHref = `${withLocale(locale, "/login")}?next=${encodeURIComponent(withLocale(locale, nextPath))}`;
 
   return (
     <main>
@@ -31,7 +26,7 @@ export async function TierGate({ kind }: TierGateProps) {
         <div style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem" }}>
           {kind === "tier2" && (
             <Link
-              href="/tier2-request"
+              href={withLocale(locale, "/tier2-request")}
               style={{
                 padding: "0.5rem 1rem",
                 background: "var(--accent)",
@@ -46,7 +41,7 @@ export async function TierGate({ kind }: TierGateProps) {
             </Link>
           )}
           <Link
-            href={kind === "tier2" ? "/login?next=/dashboard/tier2" : "/login?next=/admin"}
+            href={loginHref}
             style={{
               padding: "0.5rem 1rem",
               border: "1px solid var(--border)",
@@ -59,7 +54,7 @@ export async function TierGate({ kind }: TierGateProps) {
           >
             {t(locale, "tier_gate.login")}
           </Link>
-          <Link href="/" style={{ color: "var(--accent)", textDecoration: "none", fontSize: "0.9375rem", alignSelf: "center" }}>
+          <Link href={withLocale(locale, "/")} style={{ color: "var(--accent)", textDecoration: "none", fontSize: "0.9375rem", alignSelf: "center" }}>
             ← {t(locale, "nav.home")}
           </Link>
         </div>

@@ -1,19 +1,7 @@
-import { cookies } from "next/headers";
 import { getCmsDataCached } from "@/lib/read-cms-cached";
-import { defaultLocale, t, type Locale } from "@/lib/i18n";
+import { t, type Locale } from "@/lib/i18n";
 
-function getLocaleFromCookieStore(
-  cookieStore: Awaited<ReturnType<typeof cookies>>,
-): Locale {
-  const raw = cookieStore.get("NEXT_LOCALE")?.value;
-  if (raw && ["nl", "en", "de", "fr"].includes(raw)) return raw as Locale;
-  return defaultLocale;
-}
-
-export default async function ComplianceBanner() {
-  const cookieStore = await cookies();
-  const locale = getLocaleFromCookieStore(cookieStore);
-
+export default async function ComplianceBanner({ locale }: { locale: Locale }) {
   const cms = await getCmsDataCached();
   const override = cms?.compliance_override?.trim() ?? "";
   const content = override ? override : t(locale, "compliance.default");

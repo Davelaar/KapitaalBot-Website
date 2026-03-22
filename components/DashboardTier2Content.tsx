@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { MermaidLiveDiagram } from "@/components/MermaidLiveDiagram";
 import { useLocale } from "@/lib/locale";
+import { withLocale } from "@/lib/locale-path";
 import type {
   EventBufferKpis,
   LabelCount,
@@ -318,7 +319,7 @@ export function DashboardTier2Content({ execution, latency, pnl, safety }: Dashb
   return (
     <>
       <nav style={{ marginBottom: "1.5rem" }}>
-        <Link href="/dashboard" style={{ color: "var(--accent)", textDecoration: "none" }}>
+        <Link href={withLocale(locale, "/dashboard")} style={{ color: "var(--accent)", textDecoration: "none" }}>
           ← {ui.navBack}
         </Link>
       </nav>
@@ -343,7 +344,7 @@ export function DashboardTier2Content({ execution, latency, pnl, safety }: Dashb
             <span dangerouslySetInnerHTML={{ __html: ui.noDataText }} />
           </p>
           <p style={{ marginTop: "0.75rem", marginBottom: 0 }}>
-            <Link href="/dashboard" style={{ color: "var(--accent)", textDecoration: "none", fontSize: "0.9375rem" }}>
+            <Link href={withLocale(locale, "/dashboard")} style={{ color: "var(--accent)", textDecoration: "none", fontSize: "0.9375rem" }}>
               → {ui.linkToTier1}
             </Link>
           </p>
@@ -453,7 +454,7 @@ export function DashboardTier2Content({ execution, latency, pnl, safety }: Dashb
         <h2 style={{ fontSize: "1.1rem", marginBottom: "0.25rem" }}>{ui.sectionG}</h2>
         <p style={{ color: "var(--muted)", fontSize: "0.875rem", marginBottom: 0 }}>
           {ui.marketSummaryText}{" "}
-          <Link href="/dashboard" style={{ color: "var(--accent)", textDecoration: "none" }}>
+          <Link href={withLocale(locale, "/dashboard")} style={{ color: "var(--accent)", textDecoration: "none" }}>
             {ui.marketSummaryLinkText}
           </Link>{" "}
           {ui.marketSummaryText2}

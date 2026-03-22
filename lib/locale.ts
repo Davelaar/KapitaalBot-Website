@@ -1,8 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
+import { useMemo, useEffect, useState } from "react";
 import type { Locale } from "./i18n";
 import { defaultLocale } from "./i18n";
+import { isLocale } from "./locale-path";
 
 export function getLocaleFromCookie(): Locale {
   if (typeof document === "undefined") return defaultLocale;
@@ -12,13 +14,30 @@ export function getLocaleFromCookie(): Locale {
   return defaultLocale;
 }
 
+/**
+ * Huidige UI-taal: primair uit URL (`/nl/...`), anders cookie (tijdens transitie).
+ */
 export function useLocale(): Locale {
-  const [locale, setLocale] = useState<Locale>(defaultLocale);
+  const pathname = usePathname();
+  const [cookieLocale, setCookieLocale] = useState<Locale>(defaultLocale);
+
   useEffect(() => {
-    setLocale(getLocaleFromCookie());
-    const handler = () => setLocale(getLocaleFromCookie());
+    setCookieLocale(getLocaleFromCookie());
+    const handler = () => setCookieLocale(getLocaleFromCookie());
     window.addEventListener("focus", handler);
     return () => window.removeEventListener("focus", handler);
   }, []);
-  return locale;
+
+  return useMemo(() => {
+    const first = pathname.split("/").filter(Boolean)[0];
+    if (first && isLocale(first)) return first;
+    return cookieLocale;
+  }, [pathname, cookieLocale]);
+}
+
+/** Server: pad zonder locale — voor redirects (niet in RSC zonder next/headers). */
+export function getLocaleFromPathnameOnly(pathname: string): Locale {
+  const first = pathname.split("/").filter(Boolean)[0];
+  if (first && isLocale(first)) return first;
+  return defaultLocale;
 }

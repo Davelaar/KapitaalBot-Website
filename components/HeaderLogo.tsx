@@ -1,8 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useLocale } from "@/lib/locale";
+import { withLocale } from "@/lib/locale-path";
 
 export function HeaderLogo() {
+  const locale = useLocale();
   const [theme, setTheme] = useState<"light" | "dark">("dark");
 
   useEffect(() => {
@@ -24,7 +27,7 @@ export function HeaderLogo() {
   const logoSrc = theme === "light" ? "/KapitaalBot.svg" : "/KapitaalBot-light.svg";
 
   return (
-    <a href="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
+    <a href={withLocale(locale, "/")} style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
       <img
         src={logoSrc}
         alt="KapitaalBot"

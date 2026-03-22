@@ -4,14 +4,14 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useLocale } from "@/lib/locale";
+import { resolveNextWithLocale, withLocale } from "@/lib/locale-path";
 import { t } from "@/lib/i18n";
 
 export function LoginForm() {
   const locale = useLocale();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const rawNext = searchParams.get("next") || "/dashboard/tier2";
-  const next = rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/dashboard/tier2";
+  const next = resolveNextWithLocale(locale, searchParams.get("next"));
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -52,7 +52,7 @@ export function LoginForm() {
   return (
     <>
       <nav style={{ marginBottom: "1.5rem" }}>
-        <Link href="/" style={{ color: "var(--accent)", textDecoration: "none" }}>
+        <Link href={withLocale(locale, "/")} style={{ color: "var(--accent)", textDecoration: "none" }}>
           ← {t(locale, "nav.home")}
         </Link>
       </nav>

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useLocale } from "@/lib/locale";
+import { withLocale } from "@/lib/locale-path";
 import { t } from "@/lib/i18n";
 
 interface ChatMessage {
@@ -109,7 +110,7 @@ export function FaqChatbot() {
                 {m.sources.map((slug, i) => (
                   <span key={`${slug}-${i}`}>
                     <Link
-                      href={`/docs/${sourceToDocSlug(slug)}`}
+                      href={withLocale(locale, `/docs/${sourceToDocSlug(slug)}`)}
                       style={{ color: "var(--accent)", textDecoration: "none" }}
                     >
                       {sourceToDocSlug(slug)}
