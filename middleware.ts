@@ -40,6 +40,12 @@ export function middleware(request: NextRequest) {
   });
 }
 
+/**
+ * Laat /sitemap.xml en /robots.txt buiten locale-redirects (SEO / Search Console).
+ * Escaped dots: in regex is "sitemap.xml" anders "sitemap" + willekeurig teken + "xml".
+ */
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|_next/webpack-hmr).*)"],
+  matcher: [
+    "/((?!api|_next/static|_next/image|_next/webpack-hmr|favicon.ico|sitemap\\.xml|robots\\.txt).*)",
+  ],
 };

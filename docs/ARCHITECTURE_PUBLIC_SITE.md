@@ -59,6 +59,12 @@ Next.js App Router (KapitaalBot-Website)
 - **`lib/page-metadata.ts`**: canonical + `alternates.languages` (hreflang + `x-default`) per logisch pad zonder locale-prefix.
 - Cookie `NEXT_LOCALE` blijft ondersteund (o.a. language switcher + fallback in `useLocale()`); primaire bron voor crawlers is het **pad**.
 
+### Search Console / sitemap
+
+- Dien sitemap in als **`https://kapitaalbot.nl/sitemap.xml`** (zelfde host als in `robots.txt` en `NEXT_PUBLIC_BASE_URL`).
+- Gebruik een **URL-prefix-property** voor `https://kapitaalbot.nl/` of een **domain property** voor `kapitaalbot.nl`. Als je alleen `www` als property hebt, gebruik dan de sitemap-URL na redirect (apex), of voeg een aparte property voor de apex toe — anders meldt GSC soms “sitemap kan niet worden opgehaald”.
+- `www.kapitaalbot.nl` redirect (301) naar de apex; dat is normaal.
+
 ## i18n
 
 - **Primair**: eerste URL-segment (`/nl/`, `/en/`, …). **Secundair**: cookie `NEXT_LOCALE` (nl, en, de, fr). `lib/locale.ts`: `useLocale()`, `getLocaleFromCookie()`.
