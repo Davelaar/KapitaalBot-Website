@@ -135,6 +135,7 @@ textarea {
 }
 
 .markdown-body .mermaid-wrapper {
+  display: block;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
@@ -145,6 +146,8 @@ textarea {
   border: 1px solid var(--border);
   border-radius: 10px;
   background: #fdfaf2;
+  /* Voorkomt dat brede SVG de grid-kolom uitrekt */
+  min-width: 0;
 }
 
 .markdown-body .mermaid-diagram {
@@ -152,6 +155,7 @@ textarea {
   max-width: 100%;
   padding: 0;
   box-sizing: border-box;
+  overflow-x: auto;
 }
 
 /* Scale diagram to the beige block; wide charts scroll inside the wrapper only */
@@ -185,6 +189,30 @@ textarea {
 
 .docs-two-col {
   grid-template-columns: minmax(220px, 1fr) minmax(0, 4fr);
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Grid child default min-width:auto laat brede diagrammen de kolom uitrekken */
+.docs-two-col > article.card {
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+  box-sizing: border-box;
+}
+
+.doc-viewer.markdown-body {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.doc-viewer img,
+.markdown-body img {
+  max-width: 100%;
+  height: auto;
 }
 
 .docs-file-list {
