@@ -1,13 +1,13 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
 import {
-  getPublicStatusSnapshot,
-  getPublicRegimeSnapshot,
-  getPublicStrategySnapshot,
-  getPublicTradingSnapshot,
-  getPublicMarketSnapshot,
-  getPublicDemoTrades,
-} from "@/lib/read-snapshots";
+  getPublicStatusSnapshotCached,
+  getPublicRegimeSnapshotCached,
+  getPublicStrategySnapshotCached,
+  getPublicTradingSnapshotCached,
+  getPublicMarketSnapshotCached,
+  getPublicDemoTradesCached,
+} from "@/lib/read-snapshots-cached";
 import { t, type Locale } from "@/lib/i18n";
 import { DashboardIntro } from "@/components/DashboardIntro";
 import StatusStrip from "@/components/StatusStrip";
@@ -22,12 +22,14 @@ export const dynamic = "force-dynamic";
 export default async function DashboardPage() {
   const cookieStore = await cookies();
   const locale = (cookieStore.get("NEXT_LOCALE")?.value || "nl") as Locale;
-  const status = getPublicStatusSnapshot();
-  const regime = getPublicRegimeSnapshot();
-  const strategy = getPublicStrategySnapshot();
-  const trading = getPublicTradingSnapshot();
-  const market = getPublicMarketSnapshot();
-  const demo = getPublicDemoTrades();
+  const [status, regime, strategy, trading, market, demo] = await Promise.all([
+    getPublicStatusSnapshotCached(),
+    getPublicRegimeSnapshotCached(),
+    getPublicStrategySnapshotCached(),
+    getPublicTradingSnapshotCached(),
+    getPublicMarketSnapshotCached(),
+    getPublicDemoTradesCached(),
+  ]);
 
   return (
     <main>

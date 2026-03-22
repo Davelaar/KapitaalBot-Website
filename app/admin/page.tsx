@@ -2,12 +2,12 @@ import Link from "next/link";
 import { getSessionTier } from "@/lib/auth";
 import { TierGate } from "@/components/TierGate";
 import {
-  getPublicStatusSnapshot,
-  getPublicRegimeSnapshot,
-  getPublicStrategySnapshot,
-  getPublicTradingSnapshot,
-  getPublicMarketSnapshot,
-} from "@/lib/read-snapshots";
+  getPublicStatusSnapshotCached,
+  getPublicRegimeSnapshotCached,
+  getPublicStrategySnapshotCached,
+  getPublicTradingSnapshotCached,
+  getPublicMarketSnapshotCached,
+} from "@/lib/read-snapshots-cached";
 import { AdminSnapshotStatus } from "@/components/AdminSnapshotStatus";
 import { cookies } from "next/headers";
 import type { Locale } from "@/lib/i18n";
@@ -32,11 +32,13 @@ export default async function AdminPage() {
     return <TierGate kind="tier3" />;
   }
 
-  const status = getPublicStatusSnapshot();
-  const regime = getPublicRegimeSnapshot();
-  const strategy = getPublicStrategySnapshot();
-  const trading = getPublicTradingSnapshot();
-  const market = getPublicMarketSnapshot();
+  const [status, regime, strategy, trading, market] = await Promise.all([
+    getPublicStatusSnapshotCached(),
+    getPublicRegimeSnapshotCached(),
+    getPublicStrategySnapshotCached(),
+    getPublicTradingSnapshotCached(),
+    getPublicMarketSnapshotCached(),
+  ]);
 
   const ui = {
     nl: {

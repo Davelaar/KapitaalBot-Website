@@ -1,11 +1,11 @@
 import {
-  getPublicStatusSnapshot,
-  getPublicRegimeSnapshot,
-  getPublicStrategySnapshot,
-  getPublicTradingSnapshot,
-  getPublicDemoTrades,
-} from "@/lib/read-snapshots";
-import { getCmsData, getProductionNotes } from "@/lib/read-cms";
+  getPublicStatusSnapshotCached,
+  getPublicRegimeSnapshotCached,
+  getPublicStrategySnapshotCached,
+  getPublicTradingSnapshotCached,
+  getPublicDemoTradesCached,
+} from "@/lib/read-snapshots-cached";
+import { getCmsDataCached, getProductionNotesCached } from "@/lib/read-cms-cached";
 import { HomePageContent } from "@/components/HomePageContent";
 import { getLocaleFromCookies } from "@/lib/locale-server";
 import { t } from "@/lib/i18n";
@@ -25,13 +25,15 @@ export async function generateMetadata() {
 }
 
 export default async function HomePage() {
-  const status = getPublicStatusSnapshot();
-  const regime = getPublicRegimeSnapshot();
-  const strategy = getPublicStrategySnapshot();
-  const trading = getPublicTradingSnapshot();
-  const demo = getPublicDemoTrades();
-  const productionNotes = getProductionNotes();
-  const cms = getCmsData();
+  const [status, regime, strategy, trading, demo, productionNotes, cms] = await Promise.all([
+    getPublicStatusSnapshotCached(),
+    getPublicRegimeSnapshotCached(),
+    getPublicStrategySnapshotCached(),
+    getPublicTradingSnapshotCached(),
+    getPublicDemoTradesCached(),
+    getProductionNotesCached(),
+    getCmsDataCached(),
+  ]);
   const notices = cms?.notices ?? [];
 
   return (

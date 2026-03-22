@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { getCmsData } from "@/lib/read-cms";
+import { getCmsDataCached } from "@/lib/read-cms-cached";
 import { defaultLocale, t, type Locale } from "@/lib/i18n";
 
 function getLocaleFromCookieStore(
@@ -14,7 +14,7 @@ export default async function ComplianceBanner() {
   const cookieStore = await cookies();
   const locale = getLocaleFromCookieStore(cookieStore);
 
-  const cms = getCmsData();
+  const cms = await getCmsDataCached();
   const override = cms?.compliance_override?.trim() ?? "";
   const content = override ? override : t(locale, "compliance.default");
 

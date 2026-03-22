@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocale } from "@/lib/locale";
 import { t } from "@/lib/i18n";
-import mermaid from "mermaid";
 
 interface MermaidLiveDiagramProps {
   chart: string;
@@ -25,49 +24,79 @@ function hashText(input: string): string {
 export function MermaidLiveDiagram({ chart, seoKeyPrefix }: MermaidLiveDiagramProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
+  /** wait = not yet in view; busy = loading mermaid / rendering */
+  const [phase, setPhase] = useState<"wait" | "busy" | "done">("wait");
   const chartId = useMemo(() => `mermaid-live-${hashText(chart)}`, [chart]);
   const locale = useLocale();
 
   useEffect(() => {
+    const node = ref.current;
+    if (!node) return;
     let cancelled = false;
 
-    async function render() {
-      if (!mermaidInitialized) {
-        mermaid.initialize({
-          startOnLoad: false,
-          securityLevel: "loose",
-          theme: "default",
-          flowchart: {
-            htmlLabels: false,
-            /* true = SVG scales to container so diagrams stay inside the card */
-            useMaxWidth: true,
-          },
-        });
-        mermaidInitialized = true;
-      }
-
+    async function renderChart() {
       try {
+        const mermaid = (await import("mermaid")).default;
+        if (cancelled) return;
+
+        if (!mermaidInitialized) {
+          mermaid.initialize({
+            startOnLoad: false,
+            securityLevel: "loose",
+            theme: "default",
+            flowchart: {
+              htmlLabels: false,
+              useMaxWidth: true,
+            },
+          });
+          mermaidInitialized = true;
+        }
+
         const { svg } = await mermaid.render(chartId, chart.trim());
-        if (!cancelled && ref.current) {
+        if (cancelled) return;
+        if (ref.current) {
           ref.current.innerHTML = svg;
           setError(null);
         }
       } catch (err) {
         if (!cancelled) {
           setError(t(locale, "mermaid.error.render_failed"));
-          if (ref.current) {
-            ref.current.innerHTML = "";
-          }
+          if (ref.current) ref.current.innerHTML = "";
         }
         console.error("Mermaid render error", err);
+      } finally {
+        if (!cancelled) setPhase("done");
       }
     }
 
-    render();
+    function scheduleRender() {
+      const run = () => {
+        if (cancelled) return;
+        setPhase("busy");
+        void renderChart();
+      };
+      if (typeof window.requestIdleCallback === "function") {
+        window.requestIdleCallback(run, { timeout: 2000 });
+      } else {
+        window.setTimeout(run, 1);
+      }
+    }
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (!entries[0]?.isIntersecting) return;
+        io.disconnect();
+        scheduleRender();
+      },
+      { rootMargin: "180px 0px", threshold: 0 }
+    );
+
+    io.observe(node);
     return () => {
       cancelled = true;
+      io.disconnect();
     };
-  }, [chart, chartId]);
+  }, [chart, chartId, locale]);
 
   const title = seoKeyPrefix ? t(locale, `${seoKeyPrefix}.title`) : undefined;
   const caption = seoKeyPrefix ? t(locale, `${seoKeyPrefix}.caption`) : undefined;
@@ -78,8 +107,19 @@ export function MermaidLiveDiagram({ chart, seoKeyPrefix }: MermaidLiveDiagramPr
       {error ? (
         <p className="mermaid-error">{error}</p>
       ) : (
-        <div ref={ref} className="mermaid-diagram" aria-label={title} />
+        <div
+          ref={ref}
+          className="mermaid-diagram"
+          aria-label={title}
+          aria-busy={phase === "busy"}
+          style={{ minHeight: phase === "busy" ? "4rem" : undefined }}
+        />
       )}
+      {phase === "busy" && !error ? (
+        <p className="mermaid-loading" style={{ color: "var(--muted)", fontSize: "0.85rem", margin: "0.25rem 0 0" }}>
+          …
+        </p>
+      ) : null}
       {(title || caption) && (
         <figcaption className="mermaid-caption">
           {title && <strong>{title}</strong>}
@@ -96,4 +136,3 @@ export function MermaidLiveDiagram({ chart, seoKeyPrefix }: MermaidLiveDiagramPr
     </figure>
   );
 }
-

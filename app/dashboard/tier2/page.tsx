@@ -1,10 +1,10 @@
 import { getSessionTier } from "@/lib/auth";
 import {
-  getTier2ExecutionSnapshot,
-  getTier2LatencySnapshot,
-  getTier2PnlSnapshot,
-  getTier2SafetySnapshot,
-} from "@/lib/read-snapshots";
+  getTier2ExecutionSnapshotCached,
+  getTier2LatencySnapshotCached,
+  getTier2PnlSnapshotCached,
+  getTier2SafetySnapshotCached,
+} from "@/lib/read-snapshots-cached";
 import { TierGate } from "@/components/TierGate";
 import { DashboardTier2Content } from "@/components/DashboardTier2Content";
 
@@ -15,10 +15,12 @@ export default async function DashboardTier2Page() {
   if (tier < 2) {
     return <TierGate kind="tier2" />;
   }
-  const execution = getTier2ExecutionSnapshot();
-  const latency = getTier2LatencySnapshot();
-  const pnl = getTier2PnlSnapshot();
-  const safety = getTier2SafetySnapshot();
+  const [execution, latency, pnl, safety] = await Promise.all([
+    getTier2ExecutionSnapshotCached(),
+    getTier2LatencySnapshotCached(),
+    getTier2PnlSnapshotCached(),
+    getTier2SafetySnapshotCached(),
+  ]);
   return (
     <main>
       <DashboardTier2Content

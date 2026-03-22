@@ -23,7 +23,7 @@ export function Analytics({ locale }: { locale: Locale }) {
         defer
         data-domain={plausibleDomain}
         src="https://plausible.io/js/script.js"
-        strategy="afterInteractive"
+        strategy="lazyOnload"
       />
     );
   }
@@ -34,7 +34,7 @@ export function Analytics({ locale }: { locale: Locale }) {
         async
         src="https://analytics.umami.is/script.js"
         data-website-id={umamiId}
-        strategy="afterInteractive"
+        strategy="lazyOnload"
       />
     );
   }
@@ -42,12 +42,12 @@ export function Analytics({ locale }: { locale: Locale }) {
   if (gaId) {
     return (
       <>
-        <Script id="kapitaalbot-analytics-locale" strategy="beforeInteractive">
+        <Script id="kapitaalbot-analytics-locale" strategy="afterInteractive">
           {`window.__KAPITAALBOT_LOCALE__=${JSON.stringify(locale)};`}
         </Script>
         <Script
           src="/analytics/kapitaalbot-analytics.js"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
           data-measurement-id={gaId}
         />
       </>

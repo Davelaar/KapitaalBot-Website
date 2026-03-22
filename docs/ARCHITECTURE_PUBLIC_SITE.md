@@ -18,19 +18,21 @@ OBSERVABILITY_EXPORT_DIR/
         │ read (server-side, read-only)
         ▼
 Next.js App Router (KapitaalBot-Website)
-   ├── getPublicStatusSnapshot() etc. (lib/read-snapshots.ts)
+   ├── getPublic*SnapshotCached() (lib/read-snapshots-cached.ts) — optioneel Redis (`REDIS_URL`), TTL via `SNAPSHOT_CACHE_TTL_SEC` (default 30s)
+   ├── Basis: getPublicStatusSnapshot() etc. (lib/read-snapshots.ts)
+   ├── CMS: getCmsDataCached / getProductionNotesCached — `CMS_CACHE_TTL_SEC` (default 120s)
    ├── Server Components: app/page.tsx, app/dashboard/page.tsx
    └── Props → StatusStrip, MetricCardGrid, RegimeStrategyOverview, MarketSummary, DemoTradeTeaser
 ```
 
-- **Geen directe DB**: de website praat alleen met het bestandssysteem (export-map).
+- **Geen directe DB**: de website praat alleen met het bestandssysteem (export-map); Redis is alleen een **cache** ervoor.
 - **Read-only**: geen wijzigingen aan snapshot-bestanden vanuit de site.
 - **Contract**: zie KRAKENBOTMAART `docs/OBSERVABILITY_SNAPSHOT_CONTRACT.md`.
 
 ## Snapshot lifecycle
 
 1. Bot draait en schrijft periodiek (of on-demand) JSON naar `OBSERVABILITY_EXPORT_DIR`.
-2. Website leest bij elke request (force-dynamic) de actuele bestanden.
+2. Website leest de bestanden (met Redis-cache als `REDIS_URL` gezet is; anders direct van schijf). Requests blijven `force-dynamic` voor cookie-/locale-gedrag.
 3. Ontbreekt een bestand of is het ongeldig → component toont fallback ("Awaiting bot export…") en geen crash.
 
 ## Tier model
