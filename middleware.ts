@@ -26,7 +26,8 @@ export function middleware(request: NextRequest) {
     const url = request.nextUrl.clone();
     const rest = pathname === "/" ? "" : pathname;
     url.pathname = `/${defaultLocale}${rest}`;
-    return NextResponse.redirect(url);
+    // 301: oude cookie-only URL's → canonieke pad-URL's (nl default); SEO / bookmarks.
+    return NextResponse.redirect(url, 301);
   }
 
   const requestHeaders = new Headers(request.headers);

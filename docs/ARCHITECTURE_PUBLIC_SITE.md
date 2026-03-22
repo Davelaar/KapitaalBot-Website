@@ -54,7 +54,7 @@ Next.js App Router (KapitaalBot-Website)
 ## URL’s en SEO (locales)
 
 - Publieke pagina’s hangen onder **`/{locale}/...`** met `locale ∈ { nl, en, de, fr }` (default `nl`).
-- **`middleware.ts`**: verzoeken zonder leading locale (bijv. `/faq`) → redirect naar `/nl/faq` (of de gekozen default); uitzonderingen o.a. `/api/*`, `/_next/*`, bestanden met extensie, `/robots.txt`, `/sitemap.xml`.
+- **`middleware.ts`**: verzoeken zonder leading locale (bijv. `/faq`) → **301** naar `/nl/faq` (default locale); uitzonderingen o.a. `/api/*`, `/_next/*`, bestanden met extensie, `/robots.txt`, `/sitemap.xml`.
 - **`lib/locale-path.ts`**: `withLocale`, `stripLocalePathname`, `parseLocaleParam`; interne links gebruiken `withLocale` zodat hreflang/canonical in `buildPageMetadata` kloppen.
 - **`lib/page-metadata.ts`**: canonical + `alternates.languages` (hreflang + `x-default`) per logisch pad zonder locale-prefix.
 - Cookie `NEXT_LOCALE` blijft ondersteund (o.a. language switcher + fallback in `useLocale()`); primaire bron voor crawlers is het **pad**.
