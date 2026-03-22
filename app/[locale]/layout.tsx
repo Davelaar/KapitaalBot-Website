@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import ComplianceBanner from "@/components/ComplianceBanner";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { NavBar } from "@/components/NavBar";
 import { Footer } from "@/components/Footer";
 import { Analytics } from "@/components/Analytics";
@@ -55,6 +56,7 @@ export default async function LocaleLayout({
       <div data-kapitaalbot-site-root>
         <NavBar />
         <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+          <Breadcrumbs />
           {children}
           <Footer />
           <ComplianceBanner locale={lang} />
