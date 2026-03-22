@@ -6,7 +6,7 @@ import { t } from "@/lib/i18n";
 
 export function Footer() {
   const locale = useLocale();
-  const linkStyle = { color: "var(--muted)", textDecoration: "none" as const };
+  const linkStyle = { color: "var(--muted)" };
   return (
     <footer
       style={{

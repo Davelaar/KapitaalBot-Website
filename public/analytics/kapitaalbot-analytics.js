@@ -19,6 +19,7 @@
 
   var MESSAGES = {
     nl: {
+      consentDialogTitle: 'Cookie- en analyticskeuze',
       intro:
         'Deze site maakt gebruik van Google voor analytische doeleinden en plaatst daarom een cookie. Indien u hier niet mee instemt, kunt u geen gebruik maken van de site.',
       accept: 'Accepteren',
@@ -27,6 +28,7 @@
         'U heeft analytics geweigerd. Deze site is daardoor niet beschikbaar.',
     },
     en: {
+      consentDialogTitle: 'Cookie and analytics choice',
       intro:
         'This site uses Google for analytics and therefore sets a cookie. If you do not agree, you cannot use this site.',
       accept: 'Accept',
@@ -35,6 +37,7 @@
         'You declined analytics. This site is therefore not available.',
     },
     de: {
+      consentDialogTitle: 'Auswahl zu Cookies und Analytics',
       intro:
         'Diese Website nutzt Google zu Analysezwecken und setzt daher ein Cookie. Wenn Sie nicht einverstanden sind, können Sie die Website nicht nutzen.',
       accept: 'Akzeptieren',
@@ -43,6 +46,7 @@
         'Sie haben Analytics abgelehnt. Diese Website steht Ihnen daher nicht zur Verfügung.',
     },
     fr: {
+      consentDialogTitle: 'Choix cookies et analytique',
       intro:
         'Ce site utilise Google à des fins analytiques et dépose donc un cookie. Si vous n’acceptez pas, vous ne pouvez pas utiliser le site.',
       accept: 'Accepter',
@@ -145,9 +149,10 @@
     wrap.setAttribute('role', 'alert');
     var msg = t();
     wrap.innerHTML =
-      '<div class="kapitaalbot-analytics-card"><p>' +
+      '<div class="kapitaalbot-analytics-card"><p id="kapitaalbot-analytics-blocked-msg">' +
       escapeHtml(msg.blocked) +
       '</p></div>';
+    wrap.setAttribute('aria-labelledby', 'kapitaalbot-analytics-blocked-msg');
     document.body.appendChild(wrap);
     document.documentElement.style.overflow = 'hidden';
   }
@@ -167,8 +172,12 @@
     overlay.id = 'kapitaalbot-analytics-overlay';
     overlay.setAttribute('role', 'dialog');
     overlay.setAttribute('aria-modal', 'true');
+    overlay.setAttribute('aria-labelledby', 'kapitaalbot-analytics-consent-heading');
     overlay.innerHTML =
       '<div class="kapitaalbot-analytics-card">' +
+      '<h2 id="kapitaalbot-analytics-consent-heading" class="kapitaalbot-sr-only">' +
+      escapeHtml(msg.consentDialogTitle) +
+      '</h2>' +
       '<p>' +
       escapeHtml(msg.intro) +
       '</p>' +

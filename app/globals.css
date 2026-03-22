@@ -1,7 +1,8 @@
 :root {
   --bg: #0f1419;
   --fg: #e6edf3;
-  --muted: #8b949e;
+  /* WCAG AA ~4.5:1+ on dark bg (was #8b949e — too low for small text) */
+  --muted: #a8b3c0;
   --accent: #2dd4bf;
   --card-bg: #161b22;
   --border: #30363d;
@@ -13,7 +14,7 @@
 [data-theme="light"] {
   --bg: #f6f8fa;
   --fg: #1f2328;
-  --muted: #656d76;
+  --muted: #4d535c;
   --accent: #098575;
   --card-bg: #ffffff;
   --border: #d0d7de;
@@ -34,6 +35,18 @@ body {
   background: var(--bg);
   color: var(--fg);
   min-height: 100vh;
+}
+
+/* WCAG: links not identified by color alone (main + footer); nav/header exempt */
+main a[href],
+footer a[href] {
+  text-decoration: underline !important;
+  text-underline-offset: 0.15em;
+}
+
+.site-header a[href],
+.site-header .mobile-nav-panel a[href] {
+  text-decoration: none !important;
 }
 
 main {

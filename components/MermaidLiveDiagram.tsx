@@ -110,8 +110,9 @@ export function MermaidLiveDiagram({ chart, seoKeyPrefix }: MermaidLiveDiagramPr
         <div
           ref={ref}
           className="mermaid-diagram"
-          aria-label={title}
-          aria-busy={phase === "busy"}
+          {...(title
+            ? { role: "img" as const, "aria-label": title }
+            : {})}
           style={{ minHeight: phase === "busy" ? "4rem" : undefined }}
         />
       )}
