@@ -3,12 +3,14 @@
  * Bij ontbrekende URL of connectfout: null — callers lezen rechtstreeks van schijf.
  */
 
-import { createClient, type RedisClientType } from "redis";
+import { createClient } from "redis";
 
-let client: RedisClientType | null = null;
+type RedisClient = ReturnType<typeof createClient>;
+
+let client: RedisClient | null = null;
 let connectFailed = false;
 
-export async function getRedis(): Promise<RedisClientType | null> {
+export async function getRedis(): Promise<RedisClient | null> {
   const url = process.env.REDIS_URL?.trim();
   if (!url) return null;
   if (connectFailed) return null;
@@ -18,8 +20,8 @@ export async function getRedis(): Promise<RedisClientType | null> {
     const c = createClient({ url });
     c.on("error", () => {});
     await c.connect();
-    client = c;
-    return c;
+    client = c as RedisClient;
+    return client;
   } catch {
     connectFailed = true;
     return null;
