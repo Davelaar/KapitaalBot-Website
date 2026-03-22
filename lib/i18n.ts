@@ -4,6 +4,7 @@
  */
 
 import { seoStrings } from "@/lib/seo-i18n";
+import { aboutStrings } from "@/lib/about-i18n";
 
 export type Locale = "nl" | "en" | "de" | "fr";
 
@@ -25,6 +26,7 @@ const strings: Record<Locale, Record<string, string>> = {
     "nav.faq": "FAQ",
     "nav.research": "FAQ",
     "nav.contact": "Contact",
+    "nav.about": "Over",
     "nav.menu.open": "Open menu",
     "nav.menu.close": "Close menu",
     "nav.access": "Toegang",
@@ -371,6 +373,7 @@ const strings: Record<Locale, Record<string, string>> = {
     "nav.faq": "FAQ",
     "nav.research": "FAQ",
     "nav.contact": "Contact",
+    "nav.about": "About",
     "nav.menu.open": "Open menu",
     "nav.menu.close": "Close menu",
     "nav.access": "Access",
@@ -716,6 +719,7 @@ const strings: Record<Locale, Record<string, string>> = {
     "nav.faq": "FAQ",
     "nav.research": "FAQ",
     "nav.contact": "Contact",
+    "nav.about": "Über",
     "nav.menu.open": "Menü öffnen",
     "nav.menu.close": "Menü schließen",
     "nav.access": "Zugang",
@@ -1061,6 +1065,7 @@ const strings: Record<Locale, Record<string, string>> = {
     "nav.faq": "FAQ",
     "nav.research": "FAQ",
     "nav.contact": "Contact",
+    "nav.about": "À propos",
     "nav.menu.open": "Ouvrir le menu",
     "nav.menu.close": "Fermer le menu",
     "nav.access": "Accès",
@@ -1399,10 +1404,13 @@ export function t(locale: Locale, key: string): string {
   return (
     strings[locale]?.[key] ??
     seoStrings[locale]?.[key] ??
+    aboutStrings[locale]?.[key] ??
     strings.en?.[key] ??
     seoStrings.en?.[key] ??
+    aboutStrings.en?.[key] ??
     strings.nl[key] ??
     seoStrings.nl[key] ??
+    aboutStrings.nl[key] ??
     key
   );
 }

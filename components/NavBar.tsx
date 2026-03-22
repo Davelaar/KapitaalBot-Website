@@ -83,6 +83,9 @@ export function NavBar() {
         <Link href="/kennis" style={{ color: "var(--fg)", textDecoration: "none", fontSize: "0.9rem" }}>
           {t(locale, "nav.kennis")}
         </Link>
+        <Link href="/over" style={{ color: "var(--fg)", textDecoration: "none", fontSize: "0.9rem" }}>
+          {t(locale, "nav.about")}
+        </Link>
         <Link href="/changelog" style={{ color: "var(--fg)", textDecoration: "none", fontSize: "0.9rem" }}>
           {t(locale, "nav.notes")}
         </Link>
@@ -187,6 +190,9 @@ export function NavBar() {
           </Link>
           <Link href="/kennis" className="mobile-nav-link" onClick={() => setMobileOpen(false)}>
             {t(locale, "nav.kennis")}
+          </Link>
+          <Link href="/over" className="mobile-nav-link" onClick={() => setMobileOpen(false)}>
+            {t(locale, "nav.about")}
           </Link>
           <Link href="/changelog" className="mobile-nav-link" onClick={() => setMobileOpen(false)}>
             {t(locale, "nav.notes")}

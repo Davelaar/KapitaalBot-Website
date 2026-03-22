@@ -25,6 +25,9 @@ export function Footer() {
       <Link href="/kennis" style={linkStyle}>
         {t(locale, "nav.kennis")}
       </Link>
+      <Link href="/over" style={linkStyle}>
+        {t(locale, "nav.about")}
+      </Link>
       <Link href="/faq" style={linkStyle}>
         {t(locale, "nav.research")}
       </Link>
