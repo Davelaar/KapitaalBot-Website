@@ -7,6 +7,7 @@ import { Footer } from "@/components/Footer";
 import { Analytics } from "@/components/Analytics";
 import { getKapitaalbotGaMeasurementId } from "@/lib/analytics";
 import { defaultLocale, t, type Locale } from "@/lib/i18n";
+import { getSiteUrl } from "@/lib/site";
 
 export async function generateMetadata(): Promise<Metadata> {
   const cookieStore = await cookies();
@@ -18,12 +19,17 @@ export async function generateMetadata(): Promise<Metadata> {
   const description = t(lang, "hero.subline");
 
   return {
-    title,
+    metadataBase: new URL(getSiteUrl()),
+    title: {
+      default: title,
+    },
     description,
     openGraph: {
       title,
       description,
       type: "website",
+      siteName: "KapitaalBot",
+      url: getSiteUrl(),
     },
     twitter: {
       card: "summary_large_image",
@@ -63,10 +69,25 @@ export default async function RootLayout({
             dangerouslySetInnerHTML={{
               __html: JSON.stringify({
                 "@context": "https://schema.org",
-                "@type": "SoftwareApplication",
-                name: "KapitaalBot",
-                applicationCategory: "FinanceApplication",
-                description: t(lang, "hero.subline"),
+                "@graph": [
+                  {
+                    "@type": "WebSite",
+                    "@id": `${getSiteUrl()}/#website`,
+                    name: "KapitaalBot",
+                    url: getSiteUrl(),
+                    inLanguage: ["nl", "en", "de", "fr"],
+                    description: t(lang, "seo.home.metaDesc"),
+                  },
+                  {
+                    "@type": "SoftwareApplication",
+                    "@id": `${getSiteUrl()}/#software`,
+                    name: "KapitaalBot",
+                    applicationCategory: "FinanceApplication",
+                    operatingSystem: "Linux",
+                    description: t(lang, "seo.home.metaDesc"),
+                    url: getSiteUrl(),
+                  },
+                ],
               }),
             }}
           ></script>

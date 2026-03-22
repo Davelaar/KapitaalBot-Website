@@ -68,6 +68,35 @@ flowchart LR
         </p>
       </section>
 
+      <section style={{ marginBottom: "1.5rem", padding: "1rem 1.25rem" }} className="card">
+        <h2 style={{ fontSize: "1.1rem", marginBottom: "0.5rem", fontWeight: 600 }}>{t(locale, "home.seoStrip.title")}</h2>
+        <p style={{ color: "var(--muted)", fontSize: "0.9rem", lineHeight: 1.6, marginBottom: "0.75rem" }}>
+          {t(locale, "home.seoStrip.intro")}
+        </p>
+        <p style={{ margin: 0, fontSize: "0.875rem" }}>
+          <Link href="/kennis/kraken-l3-orderbook-bot" style={{ color: "var(--accent)", textDecoration: "none" }}>
+            {t(locale, "home.seoStrip.anchor.l3")}
+          </Link>
+          {" · "}
+          <Link href="/kennis/kraken-websocket-api-spot" style={{ color: "var(--accent)", textDecoration: "none" }}>
+            {t(locale, "home.seoStrip.anchor.ws")}
+          </Link>
+          {" · "}
+          <Link href="/kennis/kraken-hybrid-maker-fees" style={{ color: "var(--accent)", textDecoration: "none" }}>
+            {t(locale, "home.seoStrip.anchor.maker")}
+          </Link>
+          {" · "}
+          <Link href="/kennis/crypto-regime-detectie" style={{ color: "var(--accent)", textDecoration: "none" }}>
+            {t(locale, "home.seoStrip.anchor.regime")}
+          </Link>
+        </p>
+        <p style={{ marginTop: "0.75rem", marginBottom: 0 }}>
+          <Link href="/kennis" style={{ color: "var(--accent)", textDecoration: "none", fontSize: "0.9rem", fontWeight: 600 }}>
+            {t(locale, "home.seoStrip.cta")}
+          </Link>
+        </p>
+      </section>
+
       {notices.length > 0 && (
         <section style={{ marginBottom: "1.5rem" }} className="card">
           <h2 style={{ fontSize: "1.2rem", marginBottom: "0.75rem" }}>{t(locale, "home.notices.title")}</h2>

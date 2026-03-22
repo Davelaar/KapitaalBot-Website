@@ -8,6 +8,17 @@ import { FaqChatbot } from "@/components/FaqChatbot";
 
 const FAQ_SECTIONS: { id: string; titleKey: string; items: { qKey: string; aKey: string }[] }[] = [
   {
+    id: "seo",
+    titleKey: "faq.section.seo.title",
+    items: [
+      { qKey: "faq.seo.q1", aKey: "faq.seo.a1" },
+      { qKey: "faq.seo.q2", aKey: "faq.seo.a2" },
+      { qKey: "faq.seo.q3", aKey: "faq.seo.a3" },
+      { qKey: "faq.seo.q4", aKey: "faq.seo.a4" },
+      { qKey: "faq.seo.q5", aKey: "faq.seo.a5" },
+    ],
+  },
+  {
     id: "overview",
     titleKey: "faq.section.overview.title",
     items: [

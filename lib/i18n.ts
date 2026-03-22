@@ -3,6 +3,8 @@
  * Identieke structuur; SEO meta per taal. Uitbreiding: path-based locale of cookie.
  */
 
+import { seoStrings } from "@/lib/seo-i18n";
+
 export type Locale = "nl" | "en" | "de" | "fr";
 
 export const defaultLocale: Locale = "nl";
@@ -1394,5 +1396,13 @@ const strings: Record<Locale, Record<string, string>> = {
 };
 
 export function t(locale: Locale, key: string): string {
-  return strings[locale]?.[key] ?? strings.nl[key] ?? key;
+  return (
+    strings[locale]?.[key] ??
+    seoStrings[locale]?.[key] ??
+    strings.en?.[key] ??
+    seoStrings.en?.[key] ??
+    strings.nl[key] ??
+    seoStrings.nl[key] ??
+    key
+  );
 }

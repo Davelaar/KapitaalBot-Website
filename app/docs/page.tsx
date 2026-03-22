@@ -3,6 +3,7 @@ import fs from "fs";
 import path from "path";
 import { cookies } from "next/headers";
 import { defaultLocale, t, type Locale } from "@/lib/i18n";
+import { buildPageMetadata } from "@/lib/page-metadata";
 
 const DOCS_DIR = path.join(process.cwd(), "content", "docs");
 
@@ -56,7 +57,12 @@ export async function generateMetadata() {
   const locale = getLocaleFromCookieStore(cookieStore);
   const title = `${t(locale, "docs.title")} — KapitaalBot`;
   const description = `${t(locale, "docs.intro")} ${t(locale, "docs.page.introExtra")}`;
-  return { title, description };
+  return buildPageMetadata({
+    locale,
+    title,
+    description,
+    path: "/docs",
+  });
 }
 
 export default async function DocsPage() {
