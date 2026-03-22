@@ -8,6 +8,8 @@ import { MermaidLiveDiagram } from "@/components/MermaidLiveDiagram";
 const docViewerStyles = {
   doc: {
     maxWidth: "100%",
+    minWidth: 0,
+    overflowX: "auto" as const,
     lineHeight: 1.6,
     fontSize: "0.9375rem",
   },

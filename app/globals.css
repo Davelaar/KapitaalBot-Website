@@ -161,7 +161,8 @@ textarea {
 /* Scale diagram to the beige block; wide charts scroll inside the wrapper only */
 .markdown-body .mermaid-diagram svg {
   max-width: 100% !important;
-  width: 100% !important;
+  /* width:100% kan in Safari brede flowcharts nog steeds laten “uitsteken”; auto + max-width werkt beter */
+  width: auto !important;
   height: auto !important;
   min-width: 0;
   display: block;
@@ -196,11 +197,20 @@ textarea {
 }
 
 /* Grid child default min-width:auto laat brede diagrammen de kolom uitrekken */
+.docs-two-col > aside.card {
+  min-width: 0;
+}
+
 .docs-two-col > article.card {
   min-width: 0;
+  width: 100%;
   max-width: 100%;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
   box-sizing: border-box;
+  /* layout containment helpt WebKit de scroll-container te respecteren */
+  contain: layout;
 }
 
 .doc-viewer.markdown-body {

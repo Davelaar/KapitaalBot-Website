@@ -103,7 +103,15 @@ export function MermaidLiveDiagram({ chart, seoKeyPrefix }: MermaidLiveDiagramPr
   const desc = seoKeyPrefix ? t(locale, `${seoKeyPrefix}.desc`) : undefined;
 
   return (
-    <figure className="mermaid-wrapper">
+    <figure
+      className="mermaid-wrapper"
+      style={{
+        width: "100%",
+        maxWidth: "100%",
+        minWidth: 0,
+        boxSizing: "border-box",
+      }}
+    >
       {error ? (
         <p className="mermaid-error">{error}</p>
       ) : (
