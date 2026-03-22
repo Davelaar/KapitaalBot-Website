@@ -6,6 +6,7 @@
 import { seoStrings } from "@/lib/seo-i18n";
 import { aboutStrings } from "@/lib/about-i18n";
 import { faqFundingStrings } from "@/lib/faq-funding-i18n";
+import { watIsKapitaalbotStrings } from "@/lib/wat-is-kapitaalbot-i18n";
 
 export type Locale = "nl" | "en" | "de" | "fr";
 
@@ -28,6 +29,8 @@ const strings: Record<Locale, Record<string, string>> = {
     "nav.research": "FAQ",
     "nav.contact": "Contact",
     "nav.about": "Over",
+    "nav.over.story": "Over KapitaalBot",
+    "nav.over.truth": "Wat is het (wel / niet)?",
     "nav.menu.open": "Open menu",
     "nav.menu.close": "Close menu",
     "nav.access": "Toegang",
@@ -385,6 +388,8 @@ const strings: Record<Locale, Record<string, string>> = {
     "nav.research": "FAQ",
     "nav.contact": "Contact",
     "nav.about": "About",
+    "nav.over.story": "About KapitaalBot",
+    "nav.over.truth": "What it is (and isn’t)",
     "nav.menu.open": "Open menu",
     "nav.menu.close": "Close menu",
     "nav.access": "Access",
@@ -741,6 +746,8 @@ const strings: Record<Locale, Record<string, string>> = {
     "nav.research": "FAQ",
     "nav.contact": "Contact",
     "nav.about": "Über",
+    "nav.over.story": "Über KapitaalBot",
+    "nav.over.truth": "Was es ist (und nicht)",
     "nav.menu.open": "Menü öffnen",
     "nav.menu.close": "Menü schließen",
     "nav.access": "Zugang",
@@ -1097,6 +1104,8 @@ const strings: Record<Locale, Record<string, string>> = {
     "nav.research": "FAQ",
     "nav.contact": "Contact",
     "nav.about": "À propos",
+    "nav.over.story": "À propos de KapitaalBot",
+    "nav.over.truth": "Qu’est-ce que c’est (et pas) ?",
     "nav.menu.open": "Ouvrir le menu",
     "nav.menu.close": "Fermer le menu",
     "nav.access": "Accès",
@@ -1446,14 +1455,17 @@ export function t(locale: Locale, key: string): string {
     strings[locale]?.[key] ??
     seoStrings[locale]?.[key] ??
     aboutStrings[locale]?.[key] ??
+    watIsKapitaalbotStrings[locale]?.[key] ??
     faqFundingStrings[locale]?.[key] ??
     strings.en?.[key] ??
     seoStrings.en?.[key] ??
     aboutStrings.en?.[key] ??
+    watIsKapitaalbotStrings.en?.[key] ??
     faqFundingStrings.en?.[key] ??
     strings.nl[key] ??
     seoStrings.nl[key] ??
     aboutStrings.nl[key] ??
+    watIsKapitaalbotStrings.nl[key] ??
     faqFundingStrings.nl[key] ??
     key
   );

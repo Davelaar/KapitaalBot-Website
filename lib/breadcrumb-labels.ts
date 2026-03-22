@@ -9,6 +9,7 @@ const SEGMENT_KEYS: Record<string, string> = {
   docs: "nav.docs",
   faq: "faq.title",
   over: "nav.about",
+  "wat-is-kapitaalbot": "watkap.breadcrumb",
   contact: "contact.title",
   changelog: "changelog.title",
   "tier2-request": "nav.access",

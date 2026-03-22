@@ -93,6 +93,9 @@ export default async function OverPage({ params }: { params: { locale: string } 
           <Link href={withLocale(locale, "/faq")} style={ctaBtn}>
             {t(locale, "about.cta.faq")}
           </Link>
+          <Link href={withLocale(locale, "/over/wat-is-kapitaalbot")} style={{ ...ctaBtn, borderColor: "var(--accent)", color: "var(--accent)" }}>
+            {t(locale, "nav.over.truth")}
+          </Link>
         </div>
       </article>
     </main>

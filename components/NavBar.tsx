@@ -12,6 +12,7 @@ import { HeaderLogo } from "@/components/HeaderLogo";
 export function NavBar() {
   const locale = useLocale();
   const [accountOpen, setAccountOpen] = useState(false);
+  const [overOpen, setOverOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const headerRef = useRef<HTMLElement | null>(null);
 
@@ -84,9 +85,73 @@ export function NavBar() {
         <Link href={withLocale(locale, "/kennis")} style={{ color: "var(--fg)", textDecoration: "none", fontSize: "0.9rem" }}>
           {t(locale, "nav.kennis")}
         </Link>
-        <Link href={withLocale(locale, "/over")} style={{ color: "var(--fg)", textDecoration: "none", fontSize: "0.9rem" }}>
-          {t(locale, "nav.about")}
-        </Link>
+        <div style={{ position: "relative" }}>
+          <button
+            type="button"
+            onClick={() => {
+              setOverOpen((v) => !v);
+              setAccountOpen(false);
+            }}
+            aria-haspopup="menu"
+            aria-expanded={overOpen}
+            style={{
+              background: "transparent",
+              border: "none",
+              color: "var(--fg)",
+              fontSize: "0.9rem",
+              cursor: "pointer",
+              padding: 0,
+            }}
+          >
+            {t(locale, "nav.about")}
+          </button>
+          {overOpen && (
+            <div
+              role="menu"
+              style={{
+                position: "absolute",
+                left: 0,
+                top: "1.75rem",
+                minWidth: "220px",
+                borderRadius: 8,
+                border: "1px solid var(--border)",
+                background: "var(--card-bg)",
+                boxShadow: "0 8px 20px rgba(0,0,0,0.25)",
+                padding: "0.35rem 0",
+                zIndex: 20,
+              }}
+            >
+              <Link
+                href={withLocale(locale, "/over")}
+                style={{
+                  display: "block",
+                  padding: "0.4rem 0.9rem",
+                  fontSize: "0.9rem",
+                  color: "var(--fg)",
+                  textDecoration: "none",
+                  whiteSpace: "nowrap",
+                }}
+                onClick={() => setOverOpen(false)}
+              >
+                {t(locale, "nav.over.story")}
+              </Link>
+              <Link
+                href={withLocale(locale, "/over/wat-is-kapitaalbot")}
+                style={{
+                  display: "block",
+                  padding: "0.4rem 0.9rem",
+                  fontSize: "0.9rem",
+                  color: "var(--fg)",
+                  textDecoration: "none",
+                  whiteSpace: "normal",
+                }}
+                onClick={() => setOverOpen(false)}
+              >
+                {t(locale, "nav.over.truth")}
+              </Link>
+            </div>
+          )}
+        </div>
         <Link href={withLocale(locale, "/changelog")} style={{ color: "var(--fg)", textDecoration: "none", fontSize: "0.9rem" }}>
           {t(locale, "nav.notes")}
         </Link>
@@ -192,8 +257,16 @@ export function NavBar() {
           <Link href={withLocale(locale, "/kennis")} className="mobile-nav-link" onClick={() => setMobileOpen(false)}>
             {t(locale, "nav.kennis")}
           </Link>
-          <Link href={withLocale(locale, "/over")} className="mobile-nav-link" onClick={() => setMobileOpen(false)}>
-            {t(locale, "nav.about")}
+          <div className="mobile-nav-section">{t(locale, "nav.about")}</div>
+          <Link href={withLocale(locale, "/over")} className="mobile-nav-link mobile-nav-sub" onClick={() => setMobileOpen(false)}>
+            {t(locale, "nav.over.story")}
+          </Link>
+          <Link
+            href={withLocale(locale, "/over/wat-is-kapitaalbot")}
+            className="mobile-nav-link mobile-nav-sub"
+            onClick={() => setMobileOpen(false)}
+          >
+            {t(locale, "nav.over.truth")}
           </Link>
           <Link href={withLocale(locale, "/changelog")} className="mobile-nav-link" onClick={() => setMobileOpen(false)}>
             {t(locale, "nav.notes")}

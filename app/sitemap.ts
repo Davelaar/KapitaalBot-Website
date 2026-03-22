@@ -21,6 +21,7 @@ const PATHS = [
   "/dashboard",
   "/kennis",
   "/over",
+  "/over/wat-is-kapitaalbot",
   "/faq",
   "/changelog",
   "/tier2-request",
@@ -47,7 +48,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
               ? 0.85
               : p === "/over"
                 ? 0.8
-                : p === "/faq" || p === "/docs"
+                : p === "/over/wat-is-kapitaalbot"
+                  ? 0.78
+                  : p === "/faq" || p === "/docs"
                   ? 0.65
                   : p === "/changelog"
                     ? 0.55
