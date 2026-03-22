@@ -21,7 +21,7 @@ Next.js App Router (KapitaalBot-Website)
    ├── getPublic*SnapshotCached() (lib/read-snapshots-cached.ts) — optioneel Redis (`REDIS_URL`), TTL via `SNAPSHOT_CACHE_TTL_SEC` (default 30s)
    ├── Basis: getPublicStatusSnapshot() etc. (lib/read-snapshots.ts)
    ├── CMS: getCmsDataCached / getProductionNotesCached — `CMS_CACHE_TTL_SEC` (default 120s)
-   ├── Server Components: app/page.tsx, app/dashboard/page.tsx
+   ├── Server Components: `app/[locale]/page.tsx`, `app/[locale]/dashboard/page.tsx`, … (alle publieke routes onder taal-segment)
    └── Props → StatusStrip, MetricCardGrid, RegimeStrategyOverview, MarketSummary, DemoTradeTeaser
 ```
 
@@ -32,7 +32,7 @@ Next.js App Router (KapitaalBot-Website)
 ## Snapshot lifecycle
 
 1. Bot draait en schrijft periodiek (of on-demand) JSON naar `OBSERVABILITY_EXPORT_DIR`.
-2. Website leest de bestanden (met Redis-cache als `REDIS_URL` gezet is; anders direct van schijf). Requests blijven `force-dynamic` voor cookie-/locale-gedrag.
+2. Website leest de bestanden (met Redis-cache als `REDIS_URL` gezet is; anders direct van schijf). Veel routes gebruiken `force-dynamic` waar nodig voor actuele data of auth.
 3. Ontbreekt een bestand of is het ongeldig → component toont fallback ("Awaiting bot export…") en geen crash.
 
 ## Tier model
@@ -49,10 +49,19 @@ Next.js App Router (KapitaalBot-Website)
 - **Types**: `lib/snapshots.ts` (contract-typing).
 - **Freshness**: `lib/snapshot-freshness.ts` (GOOD/WARN/STALE).
 - **Tier2-aanvragen**: `POST /api/tier2-request` → `data/tier2_requests.json`.
+- **API-routes**: zonder taal-prefix, bv. `app/api/...` (Next laat `/api/*` buiten locale-redirect).
+
+## URL’s en SEO (locales)
+
+- Publieke pagina’s hangen onder **`/{locale}/...`** met `locale ∈ { nl, en, de, fr }` (default `nl`).
+- **`middleware.ts`**: verzoeken zonder leading locale (bijv. `/faq`) → redirect naar `/nl/faq` (of de gekozen default); uitzonderingen o.a. `/api/*`, `/_next/*`, bestanden met extensie, `/robots.txt`, `/sitemap.xml`.
+- **`lib/locale-path.ts`**: `withLocale`, `stripLocalePathname`, `parseLocaleParam`; interne links gebruiken `withLocale` zodat hreflang/canonical in `buildPageMetadata` kloppen.
+- **`lib/page-metadata.ts`**: canonical + `alternates.languages` (hreflang + `x-default`) per logisch pad zonder locale-prefix.
+- Cookie `NEXT_LOCALE` blijft ondersteund (o.a. language switcher + fallback in `useLocale()`); primaire bron voor crawlers is het **pad**.
 
 ## i18n
 
-- Locale via cookie `NEXT_LOCALE` (nl, en, de, fr). `lib/locale.ts`: useLocale(), getLocaleFromCookie().
+- **Primair**: eerste URL-segment (`/nl/`, `/en/`, …). **Secundair**: cookie `NEXT_LOCALE` (nl, en, de, fr). `lib/locale.ts`: `useLocale()`, `getLocaleFromCookie()`.
 - Vertalingen in `lib/i18n.ts`; nav, FAQ, access, changelog, docs. Merknaam "KapitaalBot" onvertaald.
 
 ## Positionering
