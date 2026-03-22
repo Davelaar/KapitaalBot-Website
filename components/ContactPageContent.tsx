@@ -47,6 +47,12 @@ export function ContactPageContent() {
       </nav>
       <h1 style={{ fontSize: "1.75rem", marginBottom: "0.5rem" }}>{t(locale, "contact.title")}</h1>
       <p style={{ color: "var(--muted)", marginBottom: "1.5rem" }}>{t(locale, "contact.intro")}</p>
+      <p style={{ color: "var(--muted)", marginBottom: "1.5rem", fontSize: "0.9rem", lineHeight: 1.6 }}>
+        {t(locale, "contact.donationNote")}{" "}
+        <Link href="/faq#funding" style={{ color: "var(--accent)", textDecoration: "underline" }}>
+          {t(locale, "contact.donationFaqLink")}
+        </Link>
+      </p>
 
       <section className="card" style={{ marginBottom: "1.25rem", padding: "1.25rem" }}>
         <h2 style={{ fontSize: "1.1rem", marginBottom: "0.75rem" }}>{t(locale, "contact.form.heading")}</h2>

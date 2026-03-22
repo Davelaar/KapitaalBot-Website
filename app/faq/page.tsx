@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocale } from "@/lib/locale";
 import { t } from "@/lib/i18n";
 import { FaqChatbot } from "@/components/FaqChatbot";
@@ -116,12 +116,37 @@ const FAQ_SECTIONS: { id: string; titleKey: string; items: { qKey: string; aKey:
       { qKey: "faq.validation.q10", aKey: "faq.validation.a10" },
     ],
   },
+  {
+    id: "funding",
+    titleKey: "faq.section.funding.title",
+    items: [
+      { qKey: "faq.funding.q1", aKey: "faq.funding.a1" },
+      { qKey: "faq.funding.q2", aKey: "faq.funding.a2" },
+      { qKey: "faq.funding.q3", aKey: "faq.funding.a3" },
+      { qKey: "faq.funding.q4", aKey: "faq.funding.a4" },
+      { qKey: "faq.funding.q5", aKey: "faq.funding.a5" },
+    ],
+  },
 ];
 
 export default function FAQPage() {
   const locale = useLocale();
   const [openSectionId, setOpenSectionId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    function applyFundingHash() {
+      if (typeof window === "undefined") return;
+      if (window.location.hash !== "#funding") return;
+      setOpenSectionId("funding");
+      requestAnimationFrame(() => {
+        document.getElementById("funding")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+    applyFundingHash();
+    window.addEventListener("hashchange", applyFundingHash);
+    return () => window.removeEventListener("hashchange", applyFundingHash);
+  }, []);
 
   function toggleSection(id: string) {
     setOpenSectionId((current) => (current === id ? null : id));
@@ -175,7 +200,7 @@ export default function FAQPage() {
           const buttonId = `faq-toggle-${section.id}`;
 
           return (
-            <section key={section.id} className="card">
+            <section key={section.id} id={section.id} className="card">
               <button
                 id={buttonId}
                 type="button"

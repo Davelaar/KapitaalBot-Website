@@ -5,6 +5,7 @@
 
 import { seoStrings } from "@/lib/seo-i18n";
 import { aboutStrings } from "@/lib/about-i18n";
+import { faqFundingStrings } from "@/lib/faq-funding-i18n";
 
 export type Locale = "nl" | "en" | "de" | "fr";
 
@@ -228,6 +229,9 @@ const strings: Record<Locale, Record<string, string>> = {
     "contact.metaDescription": "Neem contact op met KapitaalBot via het formulier.",
     "contact.intro":
       "Stuur een bericht met het formulier hieronder. Voor Tier 2-toegang gebruik je het access-formulier onder Account → Toegang.",
+    "contact.donationNote":
+      "Zoek je donaties om verder te bouwen en te testen? Bijdragers kunnen in overleg toegang krijgen tot uitgebreidere observability (zoals Tier 2) — geen automatische koppeling en geen rendementsbelofte.",
+    "contact.donationFaqLink": "Meer in de FAQ: Donaties, bouwen & testen",
     "contact.accessLink": "Tier 2-toegang aanvragen",
     "contact.accessNote": "Toegang tot Tier 2-dashboards:",
     "contact.form.heading": "Bericht versturen",
@@ -574,6 +578,9 @@ const strings: Record<Locale, Record<string, string>> = {
     "contact.metaDescription": "Contact KapitaalBot via the form.",
     "contact.intro":
       "Send a message with the form below. For Tier 2 access, use the access form under Account → Access.",
+    "contact.donationNote":
+      "Looking to donate so we can keep building and testing? Contributors may qualify for broader observability (e.g. Tier 2) by arrangement — not automatic and not a return promise.",
+    "contact.donationFaqLink": "More in the FAQ: Donations, building & testing",
     "contact.accessLink": "Request Tier 2 access",
     "contact.accessNote": "Tier 2 dashboard access:",
     "contact.form.heading": "Send a message",
@@ -920,6 +927,9 @@ const strings: Record<Locale, Record<string, string>> = {
     "contact.metaDescription": "Kontaktieren Sie KapitaalBot über das Formular.",
     "contact.intro":
       "Senden Sie eine Nachricht mit dem Formular unten. Für Tier-2-Zugang nutzen Sie das Access-Formular unter Konto → Zugang.",
+    "contact.donationNote":
+      "Sie möchten unterstützen, damit weiter gebaut und getestet werden kann? Beitragende können nach Absprache Zugang zu erweiterter Observability erhalten (z. B. Tier 2) — keine automatische Verknüpfung und kein Renditeversprechen.",
+    "contact.donationFaqLink": "Mehr in der FAQ: Spenden, Entwicklung & Tests",
     "contact.accessLink": "Tier-2-Zugang anfragen",
     "contact.accessNote": "Zugang zu Tier-2-Dashboards:",
     "contact.form.heading": "Nachricht senden",
@@ -1266,6 +1276,9 @@ const strings: Record<Locale, Record<string, string>> = {
     "contact.metaDescription": "Contactez KapitaalBot via le formulaire.",
     "contact.intro":
       "Envoyez un message avec le formulaire ci-dessous. Pour l’accès Tier 2, utilisez le formulaire d’accès sous Compte → Accès.",
+    "contact.donationNote":
+      "Vous souhaitez soutenir pour continuer à construire et tester ? Les contributeurs peuvent, selon accord, obtenir un accès à une observabilité plus large (p. ex. Tier 2) — pas de lien automatique ni promesse de rendement.",
+    "contact.donationFaqLink": "Plus dans la FAQ : Dons, développement & tests",
     "contact.accessLink": "Demander l’accès Tier 2",
     "contact.accessNote": "Accès aux tableaux de bord Tier 2 :",
     "contact.form.heading": "Envoyer un message",
@@ -1405,12 +1418,15 @@ export function t(locale: Locale, key: string): string {
     strings[locale]?.[key] ??
     seoStrings[locale]?.[key] ??
     aboutStrings[locale]?.[key] ??
+    faqFundingStrings[locale]?.[key] ??
     strings.en?.[key] ??
     seoStrings.en?.[key] ??
     aboutStrings.en?.[key] ??
+    faqFundingStrings.en?.[key] ??
     strings.nl[key] ??
     seoStrings.nl[key] ??
     aboutStrings.nl[key] ??
+    faqFundingStrings.nl[key] ??
     key
   );
 }
