@@ -8,7 +8,7 @@ import { parseLocaleParam, withLocale } from "@/lib/locale-path";
 export const dynamic = "force-dynamic";
 
 export default async function AdminCmsPage({ params }: { params: { locale: string } }) {
-  const locale = parseLocaleParam(params.locale) as Locale;
+  const locale = parseLocaleParam(params.locale);
   const tier = await getSessionTier();
   if (tier < 3) return <TierGate kind="tier3" locale={locale} />;
 
