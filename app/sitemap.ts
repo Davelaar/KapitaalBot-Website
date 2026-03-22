@@ -1,8 +1,20 @@
 import type { MetadataRoute } from "next";
+import fs from "fs";
+import path from "path";
 import { locales } from "@/lib/i18n";
 import { getSiteUrl } from "@/lib/site";
 import { withLocale } from "@/lib/locale-path";
 import { KENNIS_SLUGS } from "@/lib/kennis-slugs";
+
+const DOCS_DIR = path.join(process.cwd(), "content", "docs");
+
+function getDocSlugs(): string[] {
+  if (!fs.existsSync(DOCS_DIR)) return [];
+  return fs
+    .readdirSync(DOCS_DIR)
+    .filter((f) => f.endsWith(".md"))
+    .map((f) => f.replace(/\.md$/, ""));
+}
 
 const PATHS = [
   "",
@@ -56,6 +68,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
         lastModified: now,
         changeFrequency: "monthly",
         priority: 0.75,
+      });
+    }
+
+    for (const slug of getDocSlugs()) {
+      entries.push({
+        url: `${base}${withLocale(locale, `/docs/${slug}`)}`,
+        lastModified: now,
+        changeFrequency: "weekly",
+        priority: 0.62,
       });
     }
   }
