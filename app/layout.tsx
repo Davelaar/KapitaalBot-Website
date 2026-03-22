@@ -20,9 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     metadataBase: new URL(getSiteUrl()),
-    title: {
-      default: title,
-    },
+    title,
     description,
     openGraph: {
       title,
