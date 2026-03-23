@@ -5,6 +5,7 @@ import { MermaidLiveDiagram } from "@/components/MermaidLiveDiagram";
 import { useLocale } from "@/lib/locale";
 import { withLocale } from "@/lib/locale-path";
 import type {
+  EpochIngestPoint,
   EventBufferKpis,
   LabelCount,
   MissedMoveBucket,
@@ -28,7 +29,16 @@ function formatRunHealthPoint(p: RunHealthPoint | null | undefined, ui: any): st
   if (!p) return ui.noRunHealthSample;
   const freshness = p.feed_freshness_secs != null ? `${Math.round(p.feed_freshness_secs)} s` : "n.v.t.";
   const freshnessLabel = freshness === "n.v.t." ? ui.na : freshness;
-  return `${ui.runWord} ${p.run_id} · ${ui.modeLabel}=${p.mode ?? ui.unknownMode} · ${ui.feedFreshnessLabel} ~${freshnessLabel}`;
+  const base = `${ui.runWord} ${p.run_id} · ${ui.modeLabel}=${p.mode ?? ui.unknownMode} · ${ui.feedFreshnessLabel} ~${freshnessLabel}`;
+  if (p.ticker_rows != null || p.trade_rows != null || p.l2_rows != null || p.l3_rows != null) {
+    return `${base} · ${ui.runRowsLabel}: ${p.ticker_rows ?? "—"}/${p.trade_rows ?? "—"}/${p.l2_rows ?? "—"}/${p.l3_rows ?? "—"}`;
+  }
+  return base;
+}
+
+function formatEpochIngestPoint(p: EpochIngestPoint, ui: any): string {
+  const bit = (v: boolean) => (v ? ui.yes : ui.no);
+  return `${ui.epochWord} ${p.epoch_id} · status=${p.status} · symbols=${p.symbol_count} · ${ui.epochCriteriaLabel}: ${bit(p.criteria_ticker_ok)}/${bit(p.criteria_trade_ok)}/${bit(p.criteria_l2_ok)}/${bit(p.criteria_l3_ok)} · ${ui.completedAtLabel}: ${p.completed_at ?? ui.na}`;
 }
 
 function summarizeLabelCounts(rows: LabelCount[] | null | undefined, ui: any): string {
@@ -47,7 +57,11 @@ function summarizeMissedMoves(rows: MissedMoveBucket[] | null | undefined, ui: a
 
 function summarizeEventBuffer(kpis: EventBufferKpis | null | undefined, ui: any): string {
   if (!kpis) return ui.noEventBufferStats;
-  return `buffered=${kpis.buffered_count}, released=${kpis.released_count}, timed_out=${kpis.timed_out_count}, unknown=${kpis.unknown_state_count}`;
+  const statusExtra =
+    kpis.status_counts_24h && kpis.status_counts_24h.length > 0
+      ? ` · status: ${summarizeLabelCounts(kpis.status_counts_24h, ui)}`
+      : "";
+  return `buffered_active=${kpis.buffered_active_count}, buffered_total=${kpis.buffered_total_count}, released_24h=${kpis.released_24h_count}, timeout_24h=${kpis.timeout_24h_count}, unknown_24h=${kpis.unknown_24h_count}${statusExtra}`;
 }
 
 function disclosureText(bundle: Tier2DataBundle, locale: string): string {
@@ -111,6 +125,14 @@ export function DashboardTier2Content({
       symbolsTraded24hLabel: "symbols verhandeld 24h",
       epochSymbolsOkExpectedLabel: "symbols (ok/verwacht):",
       epochSummaryMissing: "Geen epoch/ingest-samenvatting in snapshot.",
+      runRowsLabel: "rijen t/tr/L2/L3",
+      epochCriteriaLabel: "criteria (tick/trade/L2/L3)",
+      completedAtLabel: "voltooid",
+      netEntryNotionalLabel: "net entry notional (quote)",
+      sharpeLabel: "Sharpe-achtig 24h",
+      sortinoLabel: "Sortino-achtig 24h",
+      activeQuietsLabel: "actieve quiets",
+      activeHardBlocksLabel: "actieve hard-blocks",
       yes: "ja",
       no: "nee",
       orders24hLabel: "Orders 24h:",
@@ -188,6 +210,14 @@ export function DashboardTier2Content({
       symbolsTraded24hLabel: "symbols traded 24h",
       epochSymbolsOkExpectedLabel: "symbols (ok/expected):",
       epochSummaryMissing: "No epoch/ingest summary in snapshot.",
+      runRowsLabel: "rows t/tr/L2/L3",
+      epochCriteriaLabel: "criteria (tick/trade/L2/L3)",
+      completedAtLabel: "completed",
+      netEntryNotionalLabel: "net entry notional (quote)",
+      sharpeLabel: "Sharpe-like 24h",
+      sortinoLabel: "Sortino-like 24h",
+      activeQuietsLabel: "active quiets",
+      activeHardBlocksLabel: "active hard-blocks",
       yes: "yes",
       no: "no",
       orders24hLabel: "Orders 24h:",
@@ -265,6 +295,14 @@ export function DashboardTier2Content({
       symbolsTraded24hLabel: "Symbole gehandelt 24h",
       epochSymbolsOkExpectedLabel: "Symbole (ok/erwartet):",
       epochSummaryMissing: "Keine Epoch-/Ingest-Zusammenfassung im Snapshot.",
+      runRowsLabel: "Zeilen t/tr/L2/L3",
+      epochCriteriaLabel: "Kriterien (Tick/Trade/L2/L3)",
+      completedAtLabel: "abgeschlossen",
+      netEntryNotionalLabel: "Net-Entry-Notional (Quote)",
+      sharpeLabel: "Sharpe-ähnlich 24h",
+      sortinoLabel: "Sortino-ähnlich 24h",
+      activeQuietsLabel: "aktive Quiets",
+      activeHardBlocksLabel: "aktive Hard-Blocks",
       yes: "ja",
       no: "nein",
       orders24hLabel: "Orders 24h:",
@@ -342,6 +380,14 @@ export function DashboardTier2Content({
       symbolsTraded24hLabel: "symboles échangés 24h",
       epochSymbolsOkExpectedLabel: "symboles (ok/attendu) :",
       epochSummaryMissing: "Aucun résumé epoch/ingest dans le snapshot.",
+      runRowsLabel: "lignes t/tr/L2/L3",
+      epochCriteriaLabel: "critères (tick/trade/L2/L3)",
+      completedAtLabel: "terminé",
+      netEntryNotionalLabel: "notional d'entrée net (quote)",
+      sharpeLabel: "Sharpe-like 24h",
+      sortinoLabel: "Sortino-like 24h",
+      activeQuietsLabel: "quiets actifs",
+      activeHardBlocksLabel: "hard-blocks actifs",
       yes: "oui",
       no: "non",
       orders24hLabel: "Orders 24h :",
@@ -545,9 +591,7 @@ export function DashboardTier2Content({
           <h2 style={{ fontSize: "1.1rem", marginBottom: "0.25rem" }}>{ui.sectionB}</h2>
           <p style={{ color: "var(--muted)", fontSize: "0.875rem", marginBottom: 0 }}>
             {execution.epoch_ingest_point
-              ? `${ui.epochWord} ${execution.epoch_ingest_point.epoch_id ?? ui.na} · ${ui.epochSymbolsOkExpectedLabel}${execution.epoch_ingest_point.symbols_ok ?? "?"}/${execution.epoch_ingest_point.symbols_expected ?? "?"} · ${ui.validLabel}${
-                  execution.epoch_ingest_point.is_valid === null ? ui.na : execution.epoch_ingest_point.is_valid ? ui.yes : ui.no
-                }`
+              ? formatEpochIngestPoint(execution.epoch_ingest_point, ui)
               : ui.epochSummaryMissing}
           </p>
         </section>
@@ -598,13 +642,27 @@ export function DashboardTier2Content({
             {ui.maxDrawdownLabel}{" "}
             {pnl.drawdown_pct != null ? `${pnl.drawdown_pct.toFixed(2)} %` : ui.na}
           </p>
-          {pnl.exposure_summary && (
-            <p style={{ color: "var(--muted)", fontSize: "0.8125rem", margin: 0 }}>
-              {ui.openPositionsLabel} {pnl.exposure_summary.open_positions_count} ({ui.exitOnlyCountLabel}{" "}
-              {pnl.exposure_summary.exit_only_positions_count}, {ui.hardBlockedCountLabel}{" "}
-              {pnl.exposure_summary.hard_blocked_positions_count}); {ui.netExposureLabel}{" "}
-              {pnl.exposure_summary.net_base_position_s ?? ui.na}
+          {(pnl.sharpe_like_24h != null || pnl.sortino_like_24h != null) && (
+            <p style={{ color: "var(--muted)", fontSize: "0.8125rem", marginBottom: "0.25rem" }}>
+              {pnl.sharpe_like_24h != null ? `${ui.sharpeLabel}: ${pnl.sharpe_like_24h.toFixed(3)}` : ""}
+              {pnl.sharpe_like_24h != null && pnl.sortino_like_24h != null ? " · " : ""}
+              {pnl.sortino_like_24h != null ? `${ui.sortinoLabel}: ${pnl.sortino_like_24h.toFixed(3)}` : ""}
             </p>
+          )}
+          {pnl.exposure_summary && (
+            <>
+              <p style={{ color: "var(--muted)", fontSize: "0.8125rem", marginBottom: "0.25rem" }}>
+                {ui.openPositionsLabel} {pnl.exposure_summary.open_positions_count} · long{" "}
+                {pnl.exposure_summary.long_positions_count} · short {pnl.exposure_summary.short_positions_count} ·{" "}
+                {ui.netExposureLabel} {pnl.exposure_summary.net_base_position.toFixed(6)} · gross{" "}
+                {pnl.exposure_summary.gross_base_position.toFixed(6)}
+              </p>
+              {pnl.exposure_summary.net_entry_notional_quote != null && (
+                <p style={{ color: "var(--muted)", fontSize: "0.8125rem", margin: 0 }}>
+                  {ui.netEntryNotionalLabel}: {pnl.exposure_summary.net_entry_notional_quote.toFixed(2)}
+                </p>
+              )}
+            </>
           )}
         </section>
       )}
@@ -617,6 +675,12 @@ export function DashboardTier2Content({
             <strong style={{ color: "var(--fg)" }}>{safety.safety_normal_count}</strong> · {ui.exitOnlyLabel}{" "}
             {safety.safety_exit_only_count} · {ui.hardBlockedLabel} {safety.safety_hard_blocked_count}
           </p>
+          {(safety.active_quiets != null || safety.active_hard_blocks != null) && (
+            <p style={{ color: "var(--muted)", fontSize: "0.8125rem", marginBottom: "0.25rem" }}>
+              {ui.activeQuietsLabel}: {safety.active_quiets ?? "—"} · {ui.activeHardBlocksLabel}:{" "}
+              {safety.active_hard_blocks ?? "—"}
+            </p>
+          )}
           <p style={{ color: "var(--muted)", fontSize: "0.8125rem", margin: 0 }}>
             {ui.symbolsPerSafetyModeLabel}{" "}
             {safety.symbol_safety_active_modes && safety.symbol_safety_active_modes.length > 0

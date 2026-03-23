@@ -133,40 +133,56 @@ export interface MissedMoveBucket {
   count: number;
 }
 
+/** Matches KRAKENBOT `RunHealthPoint` JSON (observability snapshot export). */
 export interface RunHealthPoint {
   run_id: number;
   started_at: string | null;
   ended_at: string | null;
   mode: string | null;
   feed_freshness_secs: number | null;
+  ticker_rows?: number;
+  trade_rows?: number;
+  l2_rows?: number;
+  l3_rows?: number;
 }
 
+/** Matches KRAKENBOT `EpochIngestPoint` JSON. */
 export interface EpochIngestPoint {
-  epoch_id: number | null;
-  symbols_expected: number | null;
-  symbols_ok: number | null;
-  is_valid: boolean | null;
+  epoch_id: number;
+  status: string;
+  symbol_count: number;
+  criteria_ticker_ok: boolean;
+  criteria_trade_ok: boolean;
+  criteria_l2_ok: boolean;
+  criteria_l3_ok: boolean;
+  completed_at?: string | null;
 }
 
+/** Matches KRAKENBOT `ExposureSummary` JSON. */
 export interface ExposureSummary {
   open_positions_count: number;
-  exit_only_positions_count: number;
-  hard_blocked_positions_count: number;
-  net_base_position_s: string | null;
-  gross_base_position_s: string | null;
-  net_entry_notional_quote_s: string | null;
+  long_positions_count: number;
+  short_positions_count: number;
+  net_base_position: number;
+  gross_base_position: number;
+  net_entry_notional_quote?: number | null;
 }
 
 export interface SymbolSafetyActiveMode {
   symbol: string;
   mode: string;
+  quiet_until?: string | null;
+  hard_block_until?: string | null;
 }
 
+/** Matches KRAKENBOT `EventBufferKpis` JSON. */
 export interface EventBufferKpis {
-  buffered_count: number;
-  released_count: number;
-  timed_out_count: number;
-  unknown_state_count: number;
+  buffered_active_count: number;
+  buffered_total_count: number;
+  released_24h_count: number;
+  timeout_24h_count: number;
+  unknown_24h_count: number;
+  status_counts_24h?: LabelCount[] | null;
 }
 
 export interface Tier2ExecutionSnapshot {
@@ -189,7 +205,11 @@ export interface Tier2LatencySnapshot {
   exported_at: string;
   submit_to_ack_ms_avg?: number | null;
   sample_count: number;
+  avg_ack_ms?: number | null;
+  max_ack_ms?: number | null;
   total_orders_24h?: number | null;
+  avg_fill_to_exit_submit_ms?: number | null;
+  max_fill_to_exit_submit_ms?: number | null;
   count_with_exit?: number | null;
   submit_to_ack_histogram_ms_24h?: LatencyBucketPoint[] | null;
   fill_to_exit_submit_histogram_ms_24h?: LatencyBucketPoint[] | null;
@@ -201,6 +221,9 @@ export interface Tier2PnlSnapshot {
   realized_pnl_quote_24h: number | null;
   equity_trend_delayed?: EquityPoint[] | null;
   drawdown_pct?: number | null;
+  sharpe_like_24h?: number | null;
+  sortino_like_24h?: number | null;
+  max_drawdown_duration_buckets_24h?: number | null;
   exposure_summary?: ExposureSummary | null;
 }
 
@@ -210,6 +233,8 @@ export interface Tier2SafetySnapshot {
   safety_normal_count: number;
   safety_exit_only_count: number;
   safety_hard_blocked_count: number;
+  active_quiets?: number | null;
+  active_hard_blocks?: number | null;
   symbol_safety_active_modes?: SymbolSafetyActiveMode[] | null;
 }
 
