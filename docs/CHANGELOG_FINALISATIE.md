@@ -6,6 +6,7 @@
 - **Contract fix (website-only)** — `lib/snapshots.ts` en `DashboardTier2Content.tsx` afgestemd op de **werkelijke** velden uit de bot-export JSON: `EpochIngestPoint` (status, symbol_count, criteria_*), `ExposureSummary` (long/short, net/gross base, net_entry_notional_quote), `EventBufferKpis` (buffered_*_count, released_24h_count, …, status_counts_24h), `RunHealthPoint` (ticker/trade/L2/L3 rows), optionele PnL risk-adjusted + safety active_quiets/hard_blocks. Hiermee verdwijnen valse lege weergaves in secties A/B/E/I. *Commit: `43198a0`.*
 - **Deploy / validatie** — Na `git pull` op de website-server: `npm ci` (of `npm install`), `npm run build`, `systemctl restart kapitaalbot-web` (of je process manager). Live check: homepage HTTP 200; Tier 2 na login: sectie J zichtbaar wanneer exportmap `tier2_data_bundle.json` bevat.
 - **Build (server)** — `tsconfig.json`: `baseUrl: "."` + `next.config.js`: expliciete `webpack.resolve.alias["@"]` naar repo-root zodat `@/*`-imports tijdens `next build` op Linux/server niet falen (`Module not found: @/lib/...`).
+- **Typecheck** — Ontbrekende `sectionConceptual`-string in alle vier taalobjecten hersteld (Tier 2-dashboard).
 
 ## 2026-03-12 — Positionering, i18n, docs, Mermaid
 

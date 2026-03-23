@@ -162,6 +162,7 @@ export function DashboardTier2Content({
       marketSummaryText2: "met de MarketSummary-module.",
       shadowOutcomeDistributionLabel: "Outcome-distributie:",
       shadowMissedMoveHistogramLabel: "Missed-move histogram:",
+      sectionConceptual: "Tier-model & dataflow (conceptueel)",
     },
     en: {
       navBack: "Dashboard",
@@ -247,6 +248,7 @@ export function DashboardTier2Content({
       marketSummaryText2: "with the MarketSummary module.",
       shadowOutcomeDistributionLabel: "Outcome distribution:",
       shadowMissedMoveHistogramLabel: "Missed-move histogram:",
+      sectionConceptual: "Tier model & dataflow (conceptual)",
     },
     de: {
       navBack: "Dashboard",
@@ -332,6 +334,7 @@ export function DashboardTier2Content({
       marketSummaryText2: "mit dem MarketSummary-Modul.",
       shadowOutcomeDistributionLabel: "Outcome-Verteilung:",
       shadowMissedMoveHistogramLabel: "Missed-Move-Histogramm:",
+      sectionConceptual: "Tier-Modell & Datenfluss (konzeptionell)",
     },
     fr: {
       navBack: "Dashboard",
@@ -417,6 +420,7 @@ export function DashboardTier2Content({
       marketSummaryText2: "avec le module MarketSummary.",
       shadowOutcomeDistributionLabel: "Distribution des outcomes :",
       shadowMissedMoveHistogramLabel: "Histogramme missed-move :",
+      sectionConceptual: "Modèle de tiers & flux de données (conceptuel)",
     },
   }[locale];
 
