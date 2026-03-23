@@ -5,6 +5,7 @@
 - **Tier 2 dashboard** — Laadt `tier2_data_bundle.json` (`getTier2DataBundleCached`); nieuwe sectie **J. Data-bundle (ingest + decision)** met disclosure, DB-rollen, intake/universe, route/no-trade, risk/capital, entry/execution, path doctrine, infra. Redis-cache key `kb:snap:v1:tier2_data_bundle`. *Commits: `f3dbf5c`.*
 - **Contract fix (website-only)** — `lib/snapshots.ts` en `DashboardTier2Content.tsx` afgestemd op de **werkelijke** velden uit de bot-export JSON: `EpochIngestPoint` (status, symbol_count, criteria_*), `ExposureSummary` (long/short, net/gross base, net_entry_notional_quote), `EventBufferKpis` (buffered_*_count, released_24h_count, …, status_counts_24h), `RunHealthPoint` (ticker/trade/L2/L3 rows), optionele PnL risk-adjusted + safety active_quiets/hard_blocks. Hiermee verdwijnen valse lege weergaves in secties A/B/E/I. *Commit: `43198a0`.*
 - **Deploy / validatie** — Na `git pull` op de website-server: `npm ci` (of `npm install`), `npm run build`, `systemctl restart kapitaalbot-web` (of je process manager). Live check: homepage HTTP 200; Tier 2 na login: sectie J zichtbaar wanneer exportmap `tier2_data_bundle.json` bevat.
+- **Build (server)** — `tsconfig.json`: `baseUrl: "."` toegevoegd naast `paths` zodat Next/webpack `@/*`-aliases op Linux CI/server betrouwbaar resolve (anders `Module not found: @/lib/locale` tijdens `next build`).
 
 ## 2026-03-12 — Positionering, i18n, docs, Mermaid
 
