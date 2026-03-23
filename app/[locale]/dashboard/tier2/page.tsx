@@ -1,5 +1,6 @@
 import { getSessionTier } from "@/lib/auth";
 import {
+  getTier2DataBundleCached,
   getTier2ExecutionSnapshotCached,
   getTier2LatencySnapshotCached,
   getTier2PnlSnapshotCached,
@@ -22,7 +23,8 @@ export default async function DashboardTier2Page({
   if (tier < 2) {
     return <TierGate kind="tier2" locale={locale} />;
   }
-  const [execution, latency, pnl, safety] = await Promise.all([
+  const [dataBundle, execution, latency, pnl, safety] = await Promise.all([
+    getTier2DataBundleCached(),
     getTier2ExecutionSnapshotCached(),
     getTier2LatencySnapshotCached(),
     getTier2PnlSnapshotCached(),
@@ -31,6 +33,7 @@ export default async function DashboardTier2Page({
   return (
     <main>
       <DashboardTier2Content
+        dataBundle={dataBundle}
         execution={execution}
         latency={latency}
         pnl={pnl}

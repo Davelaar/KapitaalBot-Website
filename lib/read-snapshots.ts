@@ -17,6 +17,7 @@ import type {
   Tier2LatencySnapshot,
   Tier2PnlSnapshot,
   Tier2SafetySnapshot,
+  Tier2DataBundle,
 } from "./snapshots";
 
 const EXPORT_DIR =
@@ -95,4 +96,9 @@ export function getTier2SafetySnapshot(): Tier2SafetySnapshot | null {
 /** Tier 3: admin_observability_snapshot */
 export function getAdminObservabilitySnapshot(): AdminObservabilitySnapshot | null {
   return readJson<AdminObservabilitySnapshot>("admin_observability_snapshot.json");
+}
+
+/** Tier 2: tier2_data_bundle (dual-DB Data menu aggregates) */
+export function getTier2DataBundle(): Tier2DataBundle | null {
+  return readJson<Tier2DataBundle>("tier2_data_bundle.json");
 }

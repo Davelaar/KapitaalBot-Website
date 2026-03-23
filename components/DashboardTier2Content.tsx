@@ -9,6 +9,7 @@ import type {
   LabelCount,
   MissedMoveBucket,
   RunHealthPoint,
+  Tier2DataBundle,
   Tier2ExecutionSnapshot,
   Tier2LatencySnapshot,
   Tier2PnlSnapshot,
@@ -16,6 +17,7 @@ import type {
 } from "@/lib/snapshots";
 
 interface DashboardTier2ContentProps {
+  dataBundle: Tier2DataBundle | null;
   execution: Tier2ExecutionSnapshot | null;
   latency: Tier2LatencySnapshot | null;
   pnl: Tier2PnlSnapshot | null;
@@ -48,7 +50,18 @@ function summarizeEventBuffer(kpis: EventBufferKpis | null | undefined, ui: any)
   return `buffered=${kpis.buffered_count}, released=${kpis.released_count}, timed_out=${kpis.timed_out_count}, unknown=${kpis.unknown_state_count}`;
 }
 
-export function DashboardTier2Content({ execution, latency, pnl, safety }: DashboardTier2ContentProps) {
+function disclosureText(bundle: Tier2DataBundle, locale: string): string {
+  if (locale === "nl") return bundle.disclosure_policy.explanation_nl;
+  return `Aggregates use ~${bundle.disclosure_policy.bucket_minutes} minute buckets and are intentionally delayed vs live trading (copy-trading protection).`;
+}
+
+export function DashboardTier2Content({
+  dataBundle,
+  execution,
+  latency,
+  pnl,
+  safety,
+}: DashboardTier2ContentProps) {
   const locale = useLocale();
   const ui = {
     nl: {
@@ -58,7 +71,7 @@ export function DashboardTier2Content({ execution, latency, pnl, safety }: Dashb
         "Uitgebreide observability uit <code>tier2_*</code> snapshots. Echte data; geen placeholders.",
       noDataTitle: "Geen Tier 2-data",
       noDataText:
-        "Er zijn nog geen <code>tier2_*</code> snapshot-bestanden. Voer op de bot <code>export-observability-snapshots</code> uit; daarna verschijnen hier de modules.",
+        "Er zijn nog geen snapshot-bestanden (<code>tier2_*</code> en/of <code>tier2_data_bundle.json</code>). Voer op de bot <code>export-observability-snapshots</code> uit en zorg dat <code>OBSERVABILITY_EXPORT_DIR</code> voor deze site naar dezelfde map wijst.",
       linkToTier1: "Ga naar Data (Tier 1)",
       sectionA: "A. Run & Data Health",
       sectionB: "B. Epoch & Ingest",
@@ -69,7 +82,19 @@ export function DashboardTier2Content({ execution, latency, pnl, safety }: Dashb
       sectionG: "G. Market / pair summary",
       sectionH: "H. Shadow trades",
       sectionI: "I. Event buffer KPI",
-      sectionConceptual: "Tier-model & dataflow (conceptueel)",
+      sectionJ: "J. Data-bundle (ingest + decision)",
+      dataBundleFile: "Bronbestand:",
+      dataBundleRoles: "DB-rollen:",
+      disclosureHeading: "Disclosure",
+      subIntake: "Intake / universe",
+      subRoute: "Route / no-trade",
+      subRisk: "Risk & capital",
+      subEntry: "Entry & execution funnel",
+      subPath: "Path doctrine",
+      subInfra: "Infra",
+      capitalEvents24h: "Capital-stage events 24h:",
+      correlationOrders24h: "Orders met correlation 24h:",
+      funnelPathTapeRows24h: "Funnel-rijen met path_tape 24h:",
       noRunHealthSample: "Geen recente run-health sample.",
       unknownMode: "onbekend",
       runWord: "Run",
@@ -123,7 +148,7 @@ export function DashboardTier2Content({ execution, latency, pnl, safety }: Dashb
         "Extended observability from <code>tier2_*</code> snapshots. Real data; no placeholders.",
       noDataTitle: "No Tier 2 data",
       noDataText:
-        "There are no <code>tier2_*</code> snapshot files yet. Run <code>export-observability-snapshots</code> on the bot; modules will appear here afterwards.",
+        "No snapshot files yet (<code>tier2_*</code> and/or <code>tier2_data_bundle.json</code>). Run <code>export-observability-snapshots</code> on the bot and point <code>OBSERVABILITY_EXPORT_DIR</code> for this site at the same directory.",
       linkToTier1: "Go to Data (Tier 1)",
       sectionA: "A. Run & Data Health",
       sectionB: "B. Epoch & Ingest",
@@ -134,7 +159,19 @@ export function DashboardTier2Content({ execution, latency, pnl, safety }: Dashb
       sectionG: "G. Market / pair summary",
       sectionH: "H. Shadow trades",
       sectionI: "I. Event buffer KPI",
-      sectionConceptual: "Tier model & dataflow (conceptual)",
+      sectionJ: "J. Data bundle (ingest + decision)",
+      dataBundleFile: "Source file:",
+      dataBundleRoles: "DB roles:",
+      disclosureHeading: "Disclosure",
+      subIntake: "Intake / universe",
+      subRoute: "Route / no-trade",
+      subRisk: "Risk & capital",
+      subEntry: "Entry & execution funnel",
+      subPath: "Path doctrine",
+      subInfra: "Infra",
+      capitalEvents24h: "Capital-stage funnel events 24h:",
+      correlationOrders24h: "Orders with correlation 24h:",
+      funnelPathTapeRows24h: "Funnel rows with path_tape 24h:",
       noRunHealthSample: "No recent run-health sample.",
       unknownMode: "unknown",
       runWord: "Run",
@@ -199,7 +236,19 @@ export function DashboardTier2Content({ execution, latency, pnl, safety }: Dashb
       sectionG: "G. Markt / Pair-Übersicht",
       sectionH: "H. Shadow-Trades",
       sectionI: "I. Event-Buffer KPI",
-      sectionConceptual: "Tier-Modell & Datenfluss (konzeptionell)",
+      sectionJ: "J. Daten-Bundle (Ingest + Decision)",
+      dataBundleFile: "Quelldatei:",
+      dataBundleRoles: "DB-Rollen:",
+      disclosureHeading: "Hinweis",
+      subIntake: "Intake / Universe",
+      subRoute: "Route / No-Trade",
+      subRisk: "Risk & Kapital",
+      subEntry: "Entry & Execution-Funnel",
+      subPath: "Path-Doktrin",
+      subInfra: "Infra",
+      capitalEvents24h: "Capital-Stage-Events 24h:",
+      correlationOrders24h: "Orders mit Correlation 24h:",
+      funnelPathTapeRows24h: "Funnel-Zeilen mit path_tape 24h:",
       noRunHealthSample: "Kein aktuelles Run-Health-Beispiel.",
       unknownMode: "unbekannt",
       runWord: "Run",
@@ -264,7 +313,19 @@ export function DashboardTier2Content({ execution, latency, pnl, safety }: Dashb
       sectionG: "G. Résumé marché / paire",
       sectionH: "H. Shadow trades",
       sectionI: "I. KPI du buffer d'événements",
-      sectionConceptual: "Modèle de tiers & flux de données (conceptuel)",
+      sectionJ: "J. Bundle Data (ingest + decision)",
+      dataBundleFile: "Fichier source :",
+      dataBundleRoles: "Rôles DB :",
+      disclosureHeading: "Divulgation",
+      subIntake: "Intake / univers",
+      subRoute: "Route / no-trade",
+      subRisk: "Risque & capital",
+      subEntry: "Entrée & funnel execution",
+      subPath: "Doctrine path",
+      subInfra: "Infra",
+      capitalEvents24h: "Événements funnel capital 24h :",
+      correlationOrders24h: "Ordres avec correlation 24h :",
+      funnelPathTapeRows24h: "Lignes funnel avec path_tape 24h :",
       noRunHealthSample: "Aucun échantillon récent de run-health.",
       unknownMode: "inconnu",
       runWord: "Run",
@@ -314,7 +375,11 @@ export function DashboardTier2Content({ execution, latency, pnl, safety }: Dashb
   }[locale];
 
   const hasAny =
-    execution !== null || latency !== null || pnl !== null || safety !== null;
+    dataBundle !== null ||
+    execution !== null ||
+    latency !== null ||
+    pnl !== null ||
+    safety !== null;
 
   return (
     <>
@@ -329,6 +394,117 @@ export function DashboardTier2Content({ execution, latency, pnl, safety }: Dashb
       <p style={{ color: "var(--muted)", marginBottom: "1rem" }}>
         <span dangerouslySetInnerHTML={{ __html: ui.intro }} />
       </p>
+
+      {dataBundle && (
+        <section
+          className="card"
+          style={{
+            marginBottom: "1rem",
+            padding: "1rem 1.25rem",
+            borderLeft: "4px solid var(--accent)",
+          }}
+        >
+          <h2 style={{ fontSize: "1.1rem", marginBottom: "0.35rem" }}>{ui.sectionJ}</h2>
+          <p style={{ color: "var(--muted)", fontSize: "0.8125rem", marginBottom: "0.5rem" }}>
+            {ui.dataBundleFile} <code>tier2_data_bundle.json</code> · contract {dataBundle.contract_version} ·{" "}
+            {dataBundle.exported_at}
+          </p>
+          <p style={{ color: "var(--muted)", fontSize: "0.8125rem", marginBottom: "0.5rem" }}>
+            {ui.dataBundleRoles}{" "}
+            <strong style={{ color: "var(--fg)" }}>
+              {dataBundle.source_db.intake_role}
+            </strong>{" "}
+            /{" "}
+            <strong style={{ color: "var(--fg)" }}>{dataBundle.source_db.decision_role}</strong>
+          </p>
+          <p style={{ color: "var(--muted)", fontSize: "0.8125rem", marginBottom: "0.75rem" }}>
+            <strong style={{ color: "var(--fg)" }}>{ui.disclosureHeading}</strong> (
+            {dataBundle.disclosure_policy.kind}, {dataBundle.disclosure_policy.bucket_minutes} min):{" "}
+            {disclosureText(dataBundle, locale)}
+          </p>
+
+          {dataBundle.intake_universe && (
+            <div style={{ marginBottom: "0.75rem" }}>
+              <h3 style={{ fontSize: "0.95rem", marginBottom: "0.25rem" }}>{ui.subIntake}</h3>
+              <p style={{ color: "var(--muted)", fontSize: "0.8125rem", margin: 0 }}>
+                epoch {dataBundle.intake_universe.epoch_id ?? "—"} · status{" "}
+                {dataBundle.intake_universe.epoch_status ?? "—"} · symbols{" "}
+                {dataBundle.intake_universe.epoch_symbol_count ?? "—"}
+                {dataBundle.intake_universe.run_id != null
+                  ? ` · run ${dataBundle.intake_universe.run_id} (rows ${dataBundle.intake_universe.run_symbol_rows ?? "—"}, ticker ${dataBundle.intake_universe.run_ticker_sum ?? "—"}, trade ${dataBundle.intake_universe.run_trade_sum ?? "—"}, L2 ${dataBundle.intake_universe.run_l2_sum ?? "—"}, L3 ${dataBundle.intake_universe.run_l3_sum ?? "—"})`
+                  : ""}
+              </p>
+            </div>
+          )}
+
+          {dataBundle.route_no_trade && (
+            <div style={{ marginBottom: "0.75rem" }}>
+              <h3 style={{ fontSize: "0.95rem", marginBottom: "0.25rem" }}>{ui.subRoute}</h3>
+              <p style={{ color: "var(--muted)", fontSize: "0.8125rem", marginBottom: "0.25rem" }}>
+                stage: {summarizeLabelCounts(dataBundle.route_no_trade.funnel_stage_counts_24h, ui)}
+              </p>
+              <p style={{ color: "var(--muted)", fontSize: "0.8125rem", marginBottom: "0.25rem" }}>
+                decision_code: {summarizeLabelCounts(dataBundle.route_no_trade.funnel_decision_code_counts_24h, ui)}
+              </p>
+              <p style={{ color: "var(--muted)", fontSize: "0.8125rem", marginBottom: "0.25rem" }}>
+                path_tape (events): {summarizeLabelCounts(dataBundle.route_no_trade.path_tape_event_counts_24h, ui)}
+              </p>
+              {dataBundle.route_no_trade.shadow_blocker_counts &&
+                dataBundle.route_no_trade.shadow_blocker_counts.length > 0 && (
+                  <p style={{ color: "var(--muted)", fontSize: "0.8125rem", margin: 0 }}>
+                    shadow blockers: {summarizeLabelCounts(dataBundle.route_no_trade.shadow_blocker_counts, ui)}
+                  </p>
+                )}
+            </div>
+          )}
+
+          {dataBundle.risk_capital && (
+            <div style={{ marginBottom: "0.75rem" }}>
+              <h3 style={{ fontSize: "0.95rem", marginBottom: "0.25rem" }}>{ui.subRisk}</h3>
+              <p style={{ color: "var(--muted)", fontSize: "0.8125rem", marginBottom: "0.25rem" }}>
+                safety by mode: {summarizeLabelCounts(dataBundle.risk_capital.symbol_safety_by_mode, ui)}
+              </p>
+              <p style={{ color: "var(--muted)", fontSize: "0.8125rem", margin: 0 }}>
+                {ui.capitalEvents24h} {dataBundle.risk_capital.funnel_capital_events_24h}
+              </p>
+            </div>
+          )}
+
+          {dataBundle.entry_execution && (
+            <div style={{ marginBottom: "0.75rem" }}>
+              <h3 style={{ fontSize: "0.95rem", marginBottom: "0.25rem" }}>{ui.subEntry}</h3>
+              <p style={{ color: "var(--muted)", fontSize: "0.8125rem", margin: 0 }}>
+                execution stage events 24h: {dataBundle.entry_execution.execution_stage_events_24h} · fill stage:{" "}
+                {dataBundle.entry_execution.fill_stage_events_24h} · {ui.correlationOrders24h}{" "}
+                {dataBundle.entry_execution.orders_with_correlation_24h}
+              </p>
+            </div>
+          )}
+
+          {dataBundle.path_doctrine && (
+            <div style={{ marginBottom: "0.75rem" }}>
+              <h3 style={{ fontSize: "0.95rem", marginBottom: "0.25rem" }}>{ui.subPath}</h3>
+              <p style={{ color: "var(--muted)", fontSize: "0.8125rem", marginBottom: "0.25rem" }}>
+                orders by path_tape: {summarizeLabelCounts(dataBundle.path_doctrine.orders_by_path_tape_24h, ui)}
+              </p>
+              <p style={{ color: "var(--muted)", fontSize: "0.8125rem", margin: 0 }}>
+                {ui.funnelPathTapeRows24h} {dataBundle.path_doctrine.funnel_rows_with_path_tape_24h}
+              </p>
+            </div>
+          )}
+
+          {dataBundle.infra && (
+            <div>
+              <h3 style={{ fontSize: "0.95rem", marginBottom: "0.25rem" }}>{ui.subInfra}</h3>
+              <p style={{ color: "var(--muted)", fontSize: "0.8125rem", margin: 0 }}>
+                recovery requests 24h: {dataBundle.infra.recovery_requests_24h} · watchdog:{" "}
+                {dataBundle.infra.latest_watchdog_state ?? "—"} · event-buffer unknown:{" "}
+                {dataBundle.infra.event_buffer_unknown_24h ?? "—"}
+              </p>
+            </div>
+          )}
+        </section>
+      )}
 
       {!hasAny && (
         <div

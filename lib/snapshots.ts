@@ -227,3 +227,83 @@ export interface AdminObservabilitySnapshot {
 }
 
 export type Tier = 1 | 2 | 3;
+
+// --- tier2_data_bundle.json (contract 1.1+) — dual-DB observability Data menu ---
+
+export interface Tier2DisclosurePolicy {
+  kind: string;
+  bucket_minutes: number;
+  as_of_utc: string;
+  explanation_nl: string;
+}
+
+export interface Tier2DataSourceMeta {
+  intake_role: string;
+  decision_role: string;
+}
+
+export interface Tier2IntakeUniverseSection {
+  source_db: string;
+  epoch_id?: number | null;
+  epoch_status?: string | null;
+  epoch_symbol_count?: number | null;
+  criteria_ticker_ok?: boolean | null;
+  criteria_trade_ok?: boolean | null;
+  criteria_l2_ok?: boolean | null;
+  criteria_l3_ok?: boolean | null;
+  run_id?: number | null;
+  run_symbol_rows?: number | null;
+  run_ticker_sum?: number | null;
+  run_trade_sum?: number | null;
+  run_l2_sum?: number | null;
+  run_l3_sum?: number | null;
+}
+
+export interface Tier2RouteNoTradeSection {
+  source_db: string;
+  funnel_stage_counts_24h: LabelCount[];
+  funnel_decision_code_counts_24h: LabelCount[];
+  funnel_reason_top_24h: LabelCount[];
+  shadow_blocker_counts?: LabelCount[] | null;
+  path_tape_event_counts_24h: LabelCount[];
+}
+
+export interface Tier2RiskCapitalSection {
+  source_db: string;
+  symbol_safety_by_mode: LabelCount[];
+  funnel_capital_events_24h: number;
+}
+
+export interface Tier2EntryExecutionSection {
+  source_db: string;
+  execution_stage_events_24h: number;
+  fill_stage_events_24h: number;
+  orders_with_correlation_24h: number;
+}
+
+export interface Tier2PathDoctrineSection {
+  source_db: string;
+  orders_by_path_tape_24h: LabelCount[];
+  funnel_rows_with_path_tape_24h: number;
+}
+
+export interface Tier2InfraSection {
+  source_db: string;
+  recovery_requests_24h: number;
+  latest_watchdog_state?: string | null;
+  event_buffer_unknown_24h?: number | null;
+}
+
+/** Single bundle for Tier 2 Data menu (ingest + decision aggregates). */
+export interface Tier2DataBundle {
+  contract_version: string;
+  exported_at: string;
+  disclosure_policy: Tier2DisclosurePolicy;
+  source_db: Tier2DataSourceMeta;
+  intake_universe?: Tier2IntakeUniverseSection | null;
+  route_no_trade?: Tier2RouteNoTradeSection | null;
+  risk_capital?: Tier2RiskCapitalSection | null;
+  entry_execution?: Tier2EntryExecutionSection | null;
+  path_doctrine?: Tier2PathDoctrineSection | null;
+  infra?: Tier2InfraSection | null;
+}

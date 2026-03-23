@@ -15,6 +15,7 @@ import type {
   Tier2LatencySnapshot,
   Tier2PnlSnapshot,
   Tier2SafetySnapshot,
+  Tier2DataBundle,
 } from "@/lib/snapshots";
 import { getRedis } from "@/lib/redis-client";
 import * as raw from "@/lib/read-snapshots";
@@ -84,4 +85,8 @@ export async function getTier2SafetySnapshotCached(): Promise<Tier2SafetySnapsho
 
 export async function getAdminObservabilitySnapshotCached(): Promise<AdminObservabilitySnapshot | null> {
   return cached("kb:snap:v1:admin_observability", () => raw.getAdminObservabilitySnapshot());
+}
+
+export async function getTier2DataBundleCached(): Promise<Tier2DataBundle | null> {
+  return cached("kb:snap:v1:tier2_data_bundle", () => raw.getTier2DataBundle());
 }
