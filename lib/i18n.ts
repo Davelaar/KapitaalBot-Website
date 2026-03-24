@@ -235,6 +235,9 @@ const strings: Record<Locale, Record<string, string>> = {
     "docs.meta.VALIDATION_REPORT_REFRESH_15MIN_RESET.desc": "Proof-run met refresh/reset checks en verwachte resultaten.",
     "docs.meta.SYSTEMD_README.label": "Systemd units",
     "docs.meta.SYSTEMD_README.desc": "Service-overzicht voor ingest/execution/export en operationele startvolgorde.",
+    "docs.meta.EXIT_PATHS_AND_PROTECTION_RUNTIME.label": "Exit-paden & bescherming",
+    "docs.meta.EXIT_PATHS_AND_PROTECTION_RUNTIME.desc":
+      "Exit/emergency protection, scenario-matrix; Mermaid: beschermingslaag en deadlock-recovery doelarchitectuur.",
     "contact.title": "Contact",
     "contact.metaDescription": "Neem contact op met KapitaalBot via het formulier.",
     "contact.intro":
@@ -593,6 +596,9 @@ const strings: Record<Locale, Record<string, string>> = {
     "docs.meta.VALIDATION_REPORT_REFRESH_15MIN_RESET.desc": "Proof-run with refresh/reset checks and expected outcomes.",
     "docs.meta.SYSTEMD_README.label": "Systemd units",
     "docs.meta.SYSTEMD_README.desc": "Service overview for ingest/execution/export and operational startup order.",
+    "docs.meta.EXIT_PATHS_AND_PROTECTION_RUNTIME.label": "Exit paths & protection",
+    "docs.meta.EXIT_PATHS_AND_PROTECTION_RUNTIME.desc":
+      "Exit/emergency protection, scenario matrix; Mermaid: protection layer and target deadlock-recovery state machine.",
     "contact.title": "Contact",
     "contact.metaDescription": "Contact KapitaalBot via the form.",
     "contact.intro":
@@ -951,6 +957,9 @@ const strings: Record<Locale, Record<string, string>> = {
     "docs.meta.VALIDATION_REPORT_REFRESH_15MIN_RESET.desc": "Proof-run mit Refresh/Reset-Checks und erwarteten Ergebnissen.",
     "docs.meta.SYSTEMD_README.label": "Systemd-Units",
     "docs.meta.SYSTEMD_README.desc": "Service-Übersicht für ingest/execution/export und die operative Startreihenfolge.",
+    "docs.meta.EXIT_PATHS_AND_PROTECTION_RUNTIME.label": "Exit-Pfade & Schutz",
+    "docs.meta.EXIT_PATHS_AND_PROTECTION_RUNTIME.desc":
+      "Exit/Notfallschutz, Szenario-Matrix; Mermaid: Schutzschicht und Ziel-State-Machine gegen Deadlocks.",
     "contact.title": "Kontakt",
     "contact.metaDescription": "Kontaktieren Sie KapitaalBot über das Formular.",
     "contact.intro":
@@ -1309,6 +1318,9 @@ const strings: Record<Locale, Record<string, string>> = {
     "docs.meta.VALIDATION_REPORT_REFRESH_15MIN_RESET.desc": "Proof-run avec checks refresh/reset et résultats attendus.",
     "docs.meta.SYSTEMD_README.label": "Unités systemd",
     "docs.meta.SYSTEMD_README.desc": "Vue d'ensemble des services pour ingest/execution/export et l'ordre de démarrage opérationnel.",
+    "docs.meta.EXIT_PATHS_AND_PROTECTION_RUNTIME.label": "Sorties & protection",
+    "docs.meta.EXIT_PATHS_AND_PROTECTION_RUNTIME.desc":
+      "Sorties/protection d’urgence, matrice de scénarios ; Mermaid : couche protection et machine cible anti-blocage.",
     "contact.title": "Contact",
     "contact.metaDescription": "Contactez KapitaalBot via le formulaire.",
     "contact.intro":

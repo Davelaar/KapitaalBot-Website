@@ -1,5 +1,11 @@
 # Changelog — Website finalisatie
 
+## 2026-03-23 — Docs: exit-paden & beschermingslaag (Mermaid deadlock-recovery)
+
+- **`content/docs/EXIT_PATHS_AND_PROTECTION_RUNTIME.md`** — Gesynchroniseerd vanuit KRAKENBOTMAART; nieuwe sectie **1a** met Mermaid flowchart (doel-state machine protection / stale snapshots). Zelfde rendering als andere docs via `DocViewer` + `MermaidLiveDiagram`.
+- **`content/docs/DOC_INDEX.md`** — Korte subsectie “Exit & beschermingslaag” met link naar dit document.
+- **i18n / docs-index** — `docs.meta.EXIT_PATHS_AND_PROTECTION_RUNTIME` (NL/EN/DE/FR); `app/[locale]/docs/page.tsx` DOC_META; Tier 2 doc-lijst (`dashboard/tier2/docs`) uitgebreid met dit bestand onder leidende documenten.
+
 ## 2026-03-23 — Tier 2 Data-bundle + snapshot-contract alignment (bot JSON)
 
 - **Tier 2 dashboard** — Laadt `tier2_data_bundle.json` (`getTier2DataBundleCached`); nieuwe sectie **J. Data-bundle (ingest + decision)** met disclosure, DB-rollen, intake/universe, route/no-trade, risk/capital, entry/execution, path doctrine, infra. Redis-cache key `kb:snap:v1:tier2_data_bundle`. *Commits: `f3dbf5c`.*

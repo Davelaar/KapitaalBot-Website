@@ -34,6 +34,10 @@ const DOC_META: Record<string, { labelKey: string; descKey: string }> = {
     descKey: "docs.meta.VALIDATION_REPORT_REFRESH_15MIN_RESET.desc",
   },
   SYSTEMD_README: { labelKey: "docs.meta.SYSTEMD_README.label", descKey: "docs.meta.SYSTEMD_README.desc" },
+  EXIT_PATHS_AND_PROTECTION_RUNTIME: {
+    labelKey: "docs.meta.EXIT_PATHS_AND_PROTECTION_RUNTIME.label",
+    descKey: "docs.meta.EXIT_PATHS_AND_PROTECTION_RUNTIME.desc",
+  },
 };
 
 function getDocSlugs(): string[] {

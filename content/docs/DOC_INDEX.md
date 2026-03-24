@@ -17,6 +17,12 @@
 | LOGGING.md | CURRENT | Loggingstructuur en markers. |
 | DOC_INDEX.md | CURRENT | Dit document — index van alle docs. |
 
+### Exit & beschermingslaag
+
+| Document | DOC_STATUS | Onderwerp |
+|----------|-----------|-----------|
+| EXIT_PATHS_AND_PROTECTION_RUNTIME.md | CURRENT | Exit-paden, emergency protection, scenario-matrix; Mermaid o.a. beschermingslaag / deadlock-recovery doelarchitectuur. |
+
 ---
 
 ## Waar vind ik wat?

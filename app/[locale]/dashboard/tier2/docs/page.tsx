@@ -23,6 +23,7 @@ const SECTIONS_BY_LOCALE: Record<
         { path: "CHANGELOG_ENGINE.md", topic: "Changelog van de engine" },
         { path: "LOGGING.md", topic: "Logging" },
         { path: "INGEST_EXECUTION_EPOCH_CONTRACT.md", topic: "Epoch/snapshot-contract" },
+        { path: "EXIT_PATHS_AND_PROTECTION_RUNTIME.md", topic: "Exit-paden, beschermingslaag (Mermaid)" },
       ],
     },
     {
@@ -47,6 +48,7 @@ const SECTIONS_BY_LOCALE: Record<
         { path: "CHANGELOG_ENGINE.md", topic: "Engine changelog" },
         { path: "LOGGING.md", topic: "Logging" },
         { path: "INGEST_EXECUTION_EPOCH_CONTRACT.md", topic: "Epoch/snapshot contract" },
+        { path: "EXIT_PATHS_AND_PROTECTION_RUNTIME.md", topic: "Exit paths, protection layer (Mermaid)" },
       ],
     },
     {
@@ -71,6 +73,7 @@ const SECTIONS_BY_LOCALE: Record<
         { path: "CHANGELOG_ENGINE.md", topic: "Engine-Changelog" },
         { path: "LOGGING.md", topic: "Logging" },
         { path: "INGEST_EXECUTION_EPOCH_CONTRACT.md", topic: "Epoch/Snapshot-Vertrag" },
+        { path: "EXIT_PATHS_AND_PROTECTION_RUNTIME.md", topic: "Exit-Pfade, Schutzschicht (Mermaid)" },
       ],
     },
     {
@@ -95,6 +98,7 @@ const SECTIONS_BY_LOCALE: Record<
         { path: "CHANGELOG_ENGINE.md", topic: "Changelog du moteur" },
         { path: "LOGGING.md", topic: "Journalisation" },
         { path: "INGEST_EXECUTION_EPOCH_CONTRACT.md", topic: "Contrat epoch/snapshot" },
+        { path: "EXIT_PATHS_AND_PROTECTION_RUNTIME.md", topic: "Sorties, couche protection (Mermaid)" },
       ],
     },
     {
