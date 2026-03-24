@@ -1,5 +1,12 @@
 # Changelog — Website finalisatie
 
+## 2026-03-24 — Runtime herstelrelease zichtbaar op website changelog
+
+- **Waarom** — Tradeflow-herstel vereiste dat de runtime-wijziging direct traceerbaar is in website/documentatie-closeout.
+- **Wat** — Engine release met truth-first halting + gestandaardiseerde funnel/reject telemetrie toegevoegd aan releaseverwijzingen.
+- **Engine commit (KRAKENBOTMAART)** — `c3d19f5` (*fix live-runner truth halts and funnel reject telemetry*).
+- **Impact** — Website changelog sluit nu aan op de daadwerkelijk gedeployde engine-state op `/srv/krakenbot`.
+
 ## 2026-03-23 — Docs: exit-paden & beschermingslaag (Mermaid deadlock-recovery)
 
 - **`content/docs/EXIT_PATHS_AND_PROTECTION_RUNTIME.md`** — Gesynchroniseerd vanuit KRAKENBOTMAART; nieuwe sectie **1a** met Mermaid flowchart (doel-state machine protection / stale snapshots). Zelfde rendering als andere docs via `DocViewer` + `MermaidLiveDiagram`.
