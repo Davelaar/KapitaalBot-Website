@@ -4,10 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npm run bot-changelog && NEXT_IGNORE_INCORRECT_LOCKFILE=1 next build",
+    "build": "npm run sync-docs-from-bot && npm run bot-changelog && NEXT_IGNORE_INCORRECT_LOCKFILE=1 next build",
     "start": "next start",
     "lint": "next lint",
     "build:diagrams": "node scripts/render-mermaid-diagrams.cjs",
+    "sync-docs-from-bot": "node scripts/sync-docs-from-bot.cjs",
     "bot-changelog": "node scripts/generate-bot-changelog.cjs"
   },
   "dependencies": {

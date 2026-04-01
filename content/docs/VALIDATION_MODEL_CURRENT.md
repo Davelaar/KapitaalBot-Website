@@ -7,6 +7,20 @@ DOC_ROLE: validation_model
 
 ---
 
+## 0. Primaire bronnen vs ondersteunende bronnen (operationeel)
+
+Bij hoog logvolume is **journald geen betrouwbare primaire KPI-bron** voor execution-activiteit: markers kunnen in de ruis verdwijnen. Scheid daarom drie lagen:
+
+| Bron | Rol |
+|------|-----|
+| **PostgreSQL** — `trading_funnel_events`, `execution_orders`, `fills`, `positions` | **Primaire waarheid** voor execution-funnel: candidate → besluit → order → fill; `ORDER_EXECUTION_DECISION` en gerelateerde events. |
+| **PostgreSQL + Redis** — `market_state_projection` (DB), MSP-runtime state (Redis) | **Primaire waarheid** voor `entry_eligible`, confidence-velden, runtime phase; geen vervanging voor de order/fill-lifecycle. |
+| **Journal / logs** | **Ondersteunend**: crashes, uitzonderingen, gerichte grep op een specifieke marker na incident; **niet** de enige bron van waarheid voor “draait execution?” of throughput. |
+
+**Concreet:** runtime-validatie en post-run rapportage richten op **DB-queries en funnel-tabellen**; journal alleen als aanvulling.
+
+---
+
 ## 1. Soorten validatie
 
 | Type | Doel | Bewijs |

@@ -1,3 +1,8 @@
+## 2026-03-27 semantic alignment
+
+- Exit/protection runtime paths are permissive risk-reduction flows.
+- `exit_eligible` / `protection_eligible` are soft hints and must not be treated as entry-class hard gates.
+- `position_monitor` keeps direct `price_cache` + execution truth as primary control path; MSP enriches context only.
 # Exit-paden en bescherming — feitelijk gedrag (read-only)
 
 Feitelijke inventarisatie van runtime exit-paden in Krakenbot: orchestratie, exchange-order types, beschermingsvensters, berekeningen en afwijkingen t.o.v. commentaar/Kraken-docs.
@@ -188,3 +193,11 @@ Legenda bescherming: **volledig** = trailing (of na ACK) op volledige `protected
 - [`src/execution/exposure_reconcile.rs`](../src/execution/exposure_reconcile.rs)
 - [`src/execution/position_monitor.rs`](../src/execution/position_monitor.rs)
 - [`src/pipeline/strategy_selector.rs`](../src/pipeline/strategy_selector.rs)
+
+---
+
+## MSP Runtime Path Update (2026-03-27)
+
+- Entry admission gebruikt MSP-state (`entry_eligible`, drift/confidence checks) als primaire runtime bron.
+- Protection/exit flow publiceert en consumeert MSP protection state.
+- Position monitor emit protection lifecycle updates naar MSP.

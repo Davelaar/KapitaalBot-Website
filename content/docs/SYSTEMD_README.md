@@ -32,8 +32,11 @@ sudo systemctl daemon-reload
 
 ## Env
 
-- Beide units: `EnvironmentFile=/srv/krakenbot/.env` (of aangepast pad). Vereist o.a. `DATABASE_URL`, `KRAKEN_WS_PUBLIC_URL`.
-- Execution: in unit staat `EXECUTION_ONLY=1` en `EXECUTION_ENABLE=true`; voor API: `KRAKEN_API_KEY`, `KRAKEN_API_SECRET` in .env.
+- Beide units laden **`EnvironmentFile=-/srv/krakenbot/.env`** (optioneel `-`). Extra keys: systemd **drop-in** met tweede `EnvironmentFile=` indien nodig.
+- **Dual-DB verplicht:** `INGEST_DATABASE_URL` (ingest) én `DECISION_DATABASE_URL` (decision), of equivalente `INGEST_DB_*` + `DECISION_DB_*` zoals in [scripts/trading_env.sh](../scripts/trading_env.sh). Zonder tweede target start de binary niet.
+- Ingest: ook `KRAKEN_WS_PUBLIC_URL` (default mag in .env).
+- Execution: unit zet `EXECUTION_ONLY=1` en `EXECUTION_ENABLE=true`; API: `KRAKEN_API_KEY`, `KRAKEN_API_SECRET` in env.
+- Vóór eerste start: `./scripts/validate_execution_readiness.sh` — zie [docs/SERVER_RUNTIME_ENV_AND_READINESS.md](../docs/SERVER_RUNTIME_ENV_AND_READINESS.md).
 
 ---
 

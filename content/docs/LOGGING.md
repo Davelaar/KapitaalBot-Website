@@ -59,7 +59,7 @@ De volgende velden moeten bij strategiekeuzes en live execution gelogd worden:
 - **slippage** — Log source/explanation (analysis/slippage_estimator).
 - **strategy_selector** — regime, selected strategy, reason, confidence (pipeline/strategy_selector). Per-pair regime/strategy in readiness report.
 - **L3** — l3_feed_connected, l3_subscribed_symbols, l3_snapshot_received, l3_update_received, l3_metrics_emitted, l3_rows_written (observe/l3_feed, db/writer).
-- **WRITER_METRICS** — periodiek (elke 10s) door de writer-task: `writer_channel_pending` = geschat aantal berichten in de writer-channel (backpressure-indicator); zie db/writer.rs.
+- **WRITER_METRICS** — periodiek (elke 10s) door elke writer-task (`channel=priority` voor ticker/trade, `channel=bulk` voor L2/L3): `writer_channel_pending` = geschatte channel-diepte (backpressure); zie db/writer.rs.
 - **readiness** — Per pair: tradable, blocker, expected_edge_bps, expected_surplus_bps, cost_breakdown (gross_move, capturable_move, fees, entry/exit slippage, spread_cost, tsl_drag, exit_drag, surplus); capturable_move_bps, move_already_spent_bps, entry_timing_quality, expected_exit_slippage_bps; overall: system_live_ready, primary_blockers, recommended_next_action.
 - **READINESS_GATE_DECISION** — Bij elke entry-readiness check (pair-level): `pair`, `tradable`, `blocker`, `strategy`, `expected_edge_bps`, `fill_probability`, `slippage_bps`, `confidence`. Gebruikt voor blocked (tradable=false of blocker≠None) en allowed (tradable=true, blocker=None).
 - **READINESS_SYSTEM_BLOCK** — Wanneer system_live_ready=false: blokkeert alle nieuwe entries; log bevat `system_live_ready`, `primary_blockers`, `action` (recommended_next_action).
@@ -103,7 +103,7 @@ De autonome live engine logt extra events om WS-native veiligheid en latency aan
 - **SYMBOL_HARD_BLOCKED** — hard-blocked symbolen worden uitgesloten bij execution universe:
   - Velden: `run_id`, `evaluation`, `symbol` of `hard_blocked_symbols`, `hard_block_until`.
 
-Deze events zijn verplicht bewijs in de server-validatie van de WS-native safety stack (zie `docs/SERVER_VALIDATION_LIVE_ENGINE.md` en `scripts/ws_safety_report.sh`).
+Deze events zijn verplicht bewijs in de server-validatie van de WS-native safety stack (zie `docs/VALIDATION_MODEL_CURRENT.md` en `scripts/ws_safety_report.sh`).
 
 ## State-first, freshness en generation (live path)
 
@@ -148,3 +148,19 @@ Zie `docs/L3_SCHAALBEPERKINGEN_50_NAAR_400.md` voor gebruik bij L3-schaal. **Uni
 - **Exit state / manager** (`src/trading/exit_state.rs`, `exit_manager.rs`): state transitions; protection_required; cancel only after confirmed exit (zie module-doc exit_manager).
 - **Post-fill exit** (`src/execution/exit_lifecycle.rs`): EXIT_PLAN_CREATED, EXIT_ORDER_ACKED, EXIT_ORDER_SKIPPED_STALE_ACK, EXPOSURE_PROTECTION_CONFIRMED, TP_MAKER_ORDER_REJECTED.
 - **Position monitor** (`src/execution/position_monitor.rs`): POSITION_MONITOR_STARTED, POSITION_MONITOR_REFRESHED, POSITION_MONITOR_STATUS, POSITION_MONITOR_SL_TRAILED, POSITION_MONITOR_TP_AT_MARKET.
+- **Exposure / position reconcile** (`trading_funnel_events`, stage `position_reconcile`): **POSITION_BASE_REPAIRED_FROM_BALANCE** — `positions.base_position` voor een long werd omhoog gezet naar de exchange `balances`-snapshot (gemiste fills / foute `order_qty`); `reason` bevat old/new/balance_cache.
+
+## Nieuwe markers (herstelplan-leakage, maart 2026)
+
+De volgende markers zijn toegevoegd als onderdeel van het leakage-herstelplan (A1–F3, D4, D5):
+
+- **FILL_PRICE_ZERO_REJECTED** (`src/execution/ws_handler.rs`): fill met prijs 0 afgewezen vóór ledger-verwerking (A3). Velden: `order_id`, `exec_id`, `symbol`.
+- **MARKET_FILL_TIMEOUT_EXPOSURE_RISK** (`src/execution/exit_lifecycle.rs`): market exit fill niet bevestigd binnen timeout; positie-risico (B3). Velden: `market_order_id`.
+- **CHANNEL_CLOSED_DURING_FILL_WAIT** (`src/execution/exit_lifecycle.rs`): WS broadcast channel gesloten tijdens fill-wait; bail als error (F2). Velden: `market_order_id`.
+- **EXIT_TIME_STOP_MISCONFIGURED** (`src/execution/exit_lifecycle.rs`): `time_stop_secs=0` gedetecteerd; geclampt naar 60s (F1).
+- **PRIVATE_WS_HUB_RELIABILITY_DEGRADED** (`src/execution/private_msg_source.rs`): broadcast lag threshold overschreden; hub betrouwbaarheid gedegradeerd (B4). Velden: `total_lagged`.
+- **OTO_TRAILING_STOP_DISCOVERED** (`src/execution/exit_lifecycle.rs`): OTO-gegenereerde trailing-stop gevonden; handmatige placement overgeslagen (D4). Velden: `symbol`, `oto_order_id`.
+- **OTO_TRAILING_STOP_NOT_FOUND** (`src/execution/exit_lifecycle.rs`): OTO trailing-stop niet gevonden binnen timeout; fallback naar handmatige placement (D4). Velden: `symbol`.
+- **EXIT_QTY_NORMALIZED** (impliciet in `normalize_exit_qty`): exit-hoeveelheid genormaliseerd om dust te voorkomen (F3).
+
+Zie [HERSTELPLAN_LEAKAGE.md](HERSTELPLAN_LEAKAGE.md) voor de volledige context per marker.

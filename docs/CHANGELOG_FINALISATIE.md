@@ -1,5 +1,10 @@
 # Changelog — Website finalisatie
 
+## 2026-04-01 — Docs SSOT: sync vanuit Krakenbot-repo bij elke build
+
+- **Probleem** — `content/docs/*.md` (o.a. ENGINE_SSOT) was een oude handmatige kopie; de live site toonde niet de actuele bot-`docs/`.
+- **Wat** — `npm run sync-docs-from-bot` kopieert vóór elke build alle `content/docs/*.md` vanuit de gevonden bot-checkout (`BOT_GIT_REPO`, `/srv/krakenbot`, …). `SYSTEMD_README.md` mapt op `systemd/README.md`. Build faalt als een verwacht bronbestand ontbreekt.
+
 ## 2026-04-01 — Engine changelog: altijd actueel (build + timer)
 
 - **Probleem** — `content/bot_changelog.json` was een handmatige snapshot; `next build` ververste die niet; productie toonde verouderde “Snapshot gegenereerd”-datum.

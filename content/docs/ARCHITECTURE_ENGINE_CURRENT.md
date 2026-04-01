@@ -1,3 +1,12 @@
+## 2026-03-27 Alignment Addendum
+
+- **MSP gating is asymmetric by design:**
+  - `entry_eligible` is a **hard runtime gate** (fail-closed). No Redis/MSP state => no new entries.
+  - `exit_eligible` and `protection_eligible` are **soft runtime hints / permissive guards** used for observability and context; exits/protection are not hard-blocked by missing MSP.
+- **Position monitor behavior:** exits/protection continue to run on direct `price_cache` + DB execution truth; MSP adds context only (no control-flow blockade).
+- **check_symbol_execution_lock is hybrid:** MSP for expected exposure/drift/halt context; DB/WS truth remains authoritative for open orders and hard safety state.
+- **Dual-read policy:** DB/WS fallback paths are intentionally retained for one release-cycle validation with mismatch logging, then removable after stable evidence.
+- **DB split wording:** dual-DB is **operationally required in production**; single-pool is not supported by runbook/SRE procedure even where code can still be configured permissively.
 # Architecture — Current Engine Status
 
 DOC_STATUS: CURRENT  
@@ -13,13 +22,13 @@ Kraken spot **queue-aware hybrid maker** bot met multiregime/multistrategy pipel
 
 - **Geen dry-run, geen paper trading.** One production path; Kraken docs and live payloads only.
 - **Ingest:** `run-ingest` — persistent WS (ticker/trade/L2/L3), universe manager, epoch/snapshot publish.
-- **Execution:** `run-execution-live` (met of zonder eigen ingest) of `run-execution-only` (EXECUTION_ONLY=true, bind to bestaande epochs).
+- **Execution:** `run-execution-live` (met eigen ingest) of `run-execution-only` (bind to bestaande epochs; `EXECUTION_ONLY=true` met `run-execution-live` wordt **afgewezen** door `execution_runtime_verify`).
 
 ---
 
 ## 2. Runtime topology
 
-**Dubbele DB:** Bij `DECISION_DATABASE_URL` zijn er twee pools: **DB Ingest** (raw + refresh) en **DB Decision** (state gesynct, epochs, snapshots, execution). Execution leest alleen van DB Decision; ingest schrijft alleen op DB Ingest; state wordt na refresh gesynct. Zonder `DECISION_DATABASE_URL` is het één pool.
+**Dubbele DB (verplicht, operationeel afgedwongen):** Twee pools: **DB Ingest** (`INGEST_DATABASE_URL`, raw + refresh) en **DB Decision** (`DECISION_DATABASE_URL`, state gesynct, epochs, snapshots, execution). Execution leest alleen van DB Decision; ingest schrijft alleen op DB Ingest; state wordt na refresh gesynct. Bij startup valideert de binary per pool `current_database()` tegen de URL en weigert start als (a) URLs identiek zijn, (b) URL-db ≠ `current_database()`, of (c) ingest- en decision-sessies dezelfde live triple (`current_database` + `inet_server_addr` + `inet_server_port`) hebben — voorkomt dubbel-role wiring met verkeerde aannames.
 
 ```mermaid
 flowchart TB
@@ -140,10 +149,13 @@ flowchart TB
   Risk --> Plan
 ```
 
-- **Regimes:** RANGE, TREND, HIGH_VOLATILITY, LOW_LIQUIDITY, CHAOS (`analysis/regime_detection.rs`).
-- **Strategies:** Liquidity, Momentum, Volume, NoTrading (`pipeline/strategy_selector.rs`).
+- **Regimes (duaal systeem):**
+  - `detect_regime` → `MarketRegime` (RANGE, TREND, HIGH_VOLATILITY, LOW_LIQUIDITY, CHAOS) — readiness + strategy fan-out (`analysis/regime_detection.rs`).
+  - `classify_regime` → `MarketRegimeType` — V2 adaptive route engine (`edge_engine/market_regime.rs`).
+- **Strategies:** Liquidity, Momentum, Volume, NoTrading (`pipeline/strategy_selector.rs`). CHAOS → lege lijst.
 - **Readiness:** Per pair tradable + één dominante blocker; strategy-specific checks (`trading/readiness_gate.rs`).
-- **Pipeline:** Load → edge_score → entry_filter → readiness → rank → size_quote_from_edge → risk_gate → plan. **Top-1:** live neemt eerste Execute outcome.
+- **Pipeline:** V2 route analysis → adaptive candidates → edge/expectancy → rank → risk_gate → plan. **Top-1:** live neemt eerste Execute outcome via `flow_poller`.
+- **Bekende gap:** `execution_orders.regime` kolom bestaat maar wordt nooit gevuld bij insert.
 
 ---
 
@@ -164,9 +176,11 @@ stateDiagram-v2
   Filled --> [*]
 ```
 
-- **DB-first:** Order row (execution_orders) vóór exchange submit.
-- **OrderTracker:** Runtime cache; ws_handler update op ACK/FILL/REJECT/CANCEL.
-- **Exit:** Post-fill: `run_post_fill_exit_phase` plaatst SL + optioneel maker TP. `position_monitor` (spawn in live runner) scant posities, trail SL, TP bij market. Zie exit_lifecycle, position_monitor.
+- **DB-first:** Order row (execution_orders) vóór exchange submit. Market orders krijgen automatisch `deadline = now + 5s` (D2).
+- **OrderTracker:** Runtime cache; ws_handler update op ACK/FILL/REJECT/CANCEL. Kraken WS v2 strict semantics (B1): `exec_type == "trade"` voor fills, `status == "filled"` voor completion.
+- **fills_ledger:** VWAP-fix (A1), fee-inclusive realized PnL (A2), fill price zero-guard (A3), CTE single-roundtrip (E3). Single serde parse in private_ws_hub (E2).
+- **Pricing:** Uitsluitend `price_cache` (WS-fed) met staleness guards (`snapshot_fresh`, `last_price_fresh`); **nul REST in runtime hot path** (D1). Universe discovery via instrument WS cache (D5).
+- **Exit:** Post-fill: `run_post_fill_exit_phase` plaatst trailing-stop (optioneel via OTO conditional D4) + optioneel maker TP. **Cancel-first exit** (B2): cancel bescherming → wait-for-cancel-or-fill → market exit op balance-qty genormaliseerd via `normalize_exit_qty` (F3). `RecvResult` (F2) onderscheidt channel close vs timeout. `position_monitor` (spawn in live runner) scant posities, trail SL, TP bij market. Broadcast lag recovery (B4). Zie exit_lifecycle, position_monitor, [HERSTELPLAN_LEAKAGE.md](HERSTELPLAN_LEAKAGE.md).
 
 ---
 
@@ -190,4 +204,16 @@ stateDiagram-v2
 
 ## 7. Statusmatrix
 
-Zie [ENGINE_SSOT.md](ENGINE_SSOT.md) sectie 7 voor de volledige statusmatrix (in code / runtime actief / server bewezen / open).
+Zie [ENGINE_SSOT.md](ENGINE_SSOT.md) sectie 7 voor de volledige statusmatrix (in code / runtime actief / server bewezen / eindoordeel).
+
+**Dead code (geïdentificeerd, niet in live path):** `ExitManager` (`trading/exit_manager.rs`) en `MomentumContext` (`trading/momentum_strategy.rs`) zijn niet gekoppeld aan enig live execution pad. "Armed" en "triggered" exit via ExitManager FSM bestaan alleen als ongebruikte code; exchange `triggered` status (trailing-stop trigger) wordt wél verwerkt via `exit_lifecycle` / `ws_handler`.
+
+---
+
+## MSP Update (2026-03-27)
+
+- Unified `market_state_projection` toegevoegd op **decision DB** als runtime projection.
+- Redis runtime read-layer actief via `msp:{symbol}` + `msp:_symbols`.
+- `flow_execution`, `protection_flow`, `position_reconcile`, `exposure_reconcile`, `position_monitor` zijn gekoppeld aan MSP events/read-path.
+- Startup pad in `live_runner`: Redis init, DB->Redis rebuild, seed USD symbols, daarna event-driven updates.
+- Execution critical path heeft geen ingest DB read dependency toegevoegd.

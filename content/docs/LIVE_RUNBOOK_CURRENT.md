@@ -1,3 +1,8 @@
+## 2026-03-27 startup gate addendum
+
+- After MSP rebuild, execution startup logs `MSP_RUNTIME_PHASE_CHECK` (bootstrap/warming/live counts).
+- Entries remain fail-closed behind MSP readiness (`entry_eligible` hard gate).
+- Exit/protection paths degrade gracefully when MSP context is unavailable; they stay focused on risk reduction.
 # Live Runbook — Current Operational Flow
 
 DOC_STATUS: SSOT  
@@ -13,7 +18,7 @@ DOC_ROLE: live_runbook
 |-------|----------|--------------|
 | **Persistent ingest** | `krakenbot run-ingest` | Alleen data: public WS (ticker/trade/L2/L3), universe refresh, epoch/snapshot publish. Geen execution. |
 | **Execution (met ingest)** | `krakenbot run-execution-live` | Eén proces: eigen ingest + evaluation loop + order submit. |
-| **Execution attach** | `EXECUTION_ONLY=true krakenbot run-execution-live` | Geen eigen ingest; leest bestaande epochs/snapshots. Voor split: ingest draait apart (bijv. systemd). |
+| **Execution attach** | `krakenbot run-execution-only` | Geen eigen ingest; leest bestaande epochs/snapshots. Voor split: ingest draait apart (bijv. systemd). `EXECUTION_ONLY=true` met `run-execution-live` wordt afgewezen. |
 
 ---
 
@@ -28,23 +33,26 @@ DOC_ROLE: live_runbook
 
 ## 3. Execution (run-execution-live)
 
-- **Vereisten:** `EXECUTION_ENABLE=true`, `KRAKEN_API_KEY`, `KRAKEN_API_SECRET`, `DATABASE_URL`. Optioneel: `DECISION_DATABASE_URL` voor fysieke scheiding (ingest vs decision pool).
+- **Vereisten:** `EXECUTION_ENABLE=true`, `KRAKEN_API_KEY`, `KRAKEN_API_SECRET`, **`INGEST_DATABASE_URL` (ingest) + `DECISION_DATABASE_URL` (decision)** — beide verplicht, verschillende connection strings **en** na connect verschillende **live triple** (`current_database`, `inet_server_addr`, `inet_server_port`); de binary weigert start bij identieke triple (`DB_DUAL_ROLE_AMBIGUOUS_IDENTICAL_LIVE_IDENTITY`) of bij URL-db ≠ `current_database()` (`DB_ROLE_URL_MISMATCH`). Journal: `DB_ROLE_VALIDATED` per pool.
+- **SQL / observability — welke DB?** Live execution schrijft **`execution_orders`, `fills`, `execution_order_events`, `realized_pnl`, `execution_order_latency`, `trading_funnel_events` (execution-pad)** naar de **decision-pool** (`DECISION_DATABASE_URL`). `INGEST_DATABASE_URL` (ingest) krijgt dezelfde tabellen alleen door **migraties**; rijen daar zijn **geen SSOT** en kunnen oud/test zijn. Gebruik voor order/fill/funnel-analyse altijd **`psql "$DECISION_DATABASE_URL"`** (of `source scripts/trading_env.sh` en dan decision-URL). Om misleidende kopieën op ingest leeg te maken zonder tabellen te droppen: `CONFIRM_TRUNCATE_INGEST_EXECUTION_MIRROR=yes ./scripts/truncate_execution_mirror_on_ingest.sh`.
+- **Readiness vóór live:** `./scripts/validate_execution_readiness.sh` of `krakenbot check-execution-readiness` (dual-DB ping + schema smoke; geen orders). Zie [SERVER_RUNTIME_ENV_AND_READINESS.md](SERVER_RUNTIME_ENV_AND_READINESS.md).
 - **Start (met ingest):** `krakenbot run-execution-live`. Eigen run_id, lineage, WS, warmup 60s, dan evaluation loop tot runtime verstreken.
-- **Start (attach):** `EXECUTION_ONLY=true krakenbot run-execution-live`. Geen WS-start; bind aan `current_valid_epoch_id` / `current_epoch_for_exit_only`.
-- **Loop (state-first):** Per evaluation: `refresh_run_symbol_state` (op ingest-pool); bij `DECISION_DATABASE_URL` sync state naar decision-pool; dan readiness uit state → pipeline uit state → generation gate (execution alleen als visible generation = cycle generation) → route-freshness filter → bij Execute: choke → submit_and_wait_for_execution_reports (DB-first, OrderTracker, private WS).
+- **Start (attach):** `krakenbot run-execution-only`. Geen WS-start; bind aan `current_valid_epoch_id` / `current_epoch_for_exit_only`.
+- **Loop (state-first):** Per evaluation: `refresh_run_symbol_state` (op ingest-pool); sync state naar decision-pool; dan readiness uit state → pipeline uit state → generation gate (execution alleen als visible generation = cycle generation) → route-freshness filter → bij Execute: choke → submit_and_wait_for_execution_reports (DB-first, OrderTracker, private WS).
 - **Config:** LIVE_VALIDATION_RUNTIME_MINUTES, LIVE_EVALUATION_INTERVAL_SECS, LIVE_DATA_FRESHNESS_SECS. Runtime moet > warmup + 1× interval (bijv. ≥7 min bij 300s interval).
-- **Markers:** EXECUTION_ENGINE_START, LIVE_EVALUATION_SCHEDULED, LIVE_EVALUATION_STARTED, RUN_SYMBOL_STATE_REFRESH, INGEST_DECISION_SYNC_VISIBLE (bij 2 pools), ROUTE_FRESHNESS_OK/STALE/CONTEXT, EXECUTION_BLOCKED_GENERATION_MISMATCH, DATA_FRESHNESS_EVALUATED, LIVE_EVALUATION_AUDIT, DATA_INTEGRITY_MATRIX, LIVE_EVALUATION_COMPLETED, NO_ORDER_ECONOMIC_GATING, STRATEGY_REJECTED, BLOCKER_DISTRIBUTION.
+- **Markers:** EXECUTION_ENGINE_START, EXECUTION_RUNTIME_DB_BOUND, EXECUTION_LIVE_RUNNER_START, LIVE_EVALUATION_SCHEDULED, LIVE_EVALUATION_STARTED, RUN_SYMBOL_STATE_REFRESH, INGEST_DECISION_SYNC_VISIBLE, ROUTE_FRESHNESS_OK/STALE/CONTEXT, EXECUTION_BLOCKED_GENERATION_MISMATCH, DATA_FRESHNESS_EVALUATED, LIVE_EVALUATION_AUDIT, DATA_INTEGRITY_MATRIX, LIVE_EVALUATION_COMPLETED, NO_ORDER_ECONOMIC_GATING, STRATEGY_REJECTED, BLOCKER_DISTRIBUTION.
 
 ---
 
 ## 4. Server (aanbevolen)
 
-Op server met env (bijv. `/etc/trading/rewrite.env` of `.env` in repo):
+Op server: secrets in **`/srv/krakenbot/.env`** (of `KRAKENBOT_ENV_FILE=…` voor scripts). Lokaal: repo-`.env`.
 
 ```bash
 cd /srv/krakenbot
 git pull
 cargo build --release
+./scripts/validate_execution_readiness.sh   # dual-DB + schema — verplicht vóór eerste execution op nieuwe env
 # Ingest (persistent):
 ./target/release/krakenbot run-ingest
 # Of execution (met of zonder EXECUTION_ONLY):
@@ -52,6 +60,12 @@ cargo build --release
 ```
 
 Script zet o.a. EXECUTION_ENABLE=true en runtime defaults. Override via env (LIVE_VALIDATION_RUNTIME_MINUTES, LIVE_EVALUATION_INTERVAL_SECS, etc.).
+
+## 4b. Compliance basis (operationeel)
+
+- Gebruik alleen `.env` met least-privilege secrets; commit nooit secrets.
+- Incidentproces en escalation: [INCIDENT_RESPONSE.md](INCIDENT_RESPONSE.md).
+- Retentie/privacy baseline: [DATA_RETENTION_PRIVACY.md](DATA_RETENTION_PRIVACY.md).
 
 ---
 
@@ -63,6 +77,7 @@ Script zet o.a. EXECUTION_ENABLE=true en runtime defaults. Override via env (LIV
 - **Evaluation:** LIVE_EVALUATION_STARTED (cycle_generation_id), LIVE_EVALUATION_AUDIT (system_live_ready, block_type), DATA_FRESHNESS_EVALUATED, ROUTE_FRESHNESS_* per symbol/route, DATA_INTEGRITY_MATRIX, LIVE_EVALUATION_COMPLETED (execute_count, skip_count).
 - **No-order diagnose:** NO_ORDER_ECONOMIC_GATING (strategy/economic blockers) vs geen valid epoch / matrix false = **data/attach blocked**.
 - **Exit lifecycle:** EXIT_PLAN_CREATED, EXIT_ORDER_ACKED, POSITION_MONITOR_SL_TRAILED, POSITION_MONITOR_TP_AT_MARKET (na fill).
+- **Herstelplan-leakage markers (maart 2026):** FILL_PRICE_ZERO_REJECTED (A3), MARKET_FILL_TIMEOUT_EXPOSURE_RISK (B3), CHANNEL_CLOSED_DURING_FILL_WAIT (F2), EXIT_TIME_STOP_MISCONFIGURED (F1), PRIVATE_WS_HUB_RELIABILITY_DEGRADED (B4), OTO_TRAILING_STOP_DISCOVERED / OTO_TRAILING_STOP_NOT_FOUND (D4).
 
 Zie [VALIDATION_MODEL_CURRENT.md](VALIDATION_MODEL_CURRENT.md) voor proof-soorten en [LOGGING.md](LOGGING.md) voor alle markers.
 
@@ -90,5 +105,13 @@ Zie [VALIDATION_MODEL_CURRENT.md](VALIDATION_MODEL_CURRENT.md) voor proof-soorte
 ## 8. Systemd
 
 - **krakenbot-ingest.service:** run-ingest (persistent).
-- **krakenbot-execution.service:** run-execution-live (of execution-only met EXECUTION_ONLY=true).
+- **krakenbot-execution.service:** run-execution-live of run-execution-only.
 - Zie [systemd/README.md](../systemd/README.md) voor start/stop/restart en dependencies.
+
+---
+
+## MSP Startup/Readiness (2026-03-27)
+
+- Execution startup initialiseert Redis MSP en voert DB->Redis rebuild uit.
+- USD symbol universe wordt gezaaid in MSP projection vóór runtime loops.
+- READY discipline: entries blijven afhankelijk van MSP eligibility/confidence, zodat stale bootstrap state geen entry submit triggert.

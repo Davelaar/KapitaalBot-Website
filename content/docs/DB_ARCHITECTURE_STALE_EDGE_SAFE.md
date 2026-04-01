@@ -1,3 +1,8 @@
+## 2026-03-27 runtime-source clarification
+
+- Exposure/capital runtime now uses MSP-primary notional projection with explicit DB fallback logging during a validation release cycle.
+- Reconcile/lock logic remains hybrid by design (MSP expected-state + DB/WS exchange truth).
+- Production operations require dual-DB posture; single-pool remains non-runbook and non-SRE-approved.
 # Definitieve DB-architectuur voor stale-edge-safe live trading
 
 DOC_STATUS: CURRENT  
@@ -123,10 +128,10 @@ Querypaden: decision path mag niet met raw rows meegroeien; refreshkosten mogen 
 
 ## DEEL H — Logische vs fysieke scheiding
 
-- **Model A (logisch, één PG):** Write-heavy raw + read-only decision state + warm + cold in één instance. Winst: eenvoud, geen replica-lag. Risico: contention op zware refresh. Voldoende zolang refresh en decision reads niet geblokkeerd worden door write load.
-- **Model B (fysiek):** Aparte ingest DB, runtime decision DB. Winst: isolation. Risico: sync/replica-lag, operatie. Niet direct noodzakelijk voor stale-edge; wel optie bij bewezen contention.
+- **Model A (logisch, één PG):** Niet meer ondersteund in productie. Binary vereist twee aparte pools met verschillende live triples.
+- **Model B (fysiek, actueel):** Aparte ingest DB en runtime decision DB. Operationeel verplicht. Afgedwongen door `Config::from_env()` (URLs verplicht + niet identiek) en `create_pools` (live triple check + `DB_DUAL_ROLE_AMBIGUOUS_IDENTICAL_LIVE_IDENTITY` weigering).
 
-**Aanbeveling:** Start met logische scheiding; alle live decision reads uit state + snapshot; refresh vóór elke evaluation. Fysieke scheiding alleen indien metingen (lock wait, refresh duration) dat rechtvaardigen.
+**Huidige situatie:** Fysieke scheiding is de enige ondersteunde configuratie. Ingest op poort 5432, decision op poort 5433.
 
 ---
 
@@ -152,3 +157,11 @@ Querypaden: decision path mag niet met raw rows meegroeien; refreshkosten mogen 
 | **Partitioning raw (500 L3)** | **Cutover uitgevoerd.** `20260313120000`: L3 partitioned tabel. `20260313130000`: L3 cutover (rename). `20260313140000`: ticker_samples, trade_samples, l2_snap_metrics partitioned + cutover. App gebruikt nu overal de gepartitioneerde tabellen onder de oorspronkelijke namen; retention blijft DELETE WHERE run_id. |
 | **Refresh generation contract** | `20260313150000`: sequence + `generation_id` op `run_symbol_state`. Elke refresh krijgt één generation_id; sync kopieert die naar decision. Live: `INGEST_DECISION_SYNC_VISIBLE` log; execution gate: alleen als `state_generation_id(decision)` = cycle generation_id, anders `EXECUTION_BLOCKED_GENERATION_MISMATCH` en exec_allowed geleegd. |
 | **Refresh-complexiteit** | **Bewijs:** refresh is O(rows) (CTE scant alle rijen per run_id). Zie `docs/REFRESH_COMPLEXITY_AND_GENERATION.md`. Meet duration_ms; bij groei incrementeel/watermark overwegen. |
+
+---
+
+## MSP DB Architecture Note (2026-03-27)
+
+- Nieuwe tabel: `krakenbot.market_state_projection` op decision DB.
+- Flat column model is leidend; JSONB beperkt tot cold-path `event_debug_detail`.
+- Debounced writes gebruiken version guard (`state_version`) zodat trage flush geen nieuwere write-through overschrijft.

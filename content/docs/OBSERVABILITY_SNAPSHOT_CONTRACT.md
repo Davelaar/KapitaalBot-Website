@@ -3,7 +3,7 @@
 DOC_STATUS: SSOT  
 DOC_ROLE: observability_contract  
 
-**Contract version:** 1.0  
+**Contract version:** 1.1  
 **Doel:** Versioned contract tussen KRAKENBOTMAART (export) en KapitaalBot-Website (BFF). De website leest uitsluitend deze snapshots; geen directe queries op execution-tabellen.
 
 ---
@@ -32,6 +32,7 @@ DOC_ROLE: observability_contract
 | `tier2_latency_snapshot.json` | 2 | Submit→ack, fill→exit, histogrammen |
 | `tier2_pnl_snapshot.json` | 2 | PnL-detail, exposure |
 | `tier2_safety_snapshot.json` | 2 | Symbols per mode, quiet/hard-block |
+| `tier2_data_bundle.json` | 2 | Multi-page **Data**-menu: intake/universe (ingest), route/no-trade, risk, entry, path/doctrine, infra (decision); dual-DB; zie §3.8 |
 | `admin_observability_snapshot.json` | 3 | Full observability, raw lifecycle (alleen admin) |
 
 ---
@@ -47,10 +48,11 @@ DOC_ROLE: observability_contract
 - `run_ended_at`: string | null
 - `latest_epoch_id`: number | null
 - `epoch_status`: "valid" | "degraded" | null
+- `epoch_run_id`: number | null (optioneel). `ingest_epochs.run_id` van de laatste epoch-rij; zelfde run als waar `epoch_symbol_count` bij hoort.
 - `epoch_symbol_count`: number | null
-- `data_freshness_secs`: number | null (max ts_local vs now)
-- `ticker_count`, `trade_count`, `l2_count`, `l3_count`: numbers (laatste run). **l3_count** = totaal aantal rijen in l3_queue_metrics (geen percentage).
-- `l3_symbol_count`: number | null (optioneel). Aantal symbolen in run_symbol_state met l3_count >= 1; gebruikt voor "L3 availability %" = (l3_symbol_count / epoch_symbol_count) * 100.
+- `data_freshness_secs`: number | null (max ts_local vs now, run-consistent over ticker/trade/L2/L3 voor dezelfde status-run).
+- `ticker_count`, `trade_count`, `l2_count`, `l3_count`: numbers voor één **status-run**: `epoch_run_id` wanneer die bestaat, anders de freshest active `run_id`.
+- `l3_symbol_count`: L3-statistiek voor diezelfde status-run. Zo is "L3 availability %" = (l3_symbol_count / epoch_symbol_count) × 100 consistent wanneer `epoch_run_id` aanwezig is.
 - `safety_normal_count`, `safety_exit_only_count`, `safety_hard_blocked_count`: numbers
 
 ### 3.2 public_regime_snapshot
@@ -77,12 +79,12 @@ DOC_ROLE: observability_contract
 ### 3.5 public_trading_snapshot
 
 - `contract_version`, `exported_at`
-- `trades_24h_count`: number — fill rows with `COALESCE(ts_exchange, ts_local)` in last 24h (UTC).
-- `orders_24h_count`: number — `GREATEST(created_at, updated_at)` in last 24h (UTC).
+- `trades_24h_count`: number — aantal **fill-rijen** in DB met `COALESCE(ts_exchange, ts_local)` in de laatste 24h (beurstijd waar bekend).
+- `orders_24h_count`: number — orders met `created_at` in de laatste 24h (werkelijk geplaatste orders in het venster).
 - `equity_trend_delayed`: array van { ts_bucket: string, value: number } (vertraagd, optioneel)
 - `drawdown_pct`: number | null (optioneel)
-- `recent_orders` (optioneel): max 10 nieuwste `execution_orders`; `ts_bucket` 15 min; `order_ref` = suffix van client order id.
-- `recent_fills` (optioneel): max 10 nieuwste `fills`; `ts_bucket` 15 min; qty/prijs als string.
+- `recent_orders` (optioneel, leeg weggelaten): max 10 nieuwste rijen uit `execution_orders`, tijd `ts_bucket` = 15 min afgerond; `order_ref` = verkorte client-order-ref (suffix), geen volledige exchange ids.
+- `recent_fills` (optioneel, leeg weggelaten): max 10 nieuwste rijen uit `fills`, tijd `ts_bucket` = 15 min afgerond; qty/prijs als string (decimal).
 
 ### 3.6 public_demo_trades
 
@@ -92,6 +94,27 @@ DOC_ROLE: observability_contract
 ### 3.7 tier2_* en admin_observability_snapshot
 
 - Zelfde `contract_version` + `exported_at`; inhoud uitgebreider (order/fill/latency/PnL/safety detail). Exacte velden in volgende iteratie of in code (Rust structs) gedefinieerd.
+- `tier2_pnl_snapshot` bevat vanaf nu ook risk-adjusted velden:
+  - `sharpe_like_24h` (optioneel)
+  - `sortino_like_24h` (optioneel)
+  - `max_drawdown_duration_buckets_24h` (optioneel, aantal 15m buckets)
+
+### 3.8 tier2_data_bundle (contract 1.1+)
+
+- **Doel:** één JSON voor KapitaalBot **Data**-menu: geaggregeerde, querybare observability over **ingest**- en **decision**-DB (gecombineerd in export; geen cross-database SQL).
+- `contract_version`: `"1.1"` (gebundeld met [`CONTRACT_VERSION`](../src/observability/snapshots.rs)).
+- `disclosure_policy`: object met o.a. `kind` (`"delayed"`), `bucket_minutes`, `as_of_utc`, `explanation_nl` — **opzettelijke vertraging** t.o.v. live trading (copytrading-bescherming); geen foutieve latentie.
+- `source_db`: `{ "intake_role": "ingest", "decision_role": "decision" }` — welk DB-role per subsysteem.
+- Subsecties (elk met eigen `source_db` veld `"ingest"` | `"decision"`):
+  - `intake_universe`: epoch-criteria, optioneel `run_id` + `run_symbol_state`/raw sums.
+  - `route_no_trade`: funnel stage/decision_code/reason/path_tape tellingen 24h; optioneel shadow `blocker_reason`-verdeling voor geselecteerde run.
+  - `risk_capital`: `symbol_safety_state` per mode; `capital`-stage funnel count 24h.
+  - `entry_execution`: execution/fill funnel counts 24h; rijen met `correlation_id` 24h.
+  - `path_doctrine`: `execution_orders` per `path_tape_class` 24h; funnel met path_tape 24h.
+  - `infra`: recovery requests 24h; laatste watchdog `state`; optioneel event-buffer unknown voor run.
+  - `market_forecast_15m`: per symbool afgeleide 15m-forecast uit route/path engine (`expected_direction_15m`, `expected_move_15m_bps`, `confidence_15m`, `recommended_route_*`, `reason_code`, `soft_gate_score`, `forecast_basis`).
+
+- **Belangrijk:** `market_forecast_15m` is een **afgeleide soft signal** (ranking/weging), geen harde prijsvoorspelling of hard execution-block.
 
 ---
 
@@ -99,7 +122,7 @@ DOC_ROLE: observability_contract
 
 - **Timestamps:** Afronden naar 15 min of 1 uur voor public snapshots.
 - **Regime-switch:** Geen realtime event feed; alleen aantal per periode en dominante regimes.
-- **Strategy/regime counts:** Alleen tellers; Tier 1 mag wel **samengevatte** laatste orders/fills tonen (`recent_orders` / `recent_fills`), geen realtime feed.
+- **Strategy/regime counts:** Alleen tellers; Tier 1 mag wel **samengevatte** laatste orders/fills tonen (`recent_orders` / `recent_fills`) zoals hierboven, geen realtime feed.
 
 ---
 
