@@ -1,5 +1,11 @@
 # Changelog — Website finalisatie
 
+## 2026-04-01 — Engine changelog: altijd actueel (build + timer)
+
+- **Probleem** — `content/bot_changelog.json` was een handmatige snapshot; `next build` ververste die niet; productie toonde verouderde “Snapshot gegenereerd”-datum.
+- **Wat** — `npm run build` draait nu altijd eerst `npm run bot-changelog`. De generator zoekt de bot-repo in vaste volgorde (`BOT_GIT_REPO`, `/srv/krakenbot`, sibling `KRAKENBOTMAART`/`krakenbot`). Script `scripts/refresh-changelog-from-bot.sh` + systemd `kapitaalbot-website-changelog-refresh.timer` (uurlijks): `git pull` op `/srv/krakenbot` en website, `npm run build`, `systemctl restart kapitaalbot-web`.
+- **Deploy server** — Eenmalig: unit files uit `systemd/` naar `/etc/systemd/system/`, `systemctl daemon-reload`, `enable --now` op de `.timer`.
+
 ## 2026-03-24 — Runtime herstelrelease zichtbaar op website changelog
 
 - **Waarom** — Tradeflow-herstel vereiste dat de runtime-wijziging direct traceerbaar is in website/documentatie-closeout.

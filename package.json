@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "NEXT_IGNORE_INCORRECT_LOCKFILE=1 next build",
+    "build": "npm run bot-changelog && NEXT_IGNORE_INCORRECT_LOCKFILE=1 next build",
     "start": "next start",
     "lint": "next lint",
     "build:diagrams": "node scripts/render-mermaid-diagrams.cjs",

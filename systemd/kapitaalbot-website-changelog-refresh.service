@@ -1,0 +1,9 @@
+[Unit]
+Description=KapitaalBot Website — refresh engine changelog from /srv/krakenbot and rebuild
+After=network.target
+
+[Service]
+Type=oneshot
+User=root
+WorkingDirectory=/srv/KapitaalBot-Website
+ExecStart=/srv/KapitaalBot-Website/scripts/refresh-changelog-from-bot.sh

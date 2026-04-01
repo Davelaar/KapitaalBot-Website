@@ -1,29 +1,48 @@
 #!/usr/bin/env node
 /**
- * Build content/bot_changelog.json from the KapitaalBot (KRAKENBOTMAART) git history.
+ * Build content/bot_changelog.json from the Krakenbot git history.
  *
- * Usage:
- *   node scripts/generate-bot-changelog.cjs [path-to-bot-repo]
- *   BOT_GIT_REPO=/path/to/KRAKENBOTMAART node scripts/generate-bot-changelog.cjs
+ * Repo resolution (first match with a .git directory wins):
+ *   1) CLI arg: node scripts/generate-bot-changelog.cjs /path/to/bot
+ *   2) BOT_GIT_REPO
+ *   3) /srv/krakenbot (production server canonical clone)
+ *   4) ../../KRAKENBOTMAART (local dev: sibling of KapitaalBot-Website)
+ *   5) ../../krakenbot (local or /srv sibling name)
  *
- * Regenerate after bot changes: npm run bot-changelog
+ * Every production `npm run build` runs this first — the changelog page must never
+ * ship stale JSON from an old manual snapshot.
  */
 const { execFileSync } = require("child_process");
 const fs = require("fs");
 const path = require("path");
 
 const SEP = "\x1f";
-const repoArg = process.argv[2];
-const repo =
-  repoArg ||
-  process.env.BOT_GIT_REPO ||
-  path.join(__dirname, "..", "..", "KRAKENBOTMAART");
 const outPath = path.join(__dirname, "..", "content", "bot_changelog.json");
 
-if (!fs.existsSync(path.join(repo, ".git"))) {
-  console.error("generate-bot-changelog: not a git repo:", repo);
+function resolveBotRepo() {
+  const repoArg = process.argv[2];
+  const candidates = [
+    repoArg,
+    process.env.BOT_GIT_REPO,
+    "/srv/krakenbot",
+    path.join(__dirname, "..", "..", "KRAKENBOTMAART"),
+    path.join(__dirname, "..", "..", "krakenbot"),
+  ].filter(Boolean);
+
+  for (const c of candidates) {
+    const abs = path.resolve(c);
+    if (fs.existsSync(path.join(abs, ".git"))) {
+      return abs;
+    }
+  }
+  console.error(
+    "generate-bot-changelog: no bot git repo found. Tried:\n  " +
+      candidates.join("\n  "),
+  );
   process.exit(1);
 }
+
+const repo = resolveBotRepo();
 
 function git(args) {
   return execFileSync("git", ["-C", repo, ...args], {
