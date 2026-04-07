@@ -249,6 +249,15 @@ export interface AdminObservabilitySnapshot {
   safety_normal_count: number;
   safety_exit_only_count: number;
   safety_hard_blocked_count: number;
+  edgeboard?: {
+    available: boolean;
+    snapshot_ts?: string | null;
+    visible_symbols?: number | null;
+    positive_edge_symbols?: number | null;
+    max_expected_net_edge_bps?: number | null;
+    training_examples_24h?: number | null;
+    outcomes_24h?: number | null;
+  } | null;
 }
 
 export type Tier = 1 | 2 | 3;
@@ -265,6 +274,7 @@ export interface Tier2DisclosurePolicy {
 export interface Tier2DataSourceMeta {
   intake_role: string;
   decision_role: string;
+  research_role?: string | null;
 }
 
 export interface Tier2IntakeUniverseSection {
@@ -319,6 +329,60 @@ export interface Tier2InfraSection {
   event_buffer_unknown_24h?: number | null;
 }
 
+export interface Tier2MarketForecastRow {
+  symbol: string;
+  expected_direction_15m: string;
+  expected_move_15m_bps: number;
+  confidence_15m: number;
+  recommended_route_type?: string | null;
+  recommended_entry_mode?: string | null;
+  recommended_exit_mode?: string | null;
+  recommended_horizon_secs?: number | null;
+  reason_code: string;
+  soft_gate_score: number;
+  forecast_basis: string;
+}
+
+export interface Tier2MarketForecastSection {
+  source_db: string;
+  run_id: number;
+  evaluation_index: number;
+  symbols_total: number;
+  forecasts: Tier2MarketForecastRow[];
+}
+
+export interface Tier2EdgeboardSignalRow {
+  rank: number;
+  symbol: string;
+  route_name: string;
+  horizon_sec: number;
+  expected_net_edge_bps: number;
+  confidence: number;
+  sample_size: number;
+  boost: number;
+  dominant_reason_code?: string | null;
+  feature_coverage_class?: string | null;
+  freshness_ms?: number | null;
+}
+
+export interface Tier2EdgeboardSection {
+  source_db: string;
+  available: boolean;
+  snapshot_ts?: string | null;
+  delay_until?: string | null;
+  expires_at?: string | null;
+  model_version?: string | null;
+  visible_rows?: number | null;
+  visible_symbols?: number | null;
+  positive_edge_symbols?: number | null;
+  avg_confidence?: number | null;
+  avg_expected_net_edge_bps?: number | null;
+  max_expected_net_edge_bps?: number | null;
+  training_examples_24h?: number | null;
+  outcomes_24h?: number | null;
+  top_signals: Tier2EdgeboardSignalRow[];
+}
+
 /** Single bundle for Tier 2 Data menu (ingest + decision aggregates). */
 export interface Tier2DataBundle {
   contract_version: string;
@@ -331,4 +395,6 @@ export interface Tier2DataBundle {
   entry_execution?: Tier2EntryExecutionSection | null;
   path_doctrine?: Tier2PathDoctrineSection | null;
   infra?: Tier2InfraSection | null;
+  market_forecast_15m?: Tier2MarketForecastSection | null;
+  edgeboard?: Tier2EdgeboardSection | null;
 }

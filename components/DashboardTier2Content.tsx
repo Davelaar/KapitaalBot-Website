@@ -11,6 +11,7 @@ import type {
   MissedMoveBucket,
   RunHealthPoint,
   Tier2DataBundle,
+  Tier2EdgeboardSignalRow,
   Tier2ExecutionSnapshot,
   Tier2LatencySnapshot,
   Tier2PnlSnapshot,
@@ -64,6 +65,22 @@ function summarizeEventBuffer(kpis: EventBufferKpis | null | undefined, ui: any)
   return `buffered_active=${kpis.buffered_active_count}, buffered_total=${kpis.buffered_total_count}, released_24h=${kpis.released_24h_count}, timeout_24h=${kpis.timeout_24h_count}, unknown_24h=${kpis.unknown_24h_count}${statusExtra}`;
 }
 
+function summarizeEdgeboardSignals(
+  rows: Tier2EdgeboardSignalRow[] | null | undefined,
+  ui: any,
+): string {
+  if (!rows || !Array.isArray(rows) || rows.length === 0) return ui.noData;
+  return rows
+    .slice(0, 5)
+    .map((r) => {
+      const boost = typeof r.boost === "number" ? r.boost.toFixed(3) : "—";
+      const edge = typeof r.expected_net_edge_bps === "number" ? r.expected_net_edge_bps.toFixed(1) : "—";
+      const conf = typeof r.confidence === "number" ? r.confidence.toFixed(2) : "—";
+      return `${r.symbol} (#${r.rank}, ${r.route_name}, edge ${edge} bps, conf ${conf}, boost ${boost})`;
+    })
+    .join(" · ");
+}
+
 function disclosureText(bundle: Tier2DataBundle, locale: string): string {
   if (locale === "nl") return bundle.disclosure_policy.explanation_nl;
   return `Aggregates use ~${bundle.disclosure_policy.bucket_minutes} minute buckets and are intentionally delayed vs live trading (copy-trading protection).`;
@@ -106,6 +123,10 @@ export function DashboardTier2Content({
       subEntry: "Entry & execution funnel",
       subPath: "Path doctrine",
       subInfra: "Infra",
+      subEdgeboard: "Edgeboard",
+      edgeboardUnavailable: "Geen zichtbare edgeboard-snapshot in RESEARCH.",
+      edgeboardTopSignals: "Top signals:",
+      edgeboardHealth: "Snapshot / health:",
       capitalEvents24h: "Capital-stage events 24h:",
       correlationOrders24h: "Orders met correlation 24h:",
       funnelPathTapeRows24h: "Funnel-rijen met path_tape 24h:",
@@ -192,6 +213,10 @@ export function DashboardTier2Content({
       subEntry: "Entry & execution funnel",
       subPath: "Path doctrine",
       subInfra: "Infra",
+      subEdgeboard: "Edgeboard",
+      edgeboardUnavailable: "No visible edgeboard snapshot in RESEARCH.",
+      edgeboardTopSignals: "Top signals:",
+      edgeboardHealth: "Snapshot / health:",
       capitalEvents24h: "Capital-stage funnel events 24h:",
       correlationOrders24h: "Orders with correlation 24h:",
       funnelPathTapeRows24h: "Funnel rows with path_tape 24h:",
@@ -278,6 +303,10 @@ export function DashboardTier2Content({
       subEntry: "Entry & Execution-Funnel",
       subPath: "Path-Doktrin",
       subInfra: "Infra",
+      subEdgeboard: "Edgeboard",
+      edgeboardUnavailable: "Kein sichtbarer Edgeboard-Snapshot in RESEARCH.",
+      edgeboardTopSignals: "Top-Signale:",
+      edgeboardHealth: "Snapshot / Health:",
       capitalEvents24h: "Capital-Stage-Events 24h:",
       correlationOrders24h: "Orders mit Correlation 24h:",
       funnelPathTapeRows24h: "Funnel-Zeilen mit path_tape 24h:",
@@ -364,6 +393,10 @@ export function DashboardTier2Content({
       subEntry: "Entrée & funnel execution",
       subPath: "Doctrine path",
       subInfra: "Infra",
+      subEdgeboard: "Edgeboard",
+      edgeboardUnavailable: "Aucun snapshot Edgeboard visible dans RESEARCH.",
+      edgeboardTopSignals: "Top signaux :",
+      edgeboardHealth: "Snapshot / santé :",
       capitalEvents24h: "Événements funnel capital 24h :",
       correlationOrders24h: "Ordres avec correlation 24h :",
       funnelPathTapeRows24h: "Lignes funnel avec path_tape 24h :",
@@ -466,6 +499,12 @@ export function DashboardTier2Content({
             </strong>{" "}
             /{" "}
             <strong style={{ color: "var(--fg)" }}>{dataBundle.source_db.decision_role}</strong>
+            {dataBundle.source_db.research_role ? (
+              <>
+                {" "}
+                / <strong style={{ color: "var(--fg)" }}>{dataBundle.source_db.research_role}</strong>
+              </>
+            ) : null}
           </p>
           <p style={{ color: "var(--muted)", fontSize: "0.8125rem", marginBottom: "0.75rem" }}>
             <strong style={{ color: "var(--fg)" }}>{ui.disclosureHeading}</strong> (
@@ -551,6 +590,41 @@ export function DashboardTier2Content({
                 {dataBundle.infra.latest_watchdog_state ?? "—"} · event-buffer unknown:{" "}
                 {dataBundle.infra.event_buffer_unknown_24h ?? "—"}
               </p>
+            </div>
+          )}
+
+          {dataBundle.edgeboard && (
+            <div style={{ marginTop: "0.75rem" }}>
+              <h3 style={{ fontSize: "0.95rem", marginBottom: "0.25rem" }}>{ui.subEdgeboard}</h3>
+              {dataBundle.edgeboard.available ? (
+                <>
+                  <p style={{ color: "var(--muted)", fontSize: "0.8125rem", marginBottom: "0.25rem" }}>
+                    {ui.edgeboardHealth} snapshot {dataBundle.edgeboard.snapshot_ts ?? "—"} · rows{" "}
+                    {dataBundle.edgeboard.visible_rows ?? "—"} · symbols {dataBundle.edgeboard.visible_symbols ?? "—"} ·
+                    positive {dataBundle.edgeboard.positive_edge_symbols ?? "—"} · avg conf{" "}
+                    {dataBundle.edgeboard.avg_confidence != null
+                      ? dataBundle.edgeboard.avg_confidence.toFixed(2)
+                      : "—"}{" "}
+                    · avg edge{" "}
+                    {dataBundle.edgeboard.avg_expected_net_edge_bps != null
+                      ? `${dataBundle.edgeboard.avg_expected_net_edge_bps.toFixed(1)} bps`
+                      : "—"}{" "}
+                    · max edge{" "}
+                    {dataBundle.edgeboard.max_expected_net_edge_bps != null
+                      ? `${dataBundle.edgeboard.max_expected_net_edge_bps.toFixed(1)} bps`
+                      : "—"}
+                  </p>
+                  <p style={{ color: "var(--muted)", fontSize: "0.8125rem", marginBottom: "0.25rem" }}>
+                    training_examples_24h: {dataBundle.edgeboard.training_examples_24h ?? "—"} · outcomes_24h:{" "}
+                    {dataBundle.edgeboard.outcomes_24h ?? "—"} · model {dataBundle.edgeboard.model_version ?? "—"}
+                  </p>
+                  <p style={{ color: "var(--muted)", fontSize: "0.8125rem", margin: 0 }}>
+                    {ui.edgeboardTopSignals} {summarizeEdgeboardSignals(dataBundle.edgeboard.top_signals, ui)}
+                  </p>
+                </>
+              ) : (
+                <p style={{ color: "var(--muted)", fontSize: "0.8125rem", margin: 0 }}>{ui.edgeboardUnavailable}</p>
+              )}
             </div>
           )}
         </section>

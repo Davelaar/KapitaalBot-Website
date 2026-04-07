@@ -98,6 +98,7 @@ DOC_ROLE: observability_contract
   - `sharpe_like_24h` (optioneel)
   - `sortino_like_24h` (optioneel)
   - `max_drawdown_duration_buckets_24h` (optioneel, aantal 15m buckets)
+- `admin_observability_snapshot` kan optioneel een compacte `edgeboard` samenvatting bevatten: `available`, `snapshot_ts`, `visible_symbols`, `positive_edge_symbols`, `max_expected_net_edge_bps`, `training_examples_24h`, `outcomes_24h`.
 
 ### 3.8 tier2_data_bundle (contract 1.1+)
 
@@ -113,8 +114,10 @@ DOC_ROLE: observability_contract
   - `path_doctrine`: `execution_orders` per `path_tape_class` 24h; funnel met path_tape 24h.
   - `infra`: recovery requests 24h; laatste watchdog `state`; optioneel event-buffer unknown voor run.
   - `market_forecast_15m`: per symbool afgeleide 15m-forecast uit route/path engine (`expected_direction_15m`, `expected_move_15m_bps`, `confidence_15m`, `recommended_route_*`, `reason_code`, `soft_gate_score`, `forecast_basis`).
+  - `edgeboard`: **RESEARCH**-gevoede delayed Edgeboard-samenvatting met `available`, laatste zichtbare `snapshot_ts`, `visible_rows`, `visible_symbols`, `positive_edge_symbols`, `avg_confidence`, `avg_expected_net_edge_bps`, `max_expected_net_edge_bps`, `training_examples_24h`, `outcomes_24h`, plus `top_signals[]` met `rank`, `symbol`, `route_name`, `horizon_sec`, `expected_net_edge_bps`, `confidence`, `sample_size`, `boost`, en optioneel `dominant_reason_code` / `feature_coverage_class` / `freshness_ms`.
 
 - **Belangrijk:** `market_forecast_15m` is een **afgeleide soft signal** (ranking/weging), geen harde prijsvoorspelling of hard execution-block.
+- **Belangrijk:** `edgeboard` is eveneens **read-only ranking observability**. Het toont welke delayed RESEARCH-snapshots live blend zouden voeden; het is geen directe order- of gate-truth.
 
 ---
 
