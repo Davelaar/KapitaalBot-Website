@@ -834,11 +834,6 @@ export function DashboardTier2Content({
                   <p style={{ color: "var(--muted)", fontSize: "0.8125rem", margin: 0 }}>
                     {ui.edgeboardTopSignals} {summarizeEdgeboardSignals(dataBundle.edgeboard.top_signals, ui)}
                   </p>
-                  <p style={{ marginTop: "0.35rem", marginBottom: 0 }}>
-                    <Link href={withLocale(locale, "/dashboard/tier2/edgeboard")} style={{ color: "var(--accent)", textDecoration: "none", fontSize: "0.8125rem" }}>
-                      → Edgeboard detailpagina
-                    </Link>
-                  </p>
                 </>
               ) : (
                 <p style={{ color: "var(--muted)", fontSize: "0.8125rem", margin: 0 }}>{ui.edgeboardUnavailable}</p>
