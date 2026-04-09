@@ -161,6 +161,9 @@ export function NavBar() {
         <Link href={withLocale(locale, "/docs")} style={{ color: "var(--fg)", textDecoration: "none", fontSize: "0.9rem" }}>
           {t(locale, "nav.architecture")}
         </Link>
+        <Link href={withLocale(locale, "/spec")} style={{ color: "var(--fg)", textDecoration: "none", fontSize: "0.9rem" }}>
+          SPEC
+        </Link>
         <Link href={withLocale(locale, "/faq")} style={{ color: "var(--fg)", textDecoration: "none", fontSize: "0.9rem" }}>
           {t(locale, "nav.research")}
         </Link>
@@ -276,6 +279,9 @@ export function NavBar() {
           </Link>
           <Link href={withLocale(locale, "/docs")} className="mobile-nav-link" onClick={() => setMobileOpen(false)}>
             {t(locale, "nav.architecture")}
+          </Link>
+          <Link href={withLocale(locale, "/spec")} className="mobile-nav-link" onClick={() => setMobileOpen(false)}>
+            SPEC
           </Link>
           <Link href={withLocale(locale, "/faq")} className="mobile-nav-link" onClick={() => setMobileOpen(false)}>
             {t(locale, "nav.research")}

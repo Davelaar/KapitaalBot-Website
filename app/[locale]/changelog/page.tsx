@@ -1,6 +1,5 @@
 import Link from "next/link";
 import type { Locale } from "@/lib/i18n";
-import { t } from "@/lib/i18n";
 import { readBotChangelog, type BotChangelogEntry } from "@/lib/read-bot-changelog";
 import { parseLocaleParam, withLocale } from "@/lib/locale-path";
 import { buildPageMetadata } from "@/lib/page-metadata";
@@ -37,96 +36,84 @@ export async function generateMetadata({
   params: { locale: string };
 }) {
   const locale = parseLocaleParam(params.locale);
+  const isNl = locale === "nl";
   return buildPageMetadata({
     locale,
-    title: `${t(locale, "changelog.title")} — KapitaalBot`,
-    description: t(locale, "changelog.intro"),
+    title: isNl ? "Changelog — canonieke wijzigingen" : "Changelog — canonical changes",
+    description: isNl
+      ? "Wijzigingslog van publieke semantiek, observability-contract en enginehistorie."
+      : "Change log for public semantics, observability contract, and engine history.",
     path: "/changelog",
   });
 }
 
 export default async function ChangelogPage({ params }: { params: { locale: string } }) {
   const locale = parseLocaleParam(params.locale) as Locale;
+  const isNl = locale === "nl";
   const bot = readBotChangelog();
   const entriesNewestFirst = bot ? [...bot.entries].reverse() : [];
 
   const ui = {
     nl: {
-      sectionWebsite: "Website (maart 2026)",
+      sectionWebsite: "Website canon-line updates",
       navBack: "Home",
       title: "Changelog",
-      intro: "Website-updates en volledige bot-historie (Git).",
+      intro: "Canonieke website-updates en volledige bot-historie (Git).",
       bulletsWebsite: [
-        "Changelog-pagina; navigatie.",
-        "Freshness-indicator (GOOD/WARN/STALE), null handling.",
-        "Dashboard: metric cards, sorteerbare markttabel, regime stacked bar.",
-        'Homepage: hero, Waarom / Hoe observability, Tier-model.',
-        "Tier2-aanvraag: POST /api/tier2-request, rate limit.",
-        "Compliance-banner per taal (cookie).",
-        "Admin: snapshot-status + raw JSON (Tier 3).",
-        "SEO: OG/twitter, robots, sitemap, JSON-LD.",
-        "Error boundaries (error.tsx, global-error.tsx).",
+        "Route-/decision-centric dashboardsemantiek als hoofdmodel.",
+        "SPEC-pagina toegevoegd als canonieke technische specificatie.",
+        "FAQ herschreven naar economisch/juridisch/technisch kennisformat.",
+        "Kennis + 'wat is kapitaalbot' gecanoniseerd op dezelfde terminologie.",
+        "Publieke safety boundary expliciet: functioneel volledig, niet reproduceerbaar.",
       ],
       foot: "Website-detailchangelog:",
     },
     en: {
-      sectionWebsite: "Website (March 2026)",
+      sectionWebsite: "Website canon-line updates",
       navBack: "Home",
       title: "Changelog",
-      intro: "Website updates and full bot history (Git).",
+      intro: "Canonical website updates and full bot history (Git).",
       bulletsWebsite: [
-        "Changelog page; navigation.",
-        "Freshness indicator (GOOD/WARN/STALE), null handling.",
-        "Dashboard: metric cards, sortable market table, regime stacked bar.",
-        "Homepage: hero, Why / How observability, Tier model.",
-        "Tier2 request: POST /api/tier2-request, rate limit.",
-        "Compliance banner per language (cookie).",
-        "Admin: snapshot status + raw JSON (Tier 3).",
-        "SEO: OG/twitter, robots, sitemap, JSON-LD.",
-        "Error boundaries (error.tsx, global-error.tsx).",
+        "Route/decision-centric dashboard semantics as primary model.",
+        "SPEC page added as canonical technical specification.",
+        "FAQ rewritten into economic/legal/technical knowledge format.",
+        "Knowledge pages + 'what is kapitaalbot' aligned to shared terminology.",
+        "Public safety boundary made explicit: functionally complete, non-reproducible.",
       ],
       foot: "Full website changelog:",
     },
     de: {
-      sectionWebsite: "Website (März 2026)",
+      sectionWebsite: "Website canon-line updates",
       navBack: "Start",
       title: "Changelog",
-      intro: "Website-Updates und vollständige Bot-Historie (Git).",
+      intro: "Kanonische Website-Updates und vollständige Bot-Historie (Git).",
       bulletsWebsite: [
-        "Changelog-Seite; Navigation.",
-        "Freshness-Indikator (GOOD/WARN/STALE), Null-Handling.",
-        "Dashboard: Metrik-Karten, sortierbare Markttabelle, Regime-Stacked-Bar.",
-        "Homepage: Hero, Warum / Wie Observability, Tier-Modell.",
-        "Tier2-Anfrage: POST /api/tier2-request, Rate-Limit.",
-        "Compliance-Banner pro Sprache (Cookie).",
-        "Admin: Snapshot-Status + Raw-JSON (Tier 3).",
-        "SEO: OG/Twitter, robots, Sitemap, JSON-LD.",
-        "Error Boundaries (error.tsx, global-error.tsx).",
+        "Route-/Decision-zentrierte Dashboard-Semantik als Hauptmodell.",
+        "SPEC-Seite als kanonische technische Spezifikation hinzugefügt.",
+        "FAQ in ökonomisch/rechtlich/technisches Wissensformat umgebaut.",
+        "Knowledge-Seiten + 'Was ist KapitaalBot' terminologisch harmonisiert.",
+        "Öffentliche Sicherheitsgrenze explizit: funktional vollständig, nicht reproduzierbar.",
       ],
       foot: "Vollständiger Website-Changelog:",
     },
     fr: {
-      sectionWebsite: "Site (mars 2026)",
+      sectionWebsite: "Website canon-line updates",
       navBack: "Accueil",
       title: "Changelog",
-      intro: "Mises à jour du site et historique complet du bot (Git).",
+      intro: "Mises à jour canoniques du site et historique complet du bot (Git).",
       bulletsWebsite: [
-        "Page Changelog ; navigation.",
-        "Indicateur de fraîcheur (GOOD/WARN/STALE), gestion des null.",
-        "Dashboard : cartes métriques, tableau marché triable, barres par régime.",
-        "Accueil : hero, Pourquoi / Comment l’observabilité, modèle par tier.",
-        "Demande Tier2 : POST /api/tier2-request, rate limit.",
-        "Bannière compliance par langue (cookie).",
-        "Admin : statut snapshot + JSON brut (Tier 3).",
-        "SEO : OG/twitter, robots, sitemap, JSON-LD.",
-        "Error boundaries (error.tsx, global-error.tsx).",
+        "Sémantique dashboard orientée route/décision comme modèle principal.",
+        "Page SPEC ajoutée comme spécification technique canonique.",
+        "FAQ réécrite en format de connaissance économique/juridique/technique.",
+        "Pages knowledge + 'what is kapitaalbot' harmonisées sur la même terminologie.",
+        "Frontière de sécurité publique explicite : complet fonctionnellement, non reproductible.",
       ],
       foot: "Changelog complet du site :",
     },
   }[locale];
 
   const generatedLabel = bot
-    ? `${t(locale, "changelog.bot.generated")}: ${formatCommittedAt(bot.generated_at, locale)}`
+    ? `${isNl ? "Gegenereerd" : "Generated"}: ${formatCommittedAt(bot.generated_at, locale)}`
     : null;
 
   return (
@@ -149,15 +136,17 @@ export default async function ChangelogPage({ params }: { params: { locale: stri
       </section>
 
       <section className="card" style={{ marginBottom: "1.5rem" }}>
-        <h2 style={{ fontSize: "1.25rem", marginBottom: "0.75rem" }}>{t(locale, "changelog.bot.title")}</h2>
+        <h2 style={{ fontSize: "1.25rem", marginBottom: "0.75rem" }}>{isNl ? "Engine commit-historie" : "Engine commit history"}</h2>
         <p style={{ color: "var(--muted)", fontSize: "0.9375rem", marginBottom: "0.75rem", lineHeight: 1.6 }}>
-          {t(locale, "changelog.bot.intro")}
+          {isNl
+            ? "Bronhistorie van de engine-repository. Deze lijst is informatief en verwijst naar commitdoelen, niet naar broncode-uitleg op deze pagina."
+            : "Source history from the engine repository. This list is informational and points to commit intent, not source code explanation on this page."}
         </p>
         {bot ? (
           <p style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1rem" }}>
             {generatedLabel}
             <br />
-            {bot.commit_count} {t(locale, "changelog.bot.commits")}
+            {bot.commit_count} {isNl ? "commits" : "commits"}
             {bot.source_repo ? (
               <>
                 <br />
@@ -166,7 +155,9 @@ export default async function ChangelogPage({ params }: { params: { locale: stri
             ) : null}
           </p>
         ) : (
-          <p style={{ color: "var(--warn, #c9a227)", fontSize: "0.9375rem" }}>{t(locale, "changelog.bot.empty")}</p>
+          <p style={{ color: "var(--warn, #c9a227)", fontSize: "0.9375rem" }}>
+            {isNl ? "Geen bot changelog beschikbaar." : "No bot changelog available."}
+          </p>
         )}
 
         {entriesNewestFirst.length > 0 && (
@@ -191,7 +182,7 @@ export default async function ChangelogPage({ params }: { params: { locale: stri
                 {e.body && e.body.replace(/\s+/g, " ").trim().length > 0 ? (
                   <details style={{ marginTop: "0.35rem" }}>
                     <summary style={{ cursor: "pointer", color: "var(--accent)" }}>
-                      {t(locale, "changelog.bot.moreBody")}
+                      {isNl ? "Toon commit body" : "Show commit body"}
                     </summary>
                     <pre
                       style={{

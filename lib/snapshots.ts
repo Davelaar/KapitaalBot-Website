@@ -34,6 +34,8 @@ export interface PublicRegimeSnapshot {
   exported_at: string;
   active_regimes: RegimeCount[];
   dominant_regime: string | null;
+  source_run_id?: number | null;
+  source_kind?: string | null;
   regime_switches_last_hour: number | null;
 }
 
@@ -73,6 +75,7 @@ export interface RecentPublicOrderRow {
   status: string;
   quantity_base: string;
   limit_price_quote?: string | null;
+  route_name?: string | null;
   regime?: string | null;
   strategy?: string | null;
   order_ref: string;
@@ -97,6 +100,9 @@ export interface PublicTradingSnapshot {
   equity_trend_delayed?: EquityPoint[] | null;
   recent_orders?: RecentPublicOrderRow[];
   recent_fills?: RecentPublicFillRow[];
+  top_reject_reasons_last_hour?: LabelCount[];
+  why_no_trade_top_last_hour?: LabelCount[];
+  route_wins_last_hour?: LabelCount[];
 }
 
 export interface DemoTradeRow {
@@ -356,6 +362,12 @@ export interface Tier2EdgeboardSignalRow {
   symbol: string;
   route_name: string;
   horizon_sec: number;
+  /** Scaled/visible gross from edgeboard snapshot row. */
+  expected_gross_move_bps?: number | null;
+  /** Statistical gross before pooled semantic scaling (when present). */
+  statistical_gross_bps?: number | null;
+  /** Applied pooled semantic scale (when present and pooled). */
+  pooled_semantic_gross_scale?: number | null;
   expected_net_edge_bps: number;
   confidence: number;
   sample_size: number;

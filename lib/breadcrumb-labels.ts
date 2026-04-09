@@ -7,6 +7,7 @@ const SEGMENT_KEYS: Record<string, string> = {
   dashboard: "nav.data",
   kennis: "breadcrumb.kennis",
   docs: "nav.docs",
+  spec: "breadcrumb.spec",
   faq: "faq.title",
   over: "nav.about",
   "wat-is-kapitaalbot": "watkap.breadcrumb",

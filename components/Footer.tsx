@@ -35,6 +35,9 @@ export function Footer() {
       <Link href={withLocale(locale, "/docs")} style={linkStyle}>
         {t(locale, "nav.architecture")}
       </Link>
+      <Link href={withLocale(locale, "/spec")} style={linkStyle}>
+        SPEC
+      </Link>
       <Link href={withLocale(locale, "/tier2-request")} style={linkStyle}>
         {t(locale, "nav.access")}
       </Link>

@@ -26,6 +26,7 @@ const PATHS = [
   "/changelog",
   "/tier2-request",
   "/docs",
+  "/spec",
   "/contact",
 ] as const;
 
@@ -52,6 +53,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
                   ? 0.78
                   : p === "/faq" || p === "/docs"
                   ? 0.65
+                  : p === "/spec"
+                    ? 0.7
                   : p === "/changelog"
                     ? 0.55
                     : p === "/tier2-request"

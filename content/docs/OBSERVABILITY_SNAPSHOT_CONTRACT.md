@@ -3,7 +3,7 @@
 DOC_STATUS: SSOT  
 DOC_ROLE: observability_contract  
 
-**Contract version:** 1.1  
+**Contract version:** 1.2  
 **Doel:** Versioned contract tussen KRAKENBOTMAART (export) en KapitaalBot-Website (BFF). De website leest uitsluitend deze snapshots; geen directe queries op execution-tabellen.
 
 ---
@@ -15,6 +15,7 @@ DOC_ROLE: observability_contract
 - Bestandsnamen: `{snapshot_family}.json` (bijv. `public_status_snapshot.json`).
 - **Vertraging (Tier 1):** Publieke snapshots gebruiken afgeronde/vertraagde timestamps (bijv. kwartier of uur); geen realtime regime-switch events.
 - **Aggregatie:** Tier 1 alleen geaggregeerde tellers en samenvattingen; geen raw order- of fill-ID’s.
+- **Publieke veiligheidsgrens:** functionele uitleg en observability-uitkomsten zijn publiek; broncode, reproduceerbare tuningwaarden en private accountdetails zijn expliciet uitgesloten.
 
 ---
 
@@ -25,14 +26,14 @@ DOC_ROLE: observability_contract
 | `public_status_snapshot.json` | 1 | Runtime health, laatste snapshot_ts, data freshness, run_id, epoch status |
 | `public_regime_snapshot.json` | 1 | Actieve regimes (geaggregeerd), regime-switch samenvatting, dominant regime per periode (vertraagd) |
 | `public_strategy_snapshot.json` | 1 | Actieve strategieën, strategy count, geaggregeerd |
-| `public_market_snapshot.json` | 1 | Suitability per symbol, spread stats, market-overview (pair_summary_24h / L2/L3 agg) |
-| `public_trading_snapshot.json` | 1 | Trades laatste 24h (counts), equity trend (vertraagd), drawdown |
+| `public_market_snapshot.json` | 1 | Market context (ondersteunend): suitability/spread-overzicht; niet de hoofdwaarheid van runtime-beslissingen |
+| `public_trading_snapshot.json` | 1 | Route-/decision-centric outcomes: orders/fills counts, reject reasons, why-no-trade, route wins, equity trend (vertraagd), drawdown |
 | `public_demo_trades.json` | 1 | Geselecteerde demo trades; lifecycle, exit reason, resultaat |
 | `tier2_execution_snapshot.json` | 2 | Order/fill-detail, expected vs realized (alleen bij Tier 2 sessie) |
 | `tier2_latency_snapshot.json` | 2 | Submit→ack, fill→exit, histogrammen |
 | `tier2_pnl_snapshot.json` | 2 | PnL-detail, exposure |
 | `tier2_safety_snapshot.json` | 2 | Symbols per mode, quiet/hard-block |
-| `tier2_data_bundle.json` | 2 | Multi-page **Data**-menu: intake/universe (ingest), route/no-trade, risk, entry, path/doctrine, infra (decision); dual-DB; zie §3.8 |
+| `tier2_data_bundle.json` | 2 | Route-/decision-centric observability-bundle: intake/universe, route/no-trade, risk, entry, path/lineage, infra, edgeboard; dual-DB; zie §3.8 |
 | `admin_observability_snapshot.json` | 3 | Full observability, raw lifecycle (alleen admin) |
 
 ---
@@ -76,15 +77,18 @@ DOC_ROLE: observability_contract
 - `pairs`: array van { symbol, trade_count, avg_spread_bps, suitability_score } (van pair_summary_24h of L2/trade agg)
 - `symbol_count`: number
 
-### 3.5 public_trading_snapshot
+### 3.5 public_trading_snapshot (route-/decision-centric)
 
 - `contract_version`, `exported_at`
 - `trades_24h_count`: number — aantal **fill-rijen** in DB met `COALESCE(ts_exchange, ts_local)` in de laatste 24h (beurstijd waar bekend).
 - `orders_24h_count`: number — orders met `created_at` in de laatste 24h (werkelijk geplaatste orders in het venster).
 - `equity_trend_delayed`: array van { ts_bucket: string, value: number } (vertraagd, optioneel)
 - `drawdown_pct`: number | null (optioneel)
-- `recent_orders` (optioneel, leeg weggelaten): max 10 nieuwste rijen uit `execution_orders`, tijd `ts_bucket` = 15 min afgerond; `order_ref` = verkorte client-order-ref (suffix), geen volledige exchange ids.
+- `recent_orders` (optioneel, leeg weggelaten): max 10 nieuwste rijen uit `execution_orders`, tijd `ts_bucket` = 15 min afgerond; `order_ref` = verkorte client-order-ref (suffix), geen volledige exchange ids. Optioneel `route_name` voor explainability.
 - `recent_fills` (optioneel, leeg weggelaten): max 10 nieuwste rijen uit `fills`, tijd `ts_bucket` = 15 min afgerond; qty/prijs als string (decimal).
+- `top_reject_reasons_last_hour` (optioneel): top reject-verdeling voor explainability.
+- `why_no_trade_top_last_hour` (optioneel): geaggregeerde no-trade oorzaken.
+- `route_wins_last_hour` (optioneel): geaggregeerde verdeling van route-keuzes.
 
 ### 3.6 public_demo_trades
 
@@ -100,10 +104,10 @@ DOC_ROLE: observability_contract
   - `max_drawdown_duration_buckets_24h` (optioneel, aantal 15m buckets)
 - `admin_observability_snapshot` kan optioneel een compacte `edgeboard` samenvatting bevatten: `available`, `snapshot_ts`, `visible_symbols`, `positive_edge_symbols`, `max_expected_net_edge_bps`, `training_examples_24h`, `outcomes_24h`.
 
-### 3.8 tier2_data_bundle (contract 1.1+)
+### 3.8 tier2_data_bundle (contract 1.2+)
 
-- **Doel:** één JSON voor KapitaalBot **Data**-menu: geaggregeerde, querybare observability over **ingest**- en **decision**-DB (gecombineerd in export; geen cross-database SQL).
-- `contract_version`: `"1.1"` (gebundeld met [`CONTRACT_VERSION`](../src/observability/snapshots.rs)).
+- **Doel:** één JSON voor KapitaalBot route-/decision-centric observability: geaggregeerde, querybare uitkomsten over **ingest**- en **decision**-DB (gecombineerd in export; geen cross-database SQL).
+- `contract_version`: `"1.2"` (gebundeld met `CONTRACT_VERSION` in bot-export).
 - `disclosure_policy`: object met o.a. `kind` (`"delayed"`), `bucket_minutes`, `as_of_utc`, `explanation_nl` — **opzettelijke vertraging** t.o.v. live trading (copytrading-bescherming); geen foutieve latentie.
 - `source_db`: `{ "intake_role": "ingest", "decision_role": "decision" }` — welk DB-role per subsysteem.
 - Subsecties (elk met eigen `source_db` veld `"ingest"` | `"decision"`):
@@ -114,10 +118,11 @@ DOC_ROLE: observability_contract
   - `path_doctrine`: `execution_orders` per `path_tape_class` 24h; funnel met path_tape 24h.
   - `infra`: recovery requests 24h; laatste watchdog `state`; optioneel event-buffer unknown voor run.
   - `market_forecast_15m`: per symbool afgeleide 15m-forecast uit route/path engine (`expected_direction_15m`, `expected_move_15m_bps`, `confidence_15m`, `recommended_route_*`, `reason_code`, `soft_gate_score`, `forecast_basis`).
-  - `edgeboard`: **RESEARCH**-gevoede delayed Edgeboard-samenvatting met `available`, laatste zichtbare `snapshot_ts`, `visible_rows`, `visible_symbols`, `positive_edge_symbols`, `avg_confidence`, `avg_expected_net_edge_bps`, `max_expected_net_edge_bps`, `training_examples_24h`, `outcomes_24h`, plus `top_signals[]` met `rank`, `symbol`, `route_name`, `horizon_sec`, `expected_net_edge_bps`, `confidence`, `sample_size`, `boost`, en optioneel `dominant_reason_code` / `feature_coverage_class` / `freshness_ms`.
+- `edgeboard`: **RESEARCH**-gevoede delayed Edgeboard-samenvatting met `available`, laatste zichtbare `snapshot_ts`, `visible_rows`, `visible_symbols`, `positive_edge_symbols`, `avg_confidence`, `avg_expected_net_edge_bps`, `max_expected_net_edge_bps`, `training_examples_24h`, `outcomes_24h`, plus `top_signals[]` met `rank`, `symbol`, `route_name`, `horizon_sec`, `expected_net_edge_bps`, `confidence`, `sample_size`, `boost`, en optioneel `dominant_reason_code` / `feature_coverage_class` / `freshness_ms` plus pooled-semantics velden `statistical_gross_bps`, `expected_gross_move_bps`, `pooled_semantic_gross_scale`.
 
 - **Belangrijk:** `market_forecast_15m` is een **afgeleide soft signal** (ranking/weging), geen harde prijsvoorspelling of hard execution-block.
 - **Belangrijk:** `edgeboard` is eveneens **read-only ranking observability**. Het toont welke delayed RESEARCH-snapshots live blend zouden voeden; het is geen directe order- of gate-truth.
+- **Belangrijk:** publieke fields blijven bewust op explainabilityniveau en bevatten geen reproduceerbare fine-tuning.
 
 ---
 

@@ -8,6 +8,15 @@ import { buildPageMetadata } from "@/lib/page-metadata";
 import { parseLocaleParam, withLocale } from "@/lib/locale-path";
 
 const DOCS_DIR = path.join(process.cwd(), "content", "docs");
+const CANONICAL_DOCS = new Set([
+  "ENGINE_SSOT",
+  "ARCHITECTURE_ENGINE_CURRENT",
+  "OBSERVABILITY_SNAPSHOT_CONTRACT",
+  "CHANGELOG_ENGINE",
+  "LIVE_RUNBOOK_CURRENT",
+  "VALIDATION_MODEL_CURRENT",
+  "DOC_INDEX",
+]);
 
 const DOC_META: Record<string, { labelKey: string }> = {
   ENGINE_SSOT: { labelKey: "docs.meta.ENGINE_SSOT.label" },
@@ -22,8 +31,12 @@ function getDocSlugs(): string[] {
     .map((f) => f.replace(/\.md$/, ""));
 }
 
+function getCanonicalDocSlugs(): string[] {
+  return getDocSlugs().filter((slug) => CANONICAL_DOCS.has(slug));
+}
+
 export function generateStaticParams() {
-  const slugs = getDocSlugs();
+  const slugs = getCanonicalDocSlugs();
   return locales.flatMap((locale) => slugs.map((slug) => ({ locale, slug })));
 }
 
@@ -49,7 +62,8 @@ export async function generateMetadata({
 export default async function DocSlugPage({ params }: { params: { locale: string; slug: string } }) {
   const { slug, locale: lp } = params;
   const locale = parseLocaleParam(lp) as Locale;
-  const slugs = getDocSlugs();
+  const isNl = locale === "nl";
+  const slugs = getCanonicalDocSlugs();
   if (!slugs.includes(slug)) notFound();
 
   const filePath = path.join(DOCS_DIR, `${slug}.md`);
@@ -69,7 +83,9 @@ export default async function DocSlugPage({ params }: { params: { locale: string
       </nav>
       <section className="docs-two-col" style={{ display: "grid", gap: "1rem", alignItems: "start" }}>
         <aside className="card" style={{ position: "sticky", top: "1rem", marginBottom: 0 }}>
-          <h2 style={{ marginTop: 0, marginBottom: "0.75rem", fontSize: "1rem" }}>{t(locale, "docs.slug.files")}</h2>
+          <h2 style={{ marginTop: 0, marginBottom: "0.75rem", fontSize: "1rem" }}>
+            {isNl ? "Canonieke docs" : "Canonical docs"}
+          </h2>
           <ul
             className="docs-file-list"
             style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "0.25rem" }}
@@ -97,6 +113,11 @@ export default async function DocSlugPage({ params }: { params: { locale: string
           </ul>
         </aside>
         <article className="card" style={{ padding: "1rem 1.25rem", marginBottom: 0 }}>
+          <p style={{ marginTop: 0, marginBottom: "0.75rem", color: "var(--muted)", fontSize: "0.85rem", lineHeight: 1.6 }}>
+            {isNl
+              ? "Publieke docs zijn functioneel volledig en canoniek, maar bevatten geen broncode, geen private accountdetails en geen reproduceerbare tuning."
+              : "Public docs are functionally complete and canonical, but contain no source code, no private account details, and no reproducible tuning."}
+          </p>
           <DocViewer content={content} />
         </article>
       </section>

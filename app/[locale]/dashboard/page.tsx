@@ -4,30 +4,23 @@ import {
   getPublicRegimeSnapshotCached,
   getPublicStrategySnapshotCached,
   getPublicTradingSnapshotCached,
-  getPublicMarketSnapshotCached,
-  getPublicDemoTradesCached,
+  getTier2DataBundleCached,
 } from "@/lib/read-snapshots-cached";
 import { t, type Locale } from "@/lib/i18n";
 import { parseLocaleParam, withLocale } from "@/lib/locale-path";
 import { DashboardIntro } from "@/components/DashboardIntro";
-import StatusStrip from "@/components/StatusStrip";
-import MetricCardGrid from "@/components/MetricCardGrid";
-import RegimeStrategyOverview from "@/components/RegimeStrategyOverview";
-import MarketSummary from "@/components/MarketSummary";
-import DemoTradeTeaser from "@/components/DemoTradeTeaser";
-import RecentExecutionSection from "@/components/RecentExecutionSection";
+import { RouteCentricDashboard } from "@/components/RouteCentricDashboard";
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage({ params }: { params: { locale: string } }) {
   const locale = parseLocaleParam(params.locale) as Locale;
-  const [status, regime, strategy, trading, market, demo] = await Promise.all([
+  const [status, regime, strategy, trading, dataBundle] = await Promise.all([
     getPublicStatusSnapshotCached(),
     getPublicRegimeSnapshotCached(),
     getPublicStrategySnapshotCached(),
     getPublicTradingSnapshotCached(),
-    getPublicMarketSnapshotCached(),
-    getPublicDemoTradesCached(),
+    getTier2DataBundleCached(),
   ]);
 
   return (
@@ -38,18 +31,14 @@ export default async function DashboardPage({ params }: { params: { locale: stri
         </Link>
       </nav>
       <DashboardIntro status={status} locale={locale} />
-
-      <StatusStrip status={status} locale={locale} />
-      <MetricCardGrid
+      <RouteCentricDashboard
+        locale={locale}
         status={status}
-        trading={trading}
         regime={regime}
         strategy={strategy}
+        trading={trading}
+        dataBundle={dataBundle}
       />
-      <RecentExecutionSection trading={trading} maxOrders={10} maxFills={10} />
-      <RegimeStrategyOverview regime={regime} strategy={strategy} />
-      <MarketSummary market={market} />
-      <DemoTradeTeaser demo={demo} maxItems={8} />
     </main>
   );
 }

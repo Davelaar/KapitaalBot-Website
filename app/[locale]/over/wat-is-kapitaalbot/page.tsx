@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { parseLocaleParam, withLocale } from "@/lib/locale-path";
-import { t } from "@/lib/i18n";
 import { buildPageMetadata } from "@/lib/page-metadata";
 import type { Locale } from "@/lib/i18n";
 
@@ -12,33 +11,25 @@ export async function generateMetadata({
   params: { locale: string };
 }) {
   const locale = parseLocaleParam(params.locale);
+  const isNl = locale === "nl";
   return buildPageMetadata({
     locale,
-    title: t(locale, "watkap.metaTitle"),
-    description: t(locale, "watkap.metaDesc"),
+    title: isNl
+      ? "Wat is KapitaalBot? — canonieke definitie"
+      : "What is KapitaalBot? — canonical definition",
+    description: isNl
+      ? "KapitaalBot is een timing-aware multistrategy multiregime route-selection engine met route-state, explainability en position-context."
+      : "KapitaalBot is a timing-aware multistrategy multiregime route-selection engine with route-state, explainability, and position context.",
     path: "/over/wat-is-kapitaalbot",
-    keywords: t(locale, "watkap.metaKeywords"),
+    keywords: isNl
+      ? "KapitaalBot definitie, route-selection engine, timing-aware trading runtime, explainability"
+      : "KapitaalBot definition, route-selection engine, timing-aware trading runtime, explainability",
   });
-}
-
-/** Rendert `**vet**` in vertaalstrings als <strong>. */
-function InlineBold({ text }: { text: string }) {
-  const parts = text.split(/\*\*/);
-  return (
-    <>
-      {parts.map((part, i) =>
-        i % 2 === 1 ? (
-          <strong key={i}>{part}</strong>
-        ) : (
-          <span key={i}>{part}</span>
-        ),
-      )}
-    </>
-  );
 }
 
 export default async function WatIsKapitaalbotPage({ params }: { params: { locale: string } }) {
   const locale = parseLocaleParam(params.locale) as Locale;
+  const isNl = locale === "nl";
   const pStyle = {
     color: "var(--muted)",
     lineHeight: 1.65 as const,
@@ -51,48 +42,71 @@ export default async function WatIsKapitaalbotPage({ params }: { params: { local
     marginBottom: "0.75rem",
     fontWeight: 600 as const,
   };
-  const h3Style = { fontSize: "1.05rem", marginTop: "1.25rem", marginBottom: "0.5rem", fontWeight: 600 as const };
-  const listStyle = { ...pStyle, paddingLeft: "1.25rem", marginTop: 0 };
-
-  const welKeys = ["watkap.wel.b1", "watkap.wel.b2", "watkap.wel.b3", "watkap.wel.b4", "watkap.wel.b5"] as const;
-  const nietKeys = ["watkap.niet.b1", "watkap.niet.b2", "watkap.niet.b3", "watkap.niet.b4"] as const;
+  const listStyle = { ...pStyle, paddingLeft: "1.25rem", marginTop: 0, marginBottom: "0.25rem" };
 
   return (
     <main style={{ maxWidth: 720, margin: "0 auto", padding: "0 1.25rem 2.5rem" }}>
       <nav style={{ marginBottom: "1.5rem" }}>
         <Link href={withLocale(locale, "/over")} style={{ color: "var(--accent)", textDecoration: "none", fontSize: "0.9rem" }}>
-          ← {t(locale, "nav.over.story")}
+          ← {isNl ? "Over KapitaalBot" : "About KapitaalBot"}
         </Link>
       </nav>
 
       <article>
         <h1 style={{ fontSize: "1.75rem", marginBottom: "1rem", fontWeight: 600, lineHeight: 1.25 }}>
-          {t(locale, "watkap.h1")}
+          {isNl ? "Wat is KapitaalBot?" : "What is KapitaalBot?"}
         </h1>
-        <p style={{ ...pStyle, fontSize: "1rem", color: "var(--fg)" }}>{t(locale, "watkap.intro")}</p>
+        <p style={{ ...pStyle, fontSize: "1rem", color: "var(--fg)" }}>
+          {isNl
+            ? "KapitaalBot is geen eenvoudige momentum- of scalpingbot. Het is een timing-aware, multistrategy, multiregime route-selection engine."
+            : "KapitaalBot is not a simple momentum or scalping bot. It is a timing-aware, multistrategy, multiregime route-selection engine."}
+        </p>
 
-        <h2 style={h2Style}>{t(locale, "watkap.wel.title")}</h2>
+        <h2 style={h2Style}>{isNl ? "Canonieke definitie" : "Canonical definition"}</h2>
         <ul style={listStyle}>
-          {welKeys.map((key) => (
-            <li key={key} style={{ marginBottom: "0.65rem" }}>
-              <InlineBold text={t(locale, key)} />
-            </li>
-          ))}
+          <li>{isNl ? "Timing-aware ranking van routekandidaten." : "Timing-aware ranking of route candidates."}</li>
+          <li>{isNl ? "Multistrategy en multiregime context als beslisinput." : "Multistrategy and multiregime context as decision input."}</li>
+          <li>{isNl ? "Route-state als operationele waarheid voor observability." : "Route-state as operational truth for observability."}</li>
+          <li>{isNl ? "Explainability via why-no-trade, route wins en reject reasons." : "Explainability through why-no-trade, route wins, and reject reasons."}</li>
+          <li>{isNl ? "Position-context en safety als randvoorwaarden voor execution." : "Position context and safety as execution boundary conditions."}</li>
         </ul>
 
-        <h2 style={h2Style}>{t(locale, "watkap.niet.title")}</h2>
+        <h2 style={h2Style}>{isNl ? "Wat KapitaalBot niet is" : "What KapitaalBot is not"}</h2>
         <ul style={listStyle}>
-          {nietKeys.map((key) => (
-            <li key={key} style={{ marginBottom: "0.65rem" }}>
-              <InlineBold text={t(locale, key)} />
-            </li>
-          ))}
+          <li>{isNl ? "Geen single-strategy indicatorbot." : "Not a single-strategy indicator bot."}</li>
+          <li>{isNl ? "Geen symbol/feed-first dashboardmodel als hoofdwaarheid." : "Not a symbol/feed-first dashboard model as primary truth."}</li>
+          <li>{isNl ? "Geen publieke broncode of reproduceerbare private tuninglaag." : "No public source code or reproducible private tuning layer."}</li>
+          <li>{isNl ? "Geen beleggingsadvies of signaaldienst." : "Not investment advice or a signaling service."}</li>
         </ul>
 
-        <h3 style={h3Style}>{t(locale, "watkap.waarom.title")}</h3>
-        <p style={pStyle}>{t(locale, "watkap.waarom.p1")}</p>
+        <h2 style={h2Style}>{isNl ? "Hoe deze pagina past in de canon" : "How this page fits the canon"}</h2>
+        <p style={pStyle}>
+          {isNl
+            ? "Deze pagina geeft de kern-definitie. Voor operationele observability gebruik je Dashboard. Voor stack/latency gebruik je SPEC. Voor contractuele details gebruik je Docs. Voor oorzaak/gevolg-vragen gebruik je FAQ."
+            : "This page provides the core definition. For operational observability, use Dashboard. For stack/latency, use SPEC. For contractual details, use Docs. For cause/effect questions, use FAQ."}
+        </p>
 
-        <p style={{ ...pStyle, marginTop: "1.5rem", fontStyle: "italic", color: "var(--fg)" }}>{t(locale, "watkap.closing")}</p>
+        <p style={{ ...pStyle, marginTop: "1.25rem", fontSize: "0.9rem" }}>
+          <Link href={withLocale(locale, "/dashboard")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+            {isNl ? "Dashboard" : "Dashboard"}
+          </Link>
+          {" · "}
+          <Link href={withLocale(locale, "/spec")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+            SPEC
+          </Link>
+          {" · "}
+          <Link href={withLocale(locale, "/docs")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+            {isNl ? "Docs" : "Docs"}
+          </Link>
+          {" · "}
+          <Link href={withLocale(locale, "/faq")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+            FAQ
+          </Link>
+          {" · "}
+          <Link href={withLocale(locale, "/kennis")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+            {isNl ? "Kennis" : "Knowledge"}
+          </Link>
+        </p>
       </article>
     </main>
   );

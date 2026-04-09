@@ -1,47 +1,81 @@
-"use client";
-
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { useLocale } from "@/lib/locale";
-import { withLocale } from "@/lib/locale-path";
+import { parseLocaleParam, withLocale } from "@/lib/locale-path";
 import { t } from "@/lib/i18n";
 import { FaqChatbot } from "@/components/FaqChatbot";
-import { FAQ_SECTIONS } from "@/lib/faq-sections";
+import type { Locale } from "@/lib/i18n";
 
-export default function FAQPage() {
-  const locale = useLocale();
-  const [openSectionId, setOpenSectionId] = useState<string | null>(null);
-  const [search, setSearch] = useState("");
+type QA = { q: string; a: string };
 
-  useEffect(() => {
-    function applyFundingHash() {
-      if (typeof window === "undefined") return;
-      if (window.location.hash !== "#funding") return;
-      setOpenSectionId("funding");
-      requestAnimationFrame(() => {
-        document.getElementById("funding")?.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
-    }
-    applyFundingHash();
-    window.addEventListener("hashchange", applyFundingHash);
-    return () => window.removeEventListener("hashchange", applyFundingHash);
-  }, []);
+function section(title: string, rows: QA[]) {
+  return (
+    <section className="card" style={{ padding: "1rem 1.25rem" }}>
+      <h2 style={{ fontSize: "1.2rem", marginBottom: "0.75rem" }}>{title}</h2>
+      <div style={{ display: "grid", gap: "0.75rem" }}>
+        {rows.map((r) => (
+          <article key={r.q} className="card" style={{ margin: 0 }}>
+            <h3 style={{ fontSize: "1rem", marginBottom: "0.35rem" }}>{r.q}</h3>
+            <p style={{ margin: 0, color: "var(--muted)", lineHeight: 1.6 }}>{r.a}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
 
-  function toggleSection(id: string) {
-    setOpenSectionId((current) => (current === id ? null : id));
-  }
+export default async function FAQPage({ params }: { params: { locale: string } }) {
+  const locale = parseLocaleParam(params.locale) as Locale;
+  const isNl = locale === "nl";
 
-  const searchLower = search.trim().toLowerCase();
-  const filteredSections = searchLower
-    ? FAQ_SECTIONS.map((section) => {
-        const matchingItems = section.items.filter(
-          (item) =>
-            t(locale, item.qKey).toLowerCase().includes(searchLower) ||
-            t(locale, item.aKey).toLowerCase().includes(searchLower)
-        );
-        return matchingItems.length > 0 ? { ...section, items: matchingItems } : null;
-      }).filter(Boolean) as typeof FAQ_SECTIONS
-    : FAQ_SECTIONS;
+  const economic: QA[] = [
+    {
+      q: isNl ? "Wat laat de publieke performance-laag wel en niet zien?" : "What does the public performance layer show and not show?",
+      a: isNl
+        ? "Wel: uitvoerbaarheid, reject reasons, route-uitkomsten en geaggregeerde execution quality. Niet: accountspecifieke PnL, balances of individuele private allocatiebeslissingen."
+        : "It shows execution viability, rejection reasons, route outcomes, and aggregated execution quality. It does not show account-specific PnL, balances, or individual private allocation decisions.",
+    },
+    {
+      q: isNl ? "Waarom is Tier 1 vertraagd?" : "Why is Tier 1 delayed?",
+      a: isNl
+        ? "Tier 1 is bewust vertraagd om strategische leakage te voorkomen en tegelijk publieke controle op systeemgedrag mogelijk te maken."
+        : "Tier 1 is intentionally delayed to prevent strategy leakage while preserving public verification of system behavior.",
+    },
+  ];
+
+  const legal: QA[] = [
+    {
+      q: isNl ? "Is dit beleggingsadvies?" : "Is this investment advice?",
+      a: isNl
+        ? "Nee. De site is een technische transparantie- en observabilitylaag. Het is geen uitnodiging, aanbeveling of individueel advies."
+        : "No. This site is a technical transparency and observability layer. It is not a solicitation, recommendation, or personal advice.",
+    },
+    {
+      q: isNl ? "Welke gegevens blijven altijd privé?" : "Which data remains private?",
+      a: isNl
+        ? "Private accountdetails, gevoelige uitvoeringsfijnafstelling, exacte thresholds/caps en reproduceerbare tuningwaarden blijven buiten de publieke laag."
+        : "Private account details, sensitive execution fine-tuning, exact thresholds/caps, and reproducible tuning values remain outside the public layer.",
+    },
+  ];
+
+  const technical: QA[] = [
+    {
+      q: isNl ? "Hoe lees ik Why-No-Trade correct?" : "How should I read Why-No-Trade correctly?",
+      a: isNl
+        ? "Zie het als geaggregeerde oorzaakanalyse van de decision funnel: welke stappen de meeste afwijzingen veroorzaken en welke routecodes dominant zijn in een tijdvenster."
+        : "Treat it as aggregated cause analysis of the decision funnel: which steps produce most rejections and which route codes dominate in a time window.",
+    },
+    {
+      q: isNl ? "Waarom wint een route?" : "Why does a route win?",
+      a: isNl
+        ? "Een route wint wanneer de gecombineerde score voor timing, verwacht netto-voordeel, risicogeschiktheid en uitvoerbaarheid beter is dan alternatieven binnen hetzelfde venster."
+        : "A route wins when its combined score for timing, expected net advantage, risk suitability, and execution viability is stronger than alternatives in the same window.",
+    },
+    {
+      q: isNl ? "Hoe helpt deze FAQ bij debuggen?" : "How does this FAQ support debugging?",
+      a: isNl
+        ? "De FAQ koppelt fouten aan oorzaak/gevolg. Gebruik daarna de dashboardboards om te zien of het probleem uit timing, routekeuze, risk/safety of execution viability komt."
+        : "The FAQ links failure modes to cause/effect. Then use dashboard boards to identify whether the issue comes from timing, route choice, risk/safety, or execution viability.",
+    },
+  ];
 
   return (
     <main>
@@ -52,85 +86,14 @@ export default function FAQPage() {
       </nav>
       <h1 style={{ fontSize: "1.75rem", marginBottom: "0.5rem" }}>{t(locale, "faq.title")}</h1>
       <p style={{ color: "var(--muted)", marginBottom: "1rem" }}>
-        {t(locale, "faq.intro")}
+        {isNl
+          ? "Canonieke publieke FAQ voor economisch, juridisch en technisch begrip van KapitaalBot. Geschikt als kennisbron voor mens en AI."
+          : "Canonical public FAQ for economic, legal, and technical understanding of KapitaalBot. Suitable as a knowledge source for humans and AI."}
       </p>
-      <input
-        type="search"
-        placeholder={t(locale, "faq.search.placeholder")}
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        aria-label={t(locale, "faq.search.ariaLabel")}
-        style={{
-          width: "100%",
-          maxWidth: 320,
-          padding: "0.5rem 0.75rem",
-          marginBottom: "1.5rem",
-          border: "1px solid var(--border)",
-          borderRadius: 4,
-          background: "var(--bg)",
-          color: "var(--fg)",
-          fontSize: "0.9375rem",
-        }}
-      />
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", marginBottom: "1.5rem" }}>
-        {filteredSections.map((section) => {
-          const isOpen = openSectionId === section.id;
-          const panelId = `faq-panel-${section.id}`;
-          const buttonId = `faq-toggle-${section.id}`;
-
-          return (
-            <section key={section.id} id={section.id} className="card">
-              <button
-                id={buttonId}
-                type="button"
-                onClick={() => toggleSection(section.id)}
-                aria-expanded={isOpen}
-                aria-controls={panelId}
-                style={{
-                  width: "100%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  background: "transparent",
-                  border: "none",
-                  padding: 0,
-                  color: "var(--fg)",
-                  cursor: "pointer",
-                  textAlign: "left",
-                  fontSize: "1.05rem",
-                  fontWeight: 600,
-                }}
-              >
-                <span>{t(locale, section.titleKey)}</span>
-                <span
-                  aria-hidden="true"
-                  style={{
-                    fontSize: "1.2rem",
-                    transform: isOpen ? "rotate(90deg)" : "rotate(0deg)",
-                    transition: "transform 0.15s ease",
-                  }}
-                >
-                  ▸
-                </span>
-              </button>
-              {isOpen && (
-                <div
-                  id={panelId}
-                  role="region"
-                  aria-labelledby={buttonId}
-                  style={{ marginTop: "0.75rem", display: "flex", flexDirection: "column", gap: "0.75rem" }}
-                >
-                  {section.items.map(({ qKey, aKey }) => (
-                    <div key={qKey} className="card" style={{ marginBottom: 0 }}>
-                      <h3 style={{ fontSize: "1.0rem", marginBottom: "0.35rem" }}>{t(locale, qKey)}</h3>
-                      <p style={{ color: "var(--muted)", margin: 0, lineHeight: 1.6 }}>{t(locale, aKey)}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </section>
-          );
-        })}
+      <div style={{ display: "grid", gap: "1rem", marginBottom: "1.5rem" }}>
+        {section(isNl ? "Economisch" : "Economic", economic)}
+        {section(isNl ? "Juridisch" : "Legal", legal)}
+        {section(isNl ? "Technisch" : "Technical", technical)}
       </div>
       <FaqChatbot />
     </main>
