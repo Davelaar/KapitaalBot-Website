@@ -376,6 +376,7 @@ export interface Tier2EdgeboardSignalRow {
   statistical_gross_bps?: number | null;
   /** Applied pooled semantic scale (when present and pooled). */
   pooled_semantic_gross_scale?: number | null;
+  expected_cost_bps?: number | null;
   expected_net_edge_bps: number;
   confidence: number;
   sample_size: number;
@@ -383,6 +384,8 @@ export interface Tier2EdgeboardSignalRow {
   dominant_reason_code?: string | null;
   feature_coverage_class?: string | null;
   freshness_ms?: number | null;
+  /** Provenance: "edgeboard_research" or "decision_fallback". */
+  edge_source_version?: string | null;
 }
 
 export interface Tier2EdgeboardCandidateRow {
@@ -409,6 +412,8 @@ export interface Tier2EdgeboardSection {
   max_expected_net_edge_bps?: number | null;
   training_examples_24h?: number | null;
   outcomes_24h?: number | null;
+  /** Age of snapshot being served (ms since snapshot_ts). */
+  snapshot_age_ms?: number | null;
   top_signals: Tier2EdgeboardSignalRow[];
   /** Per-symbol rollup (best route per symbol); may be absent in older exports. */
   candidates?: Tier2EdgeboardCandidateRow[] | null;

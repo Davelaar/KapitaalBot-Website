@@ -13,7 +13,7 @@ import type {
   PublicTradingSnapshot,
   Tier2DataBundle,
 } from "@/lib/snapshots";
-import { labelCountsToPieSegments, SimplePieChart } from "@/components/SimplePieChart";
+import { labelCountsToPieSegments, pieSegmentsTotal, SimplePieChart } from "@/components/SimplePieChart";
 
 type Props = {
   locale: Locale;
@@ -34,6 +34,23 @@ function formatHorizonSec(sec: number | null | undefined): string {
   return String(sec);
 }
 
+function formatFreshnessMs(ms: number | null | undefined): string {
+  if (ms == null) return "—";
+  if (ms < 1000) return `${ms}ms`;
+  const secs = Math.round(ms / 1000);
+  if (secs < 120) return `${secs}s`;
+  return `${Math.round(secs / 60)}m`;
+}
+
+function freshnessColor(ms: number | null | undefined): string {
+  if (ms == null) return "var(--text-muted)";
+  if (ms <= 300_000) return "var(--success)";
+  if (ms <= 3_600_000) return "var(--warning)";
+  return "var(--danger)";
+}
+
+const FEED_FRESHNESS_STALE_THRESHOLD_SECS = 60;
+
 function card(title: string, body: ReactNode) {
   return (
     <section className="card" style={{ padding: "1rem 1.25rem" }}>
@@ -51,6 +68,11 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
   const decisionTop = top(dataBundle?.route_no_trade?.funnel_decision_code_counts_24h, 10);
   const pathTapeTop = top(dataBundle?.path_doctrine?.orders_by_path_tape_24h, 8);
   const edgeSignals = dataBundle?.edgeboard?.top_signals ?? [];
+  const edgeboardSourceDb = dataBundle?.edgeboard?.source_db ?? null;
+  const edgeboardSnapshotAgeMs = dataBundle?.edgeboard?.snapshot_age_ms ?? null;
+  const isDecisionFallback = edgeboardSourceDb === "decision_fallback";
+  const feedFreshnessSecs = status?.data_freshness_secs ?? null;
+  const feedStale = feedFreshnessSecs != null && feedFreshnessSecs > FEED_FRESHNESS_STALE_THRESHOLD_SECS;
   const activeRegimes = regime?.active_regimes ?? [];
   const activeStrategies = strategy?.active_strategies ?? [];
 
@@ -64,6 +86,7 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
   );
   const funnelStagePie = labelCountsToPieSegments(dataBundle?.route_no_trade?.funnel_stage_counts_24h, 8);
   const decisionPie = labelCountsToPieSegments(dataBundle?.route_no_trade?.funnel_decision_code_counts_24h, 8);
+  const pathTapePie = labelCountsToPieSegments(dataBundle?.path_doctrine?.orders_by_path_tape_24h, 8);
 
   const winners = trading?.symbol_pnl_day_utc_top_winners ?? [];
   const losers = trading?.symbol_pnl_day_utc_top_losers ?? [];
@@ -89,6 +112,19 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
           <p style={{ margin: "0 0 0.5rem", fontSize: "0.8rem", color: "var(--accent)", fontWeight: 600 }}>
             {t(locale, "dashboard.refreshNote")}
           </p>
+          {isDecisionFallback && (
+            <p style={{ margin: "0 0 0.5rem", fontSize: "0.8rem", color: "var(--danger)", fontWeight: 600 }}>
+              {isNl
+                ? "Bron: decision fallback — research snapshot is verlopen. Edge/confidence semantiek verschilt van research."
+                : "Source: decision fallback — research snapshot expired. Edge/confidence semantics differ from research."}
+            </p>
+          )}
+          {edgeboardSnapshotAgeMs != null && (
+            <p style={{ margin: "0 0 0.25rem", fontSize: "0.75rem", color: "var(--muted)" }}>
+              {isNl ? "Snapshot leeftijd: " : "Snapshot age: "}{formatFreshnessMs(edgeboardSnapshotAgeMs)}
+              {edgeboardSourceDb ? ` · ${isNl ? "bron" : "source"}: ${edgeboardSourceDb}` : ""}
+            </p>
+          )}
           {edgeSignals.length > 0 ? (
             <div
               style={{
@@ -99,11 +135,11 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
                 borderRadius: 8,
               }}
             >
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.85rem" }}>
-                <thead style={{ position: "sticky", top: 0, background: "var(--card-bg)", zIndex: 1 }}>
+              <table className="kb-table">
+                <thead style={{ position: "sticky", top: 0, zIndex: 1 }}>
                   <tr>
-                    {["#", "Symbol", "Route", t(locale, "dashboard.routeColHorizon"), "Edge (bps)", "Confidence", "Reason"].map((h) => (
-                      <th key={h} style={{ textAlign: "left", padding: "0.35rem", borderBottom: "1px solid var(--border)" }}>
+                    {["#", "Symbol", "Route", t(locale, "dashboard.routeColHorizon"), "Net Edge (bps)", "Confidence", "Reason", "Fresh"].map((h) => (
+                      <th key={h} style={{ textAlign: "left" }}>
                         {h}
                       </th>
                     ))}
@@ -112,13 +148,14 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
                 <tbody>
                   {edgeSignals.map((s, idx) => (
                     <tr key={`${idx}-${s.symbol}-${s.rank}-${s.route_name}-${s.horizon_sec}`}>
-                      <td style={{ padding: "0.35rem", borderBottom: "1px solid var(--border)" }}>{s.rank}</td>
-                      <td style={{ padding: "0.35rem", borderBottom: "1px solid var(--border)" }}>{s.symbol}</td>
-                      <td style={{ padding: "0.35rem", borderBottom: "1px solid var(--border)" }}>{s.route_name}</td>
-                      <td style={{ padding: "0.35rem", borderBottom: "1px solid var(--border)" }}>{formatHorizonSec(s.horizon_sec)}</td>
-                      <td style={{ padding: "0.35rem", borderBottom: "1px solid var(--border)" }}>{s.expected_net_edge_bps.toFixed(1)}</td>
-                      <td style={{ padding: "0.35rem", borderBottom: "1px solid var(--border)" }}>{s.confidence.toFixed(2)}</td>
-                      <td style={{ padding: "0.35rem", borderBottom: "1px solid var(--border)" }}>{s.dominant_reason_code ?? "—"}</td>
+                      <td>{s.rank}</td>
+                      <td>{s.symbol}</td>
+                      <td>{s.route_name}</td>
+                      <td>{formatHorizonSec(s.horizon_sec)}</td>
+                      <td style={{ color: s.expected_net_edge_bps < 0 ? "var(--danger)" : undefined }}>{s.expected_net_edge_bps.toFixed(1)}</td>
+                      <td>{s.confidence.toFixed(2)}</td>
+                      <td>{s.dominant_reason_code ?? "—"}</td>
+                      <td style={{ color: freshnessColor(s.freshness_ms), fontSize: "0.8rem" }}>{formatFreshnessMs(s.freshness_ms)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -140,7 +177,7 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
               <p style={{ marginTop: 0, color: "var(--muted)", fontSize: "0.85rem" }}>{t(locale, "dashboard.edgeCandidatesIntro")}</p>
               <div style={{ display: "grid", gap: "0.75rem", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))" }}>
                 <div>
-                  <p style={{ margin: "0 0 0.35rem", fontWeight: 600, color: "var(--freshness-good)", fontSize: "0.9rem" }}>
+                  <p style={{ margin: "0 0 0.35rem", fontWeight: 600, color: "var(--success)", fontSize: "0.9rem" }}>
                     {t(locale, "dashboard.edgeCandidatesBest")}
                   </p>
                   <ul style={{ margin: 0, paddingLeft: "1.1rem", fontSize: "0.85rem" }}>
@@ -152,7 +189,7 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
                   </ul>
                 </div>
                 <div>
-                  <p style={{ margin: "0 0 0.35rem", fontWeight: 600, color: "var(--freshness-stale)", fontSize: "0.9rem" }}>
+                  <p style={{ margin: "0 0 0.35rem", fontWeight: 600, color: "var(--danger)", fontSize: "0.9rem" }}>
                     {t(locale, "dashboard.edgeCandidatesWorst")}
                   </p>
                   <ul style={{ margin: 0, paddingLeft: "1.1rem", fontSize: "0.85rem" }}>
@@ -176,7 +213,7 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
           ) : null}
           <div style={{ display: "grid", gap: "0.75rem", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))" }}>
             <div>
-              <p style={{ margin: "0 0 0.35rem", fontWeight: 600, color: "var(--freshness-good)", fontSize: "0.9rem" }}>
+              <p style={{ margin: "0 0 0.35rem", fontWeight: 600, color: "var(--success)", fontSize: "0.9rem" }}>
                 {t(locale, "dashboard.topWinners")}
               </p>
               {winners.length ? (
@@ -192,7 +229,7 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
               )}
             </div>
             <div>
-              <p style={{ margin: "0 0 0.35rem", fontWeight: 600, color: "var(--freshness-stale)", fontSize: "0.9rem" }}>
+              <p style={{ margin: "0 0 0.35rem", fontWeight: 600, color: "var(--danger)", fontSize: "0.9rem" }}>
                 {t(locale, "dashboard.topLosers")}
               </p>
               {losers.length ? (
@@ -215,15 +252,39 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
         <section className="card" style={{ padding: "1rem 1.25rem" }}>
           <h2 style={{ fontSize: "1.05rem", marginBottom: "0.5rem" }}>{isNl ? "Verdeling (funnel)" : "Distribution (funnel)"}</h2>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "1.25rem", justifyContent: "flex-start" }}>
-            <SimplePieChart title={isNl ? "Funnel-fase (24h)" : "Funnel stage (24h)"} segments={funnelStagePie} size={150} />
-            <SimplePieChart title={isNl ? "Decision codes (24h)" : "Decision codes (24h)"} segments={decisionPie} size={150} />
+            <SimplePieChart
+              title={isNl ? "Funnel-fase (24h)" : "Funnel stage (24h)"}
+              segments={funnelStagePie}
+              size={158}
+              variant="donut"
+              centerLabel={pieSegmentsTotal(funnelStagePie) > 0 ? pieSegmentsTotal(funnelStagePie).toLocaleString() : undefined}
+            />
+            <SimplePieChart
+              title={isNl ? "Decision codes (24h)" : "Decision codes (24h)"}
+              segments={decisionPie}
+              size={158}
+              variant="donut"
+              centerLabel={pieSegmentsTotal(decisionPie) > 0 ? pieSegmentsTotal(decisionPie).toLocaleString() : undefined}
+            />
           </div>
         </section>
         <section className="card" style={{ padding: "1rem 1.25rem" }}>
           <h2 style={{ fontSize: "1.05rem", marginBottom: "0.5rem" }}>{isNl ? "Regime & strategie" : "Regime & strategy"}</h2>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "1.25rem", justifyContent: "flex-start" }}>
-            <SimplePieChart title={isNl ? "Actieve regimes" : "Active regimes"} segments={regimePie} size={150} />
-            <SimplePieChart title={isNl ? "Actieve strategieën" : "Active strategies"} segments={strategyPie} size={150} />
+            <SimplePieChart
+              title={isNl ? "Actieve regimes" : "Active regimes"}
+              segments={regimePie}
+              size={158}
+              variant="donut"
+              centerLabel={pieSegmentsTotal(regimePie) > 0 ? pieSegmentsTotal(regimePie).toLocaleString() : undefined}
+            />
+            <SimplePieChart
+              title={isNl ? "Actieve strategieën" : "Active strategies"}
+              segments={strategyPie}
+              size={158}
+              variant="donut"
+              centerLabel={pieSegmentsTotal(strategyPie) > 0 ? pieSegmentsTotal(strategyPie).toLocaleString() : undefined}
+            />
           </div>
         </section>
       </div>
@@ -260,12 +321,22 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
             </p>
             <SimplePieChart
               title={isNl ? "Orders per route-pad (24h)" : "Orders by route path (24h)"}
-              segments={labelCountsToPieSegments(dataBundle?.path_doctrine?.orders_by_path_tape_24h, 8)}
-              size={140}
+              segments={pathTapePie}
+              size={152}
+              variant="donut"
+              centerLabel={pieSegmentsTotal(pathTapePie) > 0 ? pieSegmentsTotal(pathTapePie).toLocaleString() : undefined}
             />
-            <p style={{ margin: "0.45rem 0 0", fontSize: "0.85rem" }}>
-              <strong>Safety:</strong>{" "}
-              N={status?.safety_normal_count ?? "—"} · E={status?.safety_exit_only_count ?? "—"} · B={status?.safety_hard_blocked_count ?? "—"}
+            <p style={{ margin: "0.45rem 0 0", fontSize: "0.85rem", display: "flex", flexWrap: "wrap", gap: "0.35rem", alignItems: "center" }}>
+              <strong style={{ marginRight: "0.25rem" }}>Safety:</strong>
+              <span className="kb-state-allow" title={isNl ? "Normal (N)" : "Normal (N)"}>
+                N={status?.safety_normal_count ?? "—"}
+              </span>
+              <span className="kb-state-skip" title={isNl ? "Exit-only (E)" : "Exit-only (E)"}>
+                E={status?.safety_exit_only_count ?? "—"}
+              </span>
+              <span className="kb-state-halt" title={isNl ? "Hard block (B)" : "Hard block (B)"}>
+                B={status?.safety_hard_blocked_count ?? "—"}
+              </span>
             </p>
             <p style={{ margin: "0.45rem 0 0", fontSize: "0.85rem" }}>
               <strong>{isNl ? "Orders per route-pad (tekst): " : "Orders by route path (text): "}</strong>
@@ -285,8 +356,16 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
                 : "Timing-relevant signals for route selection and execution viability."}
             </p>
             <p style={{ margin: 0, fontSize: "0.85rem" }}>
-              <strong>{isNl ? "Data freshness: " : "Data freshness: "}</strong>
-              {status?.data_freshness_secs != null ? `${status.data_freshness_secs}s` : "—"}
+              <strong>{isNl ? "Feed freshness (ticker/trade): " : "Feed freshness (ticker/trade): "}</strong>
+              <span style={{ color: feedStale ? "var(--danger)" : "var(--success)", fontWeight: feedStale ? 700 : 400 }}>
+                {feedFreshnessSecs != null ? `${feedFreshnessSecs}s` : "—"}
+                {feedStale ? (isNl ? " — STALE" : " — STALE") : ""}
+              </span>
+            </p>
+            <p style={{ margin: "0.15rem 0 0", fontSize: "0.75rem", color: "var(--muted)" }}>
+              {isNl
+                ? "= leeftijd van het recentste ticker/trade-bericht van de exchange (INGEST pool). Threshold: 60s."
+                : "= age of the most recent ticker/trade message from the exchange (INGEST pool). Threshold: 60s."}
             </p>
             <p style={{ margin: "0.45rem 0 0", fontSize: "0.85rem" }}>
               <strong>{isNl ? "Orders 24h: " : "Orders 24h: "}</strong>{trading?.orders_24h_count ?? "—"} ·{" "}

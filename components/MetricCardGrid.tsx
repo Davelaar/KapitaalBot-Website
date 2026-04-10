@@ -24,14 +24,16 @@ interface MetricCardProps {
 }
 
 function MetricCard({ label, value, chip, progress }: MetricCardProps) {
-  const chipStyle =
+  const chipClass =
     chip === "good"
-      ? { background: "var(--freshness-good)", color: "#fff" }
+      ? "kb-chip kb-chip--good"
       : chip === "warn"
-        ? { background: "var(--freshness-warn)", color: "#0f1419" }
+        ? "kb-chip kb-chip--warn"
         : chip === "stale"
-          ? { background: "var(--freshness-stale)", color: "#fff" }
-          : undefined;
+          ? "kb-chip kb-chip--stale"
+          : chip === "neutral"
+            ? "kb-chip kb-chip--neutral"
+            : "";
 
   return (
     <div
@@ -46,24 +48,12 @@ function MetricCard({ label, value, chip, progress }: MetricCardProps) {
           style={{
             fontSize: "1.5rem",
             fontWeight: 600,
-            color: "var(--accent)",
+            color: "var(--brand)",
           }}
         >
           {value}
         </div>
-        {chip != null && chipStyle && (
-          <span
-            style={{
-              fontSize: "0.6875rem",
-              fontWeight: 600,
-              padding: "0.15rem 0.4rem",
-              borderRadius: 6,
-              ...chipStyle,
-            }}
-          >
-            {chip.toUpperCase()}
-          </span>
-        )}
+        {chip != null && chipClass ? <span className={chipClass}>{chip.toUpperCase()}</span> : null}
       </div>
       <div
         className="metric-card__label"

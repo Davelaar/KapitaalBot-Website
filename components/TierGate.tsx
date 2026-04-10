@@ -25,33 +25,11 @@ export async function TierGate({ kind, locale }: TierGateProps) {
         </p>
         <div style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem" }}>
           {kind === "tier2" && (
-            <Link
-              href={withLocale(locale, "/tier2-request")}
-              style={{
-                padding: "0.5rem 1rem",
-                background: "var(--accent)",
-                color: "#0f1419",
-                textDecoration: "none",
-                borderRadius: "8px",
-                fontWeight: 600,
-                fontSize: "0.9375rem",
-              }}
-            >
+            <Link href={withLocale(locale, "/tier2-request")} className="kb-btn kb-btn--primary">
               {t(locale, "tier_gate.request_access")}
             </Link>
           )}
-          <Link
-            href={loginHref}
-            style={{
-              padding: "0.5rem 1rem",
-              border: "1px solid var(--border)",
-              color: "var(--fg)",
-              textDecoration: "none",
-              borderRadius: "8px",
-              fontWeight: 500,
-              fontSize: "0.9375rem",
-            }}
-          >
+          <Link href={loginHref} className="kb-btn kb-btn--secondary">
             {t(locale, "tier_gate.login")}
           </Link>
           <Link href={withLocale(locale, "/")} style={{ color: "var(--accent)", textDecoration: "none", fontSize: "0.9375rem", alignSelf: "center" }}>

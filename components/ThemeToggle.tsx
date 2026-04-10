@@ -28,17 +28,10 @@ export function ThemeToggle() {
   return (
     <button
       type="button"
+      className="kb-theme-toggle"
+      data-active={theme === "dark" ? "true" : "false"}
       onClick={toggle}
       aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-      style={{
-        padding: "0.35rem 0.75rem",
-        border: "1px solid var(--border)",
-        borderRadius: "6px",
-        background: "var(--card-bg)",
-        color: "var(--fg)",
-        cursor: "pointer",
-        fontSize: "0.875rem",
-      }}
     >
       {theme === "dark" ? "Light" : "Dark"}
     </button>

@@ -10,10 +10,10 @@ interface MarketSummaryTableProps {
 type SortKey = "symbol" | "trade_count" | "avg_spread_bps" | "suitability_score";
 
 function suitabilityColor(score: number | null): string {
-  if (score == null) return "var(--muted)";
-  if (score >= 0.7) return "var(--freshness-good)";
-  if (score >= 0.4) return "var(--freshness-warn)";
-  return "var(--freshness-stale)";
+  if (score == null) return "var(--text-muted)";
+  if (score >= 0.7) return "var(--success)";
+  if (score >= 0.4) return "var(--warning)";
+  return "var(--danger)";
 }
 
 function tradeDensity(count: number): "Low" | "Med" | "High" {
@@ -47,9 +47,9 @@ export function MarketSummaryTable({ pairs }: MarketSummaryTableProps) {
 
   return (
     <div style={{ overflowX: "auto" }}>
-      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.875rem" }}>
+      <table className="kb-table" style={{ fontSize: "0.875rem" }}>
         <thead>
-          <tr style={{ borderBottom: "1px solid var(--border)", textAlign: "left" }}>
+          <tr style={{ textAlign: "left" }}>
             <th>
               <button
                 type="button"
@@ -127,7 +127,7 @@ export function MarketSummaryTable({ pairs }: MarketSummaryTableProps) {
             const suit = p.suitability_score ?? null;
             const density = tradeDensity(p.trade_count);
             return (
-              <tr key={p.symbol} style={{ borderBottom: "1px solid var(--border)" }}>
+              <tr key={p.symbol}>
                 <td style={{ padding: "0.5rem 0.75rem 0.5rem 0", fontFamily: "monospace" }}>
                   {p.symbol}
                 </td>
@@ -147,18 +147,7 @@ export function MarketSummaryTable({ pairs }: MarketSummaryTableProps) {
                 <td style={{ padding: "0.5rem 0.75rem" }}>
                   {spreadBps != null ? spreadBps.toFixed(1) : "—"}
                   {spreadWarn && (
-                    <span
-                      style={{
-                        marginLeft: "0.35rem",
-                        padding: "0.1rem 0.35rem",
-                        borderRadius: 4,
-                        background: "var(--freshness-warn)",
-                        color: "#0f1419",
-                        fontSize: "0.6875rem",
-                        fontWeight: 600,
-                      }}
-                      title="Spread > 20 bps"
-                    >
+                    <span className="kb-chip kb-chip--warn" style={{ marginLeft: "0.35rem" }} title="Spread > 20 bps">
                       &gt;20
                     </span>
                   )}

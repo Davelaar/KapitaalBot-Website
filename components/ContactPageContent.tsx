@@ -111,18 +111,13 @@ export function ContactPageContent() {
                 }}
               />
             </label>
-            {error && <p style={{ margin: 0, color: "var(--freshness-stale)", fontSize: "0.9rem" }}>{error}</p>}
+            {error && <p style={{ margin: 0, color: "var(--danger)", fontSize: "0.9rem" }}>{error}</p>}
             <button
               type="submit"
               disabled={busy}
+              className="kb-btn kb-btn--primary"
               style={{
                 alignSelf: "flex-start",
-                padding: "0.5rem 1.25rem",
-                borderRadius: 8,
-                border: "none",
-                background: "var(--accent)",
-                color: "#0f1419",
-                fontWeight: 700,
                 cursor: busy ? "not-allowed" : "pointer",
                 opacity: busy ? 0.8 : 1,
               }}
