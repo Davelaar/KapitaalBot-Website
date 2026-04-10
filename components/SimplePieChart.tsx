@@ -44,6 +44,7 @@ export function SimplePieChart({
   className,
   variant = "pie",
   centerLabel,
+  showLegend = true,
 }: {
   title?: string;
   segments: PieSegment[];
@@ -53,6 +54,7 @@ export function SimplePieChart({
   variant?: "pie" | "donut";
   /** Shown in donut hole (e.g. total count) — restraint: short text only. */
   centerLabel?: string;
+  showLegend?: boolean;
 }) {
   const positive = segments.filter((s) => s.value > 0);
   const sum = positive.reduce((a, s) => a + s.value, 0);
@@ -102,7 +104,7 @@ export function SimplePieChart({
         <p style={{ margin: "0 0 0.5rem", fontSize: "0.85rem", fontWeight: 600, color: "var(--text)" }}>{title}</p>
       ) : null}
       <div style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem", alignItems: "flex-start" }}>
-        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ flexShrink: 0 } as CSSProperties}>
+        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ flexShrink: 0 } as CSSProperties} className="kb-pie-svg">
           {slices.map((sl, idx) => (
             <path key={idx} d={sl.path} fill={sl.color} stroke="var(--border-strong)" strokeWidth={0.5} />
           ))}
@@ -119,25 +121,27 @@ export function SimplePieChart({
             </text>
           ) : null}
         </svg>
-        <ul
-          style={{
-            margin: 0,
-            padding: "0 0 0 1rem",
-            fontSize: "0.78rem",
-            color: "var(--text-muted)",
-            listStyle: "disc",
-            maxWidth: "14rem",
-          }}
-        >
-          {slices.map((sl, idx) => (
-            <li key={idx} style={{ marginBottom: "0.2rem" }}>
-              <span style={{ color: sl.color, fontWeight: 600 }}>●</span> {sl.label}{" "}
-              <span style={{ color: "var(--text)" }}>
-                ({sl.pct.toFixed(0)}% · {sl.value.toLocaleString()})
-              </span>
-            </li>
-          ))}
-        </ul>
+        {showLegend ? (
+          <ul
+            style={{
+              margin: 0,
+              padding: "0 0 0 1rem",
+              fontSize: "0.78rem",
+              color: "var(--text-muted)",
+              listStyle: "disc",
+              maxWidth: "14rem",
+            }}
+          >
+            {slices.map((sl, idx) => (
+              <li key={idx} style={{ marginBottom: "0.2rem" }}>
+                <span style={{ color: sl.color, fontWeight: 600 }}>●</span> {sl.label}{" "}
+                <span style={{ color: "var(--text)" }}>
+                  ({sl.pct.toFixed(0)}% · {sl.value.toLocaleString()})
+                </span>
+              </li>
+            ))}
+          </ul>
+        ) : null}
       </div>
     </div>
   );

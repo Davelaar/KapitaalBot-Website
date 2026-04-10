@@ -8,7 +8,7 @@ import {
 } from "@/lib/read-snapshots-cached";
 import { t, type Locale } from "@/lib/i18n";
 import { parseLocaleParam, withLocale } from "@/lib/locale-path";
-import { DashboardIntro } from "@/components/DashboardIntro";
+import { DashboardCockpit } from "@/components/DashboardCockpit";
 import { RouteCentricDashboard } from "@/components/RouteCentricDashboard";
 import { DashboardAutoRefresh } from "@/components/DashboardAutoRefresh";
 
@@ -32,7 +32,14 @@ export default async function DashboardPage({ params }: { params: { locale: stri
             ← {t(locale, "nav.system")}
           </Link>
         </nav>
-        <DashboardIntro status={status} locale={locale} />
+        <DashboardCockpit
+          locale={locale}
+          status={status}
+          regime={regime}
+          strategy={strategy}
+          trading={trading}
+          dataBundle={dataBundle}
+        />
         <RouteCentricDashboard
           locale={locale}
           status={status}
