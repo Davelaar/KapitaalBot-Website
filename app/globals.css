@@ -9,18 +9,35 @@
   --freshness-good: #2ea043;
   --freshness-warn: #d4a72c;
   --freshness-stale: #da3633;
+  --pie-1: #2dd4bf;
+  --pie-2: #58a6ff;
+  --pie-3: #a371f7;
+  --pie-4: #f0883e;
+  --pie-5: #3fb950;
+  --pie-6: #d4a72c;
+  --pie-7: #f778ba;
+  --pie-8: #8b949e;
 }
 
+/* Softer light theme: avoid near-white glare (evening-friendly). */
 [data-theme="light"] {
-  --bg: #f6f8fa;
-  --fg: #1f2328;
-  --muted: #4d535c;
-  --accent: #098575;
-  --card-bg: #ffffff;
-  --border: #d0d7de;
-  --freshness-good: #1a7f37;
-  --freshness-warn: #9a6700;
-  --freshness-stale: #cf2222;
+  --bg: #d8dce3;
+  --fg: #1a1d21;
+  --muted: #4a5058;
+  --accent: #0d7a6c;
+  --card-bg: #cdd2d9;
+  --border: #b8bec8;
+  --freshness-good: #1a6b32;
+  --freshness-warn: #8a5f00;
+  --freshness-stale: #b42318;
+  --pie-1: #0d7a6c;
+  --pie-2: #1f6feb;
+  --pie-3: #8250df;
+  --pie-4: #bc4c00;
+  --pie-5: #2f8f46;
+  --pie-6: #9a6700;
+  --pie-7: #bf3989;
+  --pie-8: #59636e;
 }
 
 * {

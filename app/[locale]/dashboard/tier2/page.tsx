@@ -8,6 +8,7 @@ import {
 } from "@/lib/read-snapshots-cached";
 import { TierGate } from "@/components/TierGate";
 import { DashboardTier2Content } from "@/components/DashboardTier2Content";
+import { DashboardAutoRefresh } from "@/components/DashboardAutoRefresh";
 import { parseLocaleParam } from "@/lib/locale-path";
 import type { Locale } from "@/lib/i18n";
 
@@ -31,7 +32,7 @@ export default async function DashboardTier2Page({
     getTier2SafetySnapshotCached(),
   ]);
   return (
-    <main>
+    <DashboardAutoRefresh intervalMs={60_000}>
       <DashboardTier2Content
         dataBundle={dataBundle}
         execution={execution}
@@ -39,6 +40,6 @@ export default async function DashboardTier2Page({
         pnl={pnl}
         safety={safety}
       />
-    </main>
+    </DashboardAutoRefresh>
   );
 }

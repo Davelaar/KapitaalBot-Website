@@ -10,6 +10,7 @@ import { t, type Locale } from "@/lib/i18n";
 import { parseLocaleParam, withLocale } from "@/lib/locale-path";
 import { DashboardIntro } from "@/components/DashboardIntro";
 import { RouteCentricDashboard } from "@/components/RouteCentricDashboard";
+import { DashboardAutoRefresh } from "@/components/DashboardAutoRefresh";
 
 export const dynamic = "force-dynamic";
 
@@ -24,21 +25,23 @@ export default async function DashboardPage({ params }: { params: { locale: stri
   ]);
 
   return (
-    <main>
-      <nav style={{ marginBottom: "1.5rem" }}>
-        <Link href={withLocale(locale, "/")} style={{ color: "var(--accent)", textDecoration: "none" }}>
-          ← {t(locale, "nav.system")}
-        </Link>
-      </nav>
-      <DashboardIntro status={status} locale={locale} />
-      <RouteCentricDashboard
-        locale={locale}
-        status={status}
-        regime={regime}
-        strategy={strategy}
-        trading={trading}
-        dataBundle={dataBundle}
-      />
-    </main>
+    <DashboardAutoRefresh intervalMs={60_000}>
+      <main>
+        <nav style={{ marginBottom: "1.5rem" }}>
+          <Link href={withLocale(locale, "/")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+            ← {t(locale, "nav.system")}
+          </Link>
+        </nav>
+        <DashboardIntro status={status} locale={locale} />
+        <RouteCentricDashboard
+          locale={locale}
+          status={status}
+          regime={regime}
+          strategy={strategy}
+          trading={trading}
+          dataBundle={dataBundle}
+        />
+      </main>
+    </DashboardAutoRefresh>
   );
 }

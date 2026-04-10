@@ -91,6 +91,11 @@ export interface RecentPublicFillRow {
   fee_quote?: string | null;
 }
 
+export interface SymbolPnlDayRow {
+  symbol: string;
+  realized_pnl_quote: number;
+}
+
 export interface PublicTradingSnapshot {
   contract_version: string;
   exported_at: string;
@@ -103,6 +108,9 @@ export interface PublicTradingSnapshot {
   top_reject_reasons_last_hour?: LabelCount[];
   why_no_trade_top_last_hour?: LabelCount[];
   route_wins_last_hour?: LabelCount[];
+  /** Top symbols by realized PnL for current UTC calendar day (quote ccy). */
+  symbol_pnl_day_utc_top_winners?: SymbolPnlDayRow[];
+  symbol_pnl_day_utc_top_losers?: SymbolPnlDayRow[];
 }
 
 export interface DemoTradeRow {

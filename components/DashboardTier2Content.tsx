@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useLocale } from "@/lib/locale";
 import { withLocale } from "@/lib/locale-path";
+import { t } from "@/lib/i18n";
+import { labelCountsToPieSegments, SimplePieChart } from "@/components/SimplePieChart";
 import type {
   LabelCount,
   Tier2DataBundle,
@@ -63,10 +65,13 @@ export function DashboardTier2Content({ dataBundle, execution, latency, pnl, saf
       <h1 style={{ fontSize: "1.7rem", marginBottom: "0.5rem" }}>
         {isNl ? "Tier 2: route-/decision-centric observability" : "Tier 2: route/decision-centric observability"}
       </h1>
-      <p style={{ color: "var(--muted)", marginBottom: "1rem", maxWidth: "78ch", lineHeight: 1.65 }}>
+      <p style={{ color: "var(--muted)", marginBottom: "0.5rem", maxWidth: "78ch", lineHeight: 1.65 }}>
         {isNl
           ? "Verdiepte operationele diagnose op basis van geaggregeerde snapshots. Deze pagina toont uitkomst- en oorzaakinformatie zonder broncode, zonder private accountdetails en zonder reproduceerbare tuning."
           : "Deep operational diagnostics from aggregated snapshots. This page shows outcomes and causes without source code, without private account details, and without reproducible tuning."}
+      </p>
+      <p style={{ color: "var(--accent)", marginBottom: "1rem", fontSize: "0.88rem", fontWeight: 600 }}>
+        {t(locale, "dashboard.refreshNote")}
       </p>
 
       {dataBundle && (
@@ -82,23 +87,86 @@ export function DashboardTier2Content({ dataBundle, execution, latency, pnl, saf
         </section>
       )}
 
+      <section className="card" style={{ marginBottom: "1rem" }}>
+        <h2 style={{ fontSize: "1.05rem", marginBottom: "0.65rem" }}>{isNl ? "Verdelingen (pie)" : "Distributions (pie)"}</h2>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "1.25rem", alignItems: "flex-start" }}>
+          <SimplePieChart
+            title={isNl ? "Funnel-fase (24h)" : "Funnel stage (24h)"}
+            segments={labelCountsToPieSegments(dataBundle?.route_no_trade?.funnel_stage_counts_24h, 8)}
+            size={148}
+          />
+          <SimplePieChart
+            title={isNl ? "Decision codes (24h)" : "Decision codes (24h)"}
+            segments={labelCountsToPieSegments(dataBundle?.route_no_trade?.funnel_decision_code_counts_24h, 8)}
+            size={148}
+          />
+          <SimplePieChart
+            title={isNl ? "Order status (24h)" : "Order status (24h)"}
+            segments={labelCountsToPieSegments(execution?.orders_status_counts_24h, 8)}
+            size={148}
+          />
+          <SimplePieChart
+            title={isNl ? "Fill side (24h)" : "Fill side (24h)"}
+            segments={labelCountsToPieSegments(execution?.fills_side_counts_24h, 8)}
+            size={148}
+          />
+          <SimplePieChart
+            title={isNl ? "Safety per mode" : "Safety by mode"}
+            segments={labelCountsToPieSegments(dataBundle?.risk_capital?.symbol_safety_by_mode, 8)}
+            size={148}
+          />
+          <SimplePieChart
+            title={isNl ? "Path tape (orders 24h)" : "Path tape (orders 24h)"}
+            segments={labelCountsToPieSegments(dataBundle?.path_doctrine?.orders_by_path_tape_24h, 8)}
+            size={148}
+          />
+        </div>
+      </section>
+
       <div style={{ display: "grid", gap: "1rem", gridTemplateColumns: "repeat(auto-fit,minmax(340px,1fr))" }}>
         <section className="card" style={{ margin: 0 }}>
           <h2 style={{ fontSize: "1.05rem", marginBottom: "0.45rem" }}>Live Route Board</h2>
           <p style={{ margin: 0, color: "var(--muted)", fontSize: "0.85rem" }}>
             {dataBundle?.edgeboard?.available
-              ? `Edgeboard: rows ${dataBundle.edgeboard.visible_rows ?? "—"} · symbols ${dataBundle.edgeboard.visible_symbols ?? "—"} · positive ${dataBundle.edgeboard.positive_edge_symbols ?? "—"}`
+              ? `Edgeboard: rows ${dataBundle.edgeboard.visible_rows ?? "—"} · symbols ${dataBundle.edgeboard.visible_symbols ?? "—"} · positive ${dataBundle.edgeboard.positive_edge_symbols ?? "—"} · source ${dataBundle.edgeboard.source_db ?? "—"}`
               : isNl
                 ? "Nog geen zichtbare edgeboard snapshot."
                 : "No visible edgeboard snapshot yet."}
           </p>
           {dataBundle?.edgeboard?.top_signals?.length ? (
-            <p style={{ margin: "0.45rem 0 0", color: "var(--muted)", fontSize: "0.85rem" }}>
-              {dataBundle.edgeboard.top_signals
-                .slice(0, 5)
-                .map((s) => `${s.symbol}/${s.route_name} (${s.expected_net_edge_bps.toFixed(1)}bps)`)
-                .join(" · ")}
-            </p>
+            <div
+              style={{
+                marginTop: "0.5rem",
+                maxHeight: "min(70vh, 26rem)",
+                overflow: "auto",
+                border: "1px solid var(--border)",
+                borderRadius: 8,
+              }}
+            >
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.82rem" }}>
+                <thead style={{ position: "sticky", top: 0, background: "var(--card-bg)", zIndex: 1 }}>
+                  <tr>
+                    {["#", "Symbol", "Route", "Edge", "Conf", "Reason"].map((h) => (
+                      <th key={h} style={{ textAlign: "left", padding: "0.3rem", borderBottom: "1px solid var(--border)" }}>
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {dataBundle.edgeboard.top_signals.map((s, idx) => (
+                    <tr key={`${idx}-${s.symbol}-${s.rank}-${s.route_name}`}>
+                      <td style={{ padding: "0.3rem", borderBottom: "1px solid var(--border)" }}>{s.rank}</td>
+                      <td style={{ padding: "0.3rem", borderBottom: "1px solid var(--border)" }}>{s.symbol}</td>
+                      <td style={{ padding: "0.3rem", borderBottom: "1px solid var(--border)" }}>{s.route_name}</td>
+                      <td style={{ padding: "0.3rem", borderBottom: "1px solid var(--border)" }}>{s.expected_net_edge_bps.toFixed(1)}</td>
+                      <td style={{ padding: "0.3rem", borderBottom: "1px solid var(--border)" }}>{s.confidence.toFixed(2)}</td>
+                      <td style={{ padding: "0.3rem", borderBottom: "1px solid var(--border)" }}>{s.dominant_reason_code ?? "—"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           ) : null}
         </section>
 

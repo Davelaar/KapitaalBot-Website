@@ -329,6 +329,15 @@ const strings: Record<Locale, Record<string, string>> = {
     "dashboard.intro": "Waargenomen systeemgedrag. Overzicht regime en strategy; vertraagde, geaggregeerde telemetrie.",
     "dashboard.intro2": "Geen realtime orderfeed; alleen read-model snapshots.",
     "dashboard.delayPrefix": "Huidige datavertraging: ",
+    "dashboard.refreshNote":
+      "Pagina vernieuwt automatisch elke minuut (server-snapshots + cache). Kritieke route-data volgt de export op de bot.",
+    "dashboard.routeBoardMeta":
+      "Bron: tier2_data_bundle.edgeboard — volledige gerankschikte lijst; eerste ~10 rijen zichtbaar zonder scrollen.",
+    "dashboard.dailyPnlTitle": "Realized PnL vandaag (UTC-dag)",
+    "dashboard.dailyPnlUtcNote":
+      "Top 3 winnaars en verliezers op basis van som realized_pnl_quote per symbool voor de lopende UTC-kalenderdag (beslissings-DB). Geen voorspelling; alleen gesloten/verwerkte PnL-rijen.",
+    "dashboard.topWinners": "Top 3 winnaars (quote)",
+    "dashboard.topLosers": "Top 3 verliezers (quote)",
     "dashboard.execution.delayNote":
       "Execution-tabellen: tijden op 15 minuten afgerond (Tier 1). Order-ref = laatste tekens van client order id.",
     "dashboard.execution.ordersTitle": "Laatste 10 execution-orders",
@@ -690,6 +699,15 @@ const strings: Record<Locale, Record<string, string>> = {
     "dashboard.intro": "Observed system behaviour. Regime and strategy overview; delayed, aggregated telemetry.",
     "dashboard.intro2": "No real-time order feed; read-model snapshots only.",
     "dashboard.delayPrefix": "Current data delay: ",
+    "dashboard.refreshNote":
+      "This page auto-refreshes every minute (server snapshots + cache). Critical route data follows the bot export cadence.",
+    "dashboard.routeBoardMeta":
+      "Source: tier2_data_bundle.edgeboard — full ranked list; about the first 10 rows visible without scrolling.",
+    "dashboard.dailyPnlTitle": "Realized PnL today (UTC day)",
+    "dashboard.dailyPnlUtcNote":
+      "Top 3 winners and losers from summed realized_pnl_quote per symbol for the current UTC calendar day (decision DB). Not a forecast; only closed/processed PnL rows.",
+    "dashboard.topWinners": "Top 3 winners (quote)",
+    "dashboard.topLosers": "Top 3 losers (quote)",
     "dashboard.execution.delayNote":
       "Execution tables: timestamps rounded to 15 minutes (Tier 1). Order ref = trailing characters of client order id.",
     "dashboard.execution.ordersTitle": "Last 10 execution orders",
@@ -1051,6 +1069,15 @@ const strings: Record<Locale, Record<string, string>> = {
     "dashboard.intro": "Beobachtetes Systemverhalten. Regime- und Strategie-Überblick; verzögerte, aggregierte Telemetrie.",
     "dashboard.intro2": "Kein Echtzeit-Order-Feed; nur Read-Model-Snapshots.",
     "dashboard.delayPrefix": "Aktuelle Datenverzögerung: ",
+    "dashboard.refreshNote":
+      "Seite aktualisiert automatisch jede Minute (Server-Snapshots + Cache). Routen-Daten folgen dem Bot-Export.",
+    "dashboard.routeBoardMeta":
+      "Quelle: tier2_data_bundle.edgeboard — vollständige Rangliste; ca. die ersten 10 Zeilen ohne Scroll sichtbar.",
+    "dashboard.dailyPnlTitle": "Realisiertes PnL heute (UTC-Tag)",
+    "dashboard.dailyPnlUtcNote":
+      "Top-3 Gewinner/Verlierer aus Summe realized_pnl_quote pro Symbol für den laufenden UTC-Kalendertag (Decision-DB).",
+    "dashboard.topWinners": "Top 3 Gewinner (Quote)",
+    "dashboard.topLosers": "Top 3 Verlierer (Quote)",
     "dashboard.execution.delayNote":
       "Execution-Tabellen: Zeitstempel auf 15 Minuten gerundet (Tier 1). Order-Ref = letzte Zeichen der Client-Order-ID.",
     "dashboard.execution.ordersTitle": "Letzte 10 Execution-Orders",
@@ -1412,6 +1439,15 @@ const strings: Record<Locale, Record<string, string>> = {
     "dashboard.intro": "Comportement système observé. Aperçu régime et stratégie ; télémétrie agrégée et différée.",
     "dashboard.intro2": "Pas de flux d'ordres temps réel ; snapshots read-model uniquement.",
     "dashboard.delayPrefix": "Délai des données actuel : ",
+    "dashboard.refreshNote":
+      "La page se rafraîchit automatiquement chaque minute (snapshots serveur + cache). Les données route suivent l’export bot.",
+    "dashboard.routeBoardMeta":
+      "Source : tier2_data_bundle.edgeboard — liste classée complète ; ~10 premières lignes visibles sans défilement.",
+    "dashboard.dailyPnlTitle": "PnL réalisé aujourd’hui (jour UTC)",
+    "dashboard.dailyPnlUtcNote":
+      "Top 3 gagnants/perdants : somme realized_pnl_quote par symbole pour le jour UTC en cours (DB décision).",
+    "dashboard.topWinners": "Top 3 gagnants (quote)",
+    "dashboard.topLosers": "Top 3 perdants (quote)",
     "dashboard.execution.delayNote":
       "Tableaux d’exécution : horodatages arrondis à 15 minutes (Tier 1). Réf. ordre = derniers caractères de l’id client.",
     "dashboard.execution.ordersTitle": "10 derniers ordres d’exécution",

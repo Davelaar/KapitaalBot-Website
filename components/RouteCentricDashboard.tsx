@@ -1,6 +1,7 @@
 "use client";
 
 import type { Locale } from "@/lib/i18n";
+import { t } from "@/lib/i18n";
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { withLocale } from "@/lib/locale-path";
@@ -12,6 +13,7 @@ import type {
   PublicTradingSnapshot,
   Tier2DataBundle,
 } from "@/lib/snapshots";
+import { labelCountsToPieSegments, SimplePieChart } from "@/components/SimplePieChart";
 
 type Props = {
   locale: Locale;
@@ -47,6 +49,20 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
   const activeRegimes = regime?.active_regimes ?? [];
   const activeStrategies = strategy?.active_strategies ?? [];
 
+  const regimePie = labelCountsToPieSegments(
+    activeRegimes.map((r) => ({ label: r.regime, count: r.count })),
+    8,
+  );
+  const strategyPie = labelCountsToPieSegments(
+    activeStrategies.map((s) => ({ label: s.strategy, count: s.count })),
+    8,
+  );
+  const funnelStagePie = labelCountsToPieSegments(dataBundle?.route_no_trade?.funnel_stage_counts_24h, 8);
+  const decisionPie = labelCountsToPieSegments(dataBundle?.route_no_trade?.funnel_decision_code_counts_24h, 8);
+
+  const winners = trading?.symbol_pnl_day_utc_top_winners ?? [];
+  const losers = trading?.symbol_pnl_day_utc_top_losers ?? [];
+
   return (
     <div style={{ display: "grid", gap: "1rem" }}>
       {card(
@@ -54,22 +70,35 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
         <>
           <p style={{ marginTop: 0, color: "var(--muted)", fontSize: "0.9rem" }}>
             {isNl
-              ? "Publieke route-state samenvatting: welke routes dominant zijn, welke signalen positief scoren, en welke beslispaden momenteel actief zijn."
-              : "Public route-state summary: which routes dominate, which signals score positively, and which decision paths are currently active."}
+              ? "Alle gerankschikte signalen uit de snapshot (research edgeboard of decision-fallback). Scroll voor de volledige lijst."
+              : "All ranked signals from the snapshot (research edgeboard or decision fallback). Scroll for the full list."}
+          </p>
+          <p style={{ margin: "0 0 0.5rem", fontSize: "0.8rem", color: "var(--accent)", fontWeight: 600 }}>
+            {t(locale, "dashboard.refreshNote")}
           </p>
           {edgeSignals.length > 0 ? (
-            <div style={{ overflowX: "auto" }}>
+            <div
+              style={{
+                overflowX: "auto",
+                maxHeight: "min(70vh, 28rem)",
+                overflowY: "auto",
+                border: "1px solid var(--border)",
+                borderRadius: 8,
+              }}
+            >
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.85rem" }}>
-                <thead>
+                <thead style={{ position: "sticky", top: 0, background: "var(--card-bg)", zIndex: 1 }}>
                   <tr>
-                    {["#","Symbol","Route","Edge (bps)","Confidence","Reason"].map((h) => (
-                      <th key={h} style={{ textAlign: "left", padding: "0.35rem", borderBottom: "1px solid var(--border)" }}>{h}</th>
+                    {["#", "Symbol", "Route", "Edge (bps)", "Confidence", "Reason"].map((h) => (
+                      <th key={h} style={{ textAlign: "left", padding: "0.35rem", borderBottom: "1px solid var(--border)" }}>
+                        {h}
+                      </th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
-                  {edgeSignals.slice(0, 10).map((s) => (
-                    <tr key={`${s.symbol}-${s.rank}-${s.route_name}`}>
+                  {edgeSignals.map((s, idx) => (
+                    <tr key={`${idx}-${s.symbol}-${s.rank}-${s.route_name}`}>
                       <td style={{ padding: "0.35rem", borderBottom: "1px solid var(--border)" }}>{s.rank}</td>
                       <td style={{ padding: "0.35rem", borderBottom: "1px solid var(--border)" }}>{s.symbol}</td>
                       <td style={{ padding: "0.35rem", borderBottom: "1px solid var(--border)" }}>{s.route_name}</td>
@@ -86,8 +115,66 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
               {isNl ? "Nog geen publieke edgeboard-signalen beschikbaar." : "No public edgeboard signals available yet."}
             </p>
           )}
+          <p style={{ margin: "0.5rem 0 0", fontSize: "0.75rem", color: "var(--muted)" }}>{t(locale, "dashboard.routeBoardMeta")}</p>
         </>,
       )}
+
+      {card(t(locale, "dashboard.dailyPnlTitle"), (
+        <>
+          <p style={{ marginTop: 0, color: "var(--muted)", fontSize: "0.85rem" }}>{t(locale, "dashboard.dailyPnlUtcNote")}</p>
+          <div style={{ display: "grid", gap: "0.75rem", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))" }}>
+            <div>
+              <p style={{ margin: "0 0 0.35rem", fontWeight: 600, color: "var(--freshness-good)", fontSize: "0.9rem" }}>
+                {t(locale, "dashboard.topWinners")}
+              </p>
+              {winners.length ? (
+                <ul style={{ margin: 0, paddingLeft: "1.1rem", fontSize: "0.85rem" }}>
+                  {winners.map((w) => (
+                    <li key={w.symbol}>
+                      <strong>{w.symbol}</strong> · +{w.realized_pnl_quote.toFixed(2)}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p style={{ margin: 0, color: "var(--muted)", fontSize: "0.85rem" }}>—</p>
+              )}
+            </div>
+            <div>
+              <p style={{ margin: "0 0 0.35rem", fontWeight: 600, color: "var(--freshness-stale)", fontSize: "0.9rem" }}>
+                {t(locale, "dashboard.topLosers")}
+              </p>
+              {losers.length ? (
+                <ul style={{ margin: 0, paddingLeft: "1.1rem", fontSize: "0.85rem" }}>
+                  {losers.map((w) => (
+                    <li key={w.symbol}>
+                      <strong>{w.symbol}</strong> · {w.realized_pnl_quote.toFixed(2)}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p style={{ margin: 0, color: "var(--muted)", fontSize: "0.85rem" }}>—</p>
+              )}
+            </div>
+          </div>
+        </>
+      ))}
+
+      <div style={{ display: "grid", gap: "1rem", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))" }}>
+        <section className="card" style={{ padding: "1rem 1.25rem" }}>
+          <h2 style={{ fontSize: "1.05rem", marginBottom: "0.5rem" }}>{isNl ? "Verdeling (funnel)" : "Distribution (funnel)"}</h2>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "1.25rem", justifyContent: "flex-start" }}>
+            <SimplePieChart title={isNl ? "Funnel-fase (24h)" : "Funnel stage (24h)"} segments={funnelStagePie} size={150} />
+            <SimplePieChart title={isNl ? "Decision codes (24h)" : "Decision codes (24h)"} segments={decisionPie} size={150} />
+          </div>
+        </section>
+        <section className="card" style={{ padding: "1rem 1.25rem" }}>
+          <h2 style={{ fontSize: "1.05rem", marginBottom: "0.5rem" }}>{isNl ? "Regime & strategie" : "Regime & strategy"}</h2>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "1.25rem", justifyContent: "flex-start" }}>
+            <SimplePieChart title={isNl ? "Actieve regimes" : "Active regimes"} segments={regimePie} size={150} />
+            <SimplePieChart title={isNl ? "Actieve strategieën" : "Active strategies"} segments={strategyPie} size={150} />
+          </div>
+        </section>
+      </div>
 
       <div style={{ display: "grid", gap: "1rem", gridTemplateColumns: "repeat(auto-fit,minmax(340px,1fr))" }}>
         {card(
@@ -119,12 +206,17 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
                 ? "Publieke positiecontext zonder accountgevoelige waarden: safety-modes en route-pad distributie."
                 : "Public position context without account-sensitive values: safety modes and route-path distribution."}
             </p>
-            <p style={{ margin: 0, fontSize: "0.85rem" }}>
+            <SimplePieChart
+              title={isNl ? "Orders per route-pad (24h)" : "Orders by route path (24h)"}
+              segments={labelCountsToPieSegments(dataBundle?.path_doctrine?.orders_by_path_tape_24h, 8)}
+              size={140}
+            />
+            <p style={{ margin: "0.45rem 0 0", fontSize: "0.85rem" }}>
               <strong>Safety:</strong>{" "}
               N={status?.safety_normal_count ?? "—"} · E={status?.safety_exit_only_count ?? "—"} · B={status?.safety_hard_blocked_count ?? "—"}
             </p>
             <p style={{ margin: "0.45rem 0 0", fontSize: "0.85rem" }}>
-              <strong>{isNl ? "Orders per route-pad: " : "Orders by route path: "}</strong>
+              <strong>{isNl ? "Orders per route-pad (tekst): " : "Orders by route path (text): "}</strong>
               {pathTapeTop.length ? pathTapeTop.map((r) => `${r.label} (${r.count})`).join(" · ") : "—"}
             </p>
           </>,
