@@ -141,8 +141,7 @@ export function DashboardCockpit({
         )}
       </header>
 
-      <div className="cockpit-top-grid">
-        <div className="cockpit-left-stack">
+      <div className="cockpit-col-left">
           <section className="cockpit-panel">
             <h2 className="cockpit-panel__title">{cockpitT(locale, "runtime")}</h2>
             <div className="cockpit-runtime-row">
@@ -251,25 +250,31 @@ export function DashboardCockpit({
             <p className="cockpit-bars-label">{cockpitT(locale, "barsCaption")}</p>
             <MiniBars equity={trading?.equity_trend_delayed} fallbackHeights={fallbackBars} />
           </section>
-        </div>
+      </div>
 
-        <div className="cockpit-right-stack">
+      <div className="cockpit-col-right">
           <section className="cockpit-panel cockpit-panel--tight">
             <div className="cockpit-gauges-row">
               <InstrumentGauge
                 pct={orders24 === 0 && trades24 === 0 ? 8 : fillPct}
                 centerPrimary={flowCenter}
                 footnote={cockpitT(locale, "gaugeFlow")}
+                size={124}
+                stroke={12}
               />
               <InstrumentGauge
                 pct={ordersGaugePct}
                 centerPrimary={ordersCenter}
                 footnote={cockpitT(locale, "gaugeOrders")}
+                size={124}
+                stroke={12}
               />
               <InstrumentGauge
                 pct={feedGaugePct}
                 centerPrimary={feedCenter}
                 footnote={cockpitT(locale, "gaugeFeeds")}
+                size={124}
+                stroke={12}
               />
             </div>
             <div className="cockpit-cta-row">
@@ -284,10 +289,9 @@ export function DashboardCockpit({
                   : cockpitT(locale, "cardIntentEntry")}
             </p>
           </section>
-        </div>
       </div>
 
-      <div className="cockpit-bottom-grid">
+      <div className="cockpit-bottom-left">
         <section className="cockpit-panel cockpit-panel--table">
           <h2 className="cockpit-panel__title">{cockpitT(locale, "tableTitle")}</h2>
           {edgeRows.length === 0 ? (
@@ -326,7 +330,9 @@ export function DashboardCockpit({
             </div>
           )}
         </section>
+      </div>
 
+      <div className="cockpit-bottom-right">
         <div className="cockpit-state-cards">
           <section className={`cockpit-state-card cockpit-state-card--allow${allowActive && !haltActive ? " is-lit" : ""}`}>
             <div className="cockpit-state-card__head">

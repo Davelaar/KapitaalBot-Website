@@ -2,8 +2,8 @@
 
 /** Thick ring gauge — cockpit instrument, not a soft chart. */
 export function InstrumentGauge({
-  size = 118,
-  stroke = 9,
+  size = 124,
+  stroke = 12,
   pct,
   centerPrimary,
   centerSecondary,
@@ -31,7 +31,7 @@ export function InstrumentGauge({
             cy={size / 2}
             r={r}
             fill="none"
-            stroke="var(--surface-strong)"
+            stroke="#2d3a52"
             strokeWidth={stroke}
           />
           <circle
