@@ -31,7 +31,7 @@ export function InstrumentGauge({
             cy={size / 2}
             r={r}
             fill="none"
-            stroke="#2d3a52"
+            stroke="var(--gauge-track)"
             strokeWidth={stroke}
           />
           <circle

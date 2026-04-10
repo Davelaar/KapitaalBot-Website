@@ -134,7 +134,7 @@ export function Tier2RequestForm() {
           style={{
             padding: "0.5rem 1.25rem",
             background: "var(--accent)",
-            color: "#0f1419",
+            color: "var(--on-brand)",
             border: "none",
             borderRadius: "8px",
             fontWeight: 600,

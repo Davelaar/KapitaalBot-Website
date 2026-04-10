@@ -98,7 +98,7 @@ export function FaqChatbot() {
                 padding: "0.35rem 0.6rem",
                 borderRadius: 8,
                 background: m.role === "user" ? "var(--accent)" : "var(--card-bg)",
-                color: m.role === "user" ? "#0f1419" : "var(--fg)",
+                color: m.role === "user" ? "var(--on-brand)" : "var(--fg)",
                 fontSize: "0.875rem",
               }}
             >

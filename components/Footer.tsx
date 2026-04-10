@@ -10,12 +10,12 @@ export function Footer() {
   const linkStyle = { color: "var(--muted)" };
   return (
     <footer
+      className="kb-site-footer"
       style={{
         padding: "0.75rem 1rem",
         textAlign: "center",
         fontSize: "0.8125rem",
         color: "var(--muted)",
-        borderTop: "1px solid var(--border)",
         display: "flex",
         flexWrap: "wrap",
         justifyContent: "center",

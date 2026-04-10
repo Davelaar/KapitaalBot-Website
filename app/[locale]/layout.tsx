@@ -53,9 +53,9 @@ export default async function LocaleLayout({
   return (
     <>
       {gaId ? <link rel="stylesheet" href="/analytics/kapitaalbot-analytics.css" /> : null}
-      <div data-kapitaalbot-site-root>
+      <div data-kapitaalbot-site-root className="kb-app-shell">
         <NavBar />
-        <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+        <div className="kb-app-main">
           <Breadcrumbs />
           {children}
           <Footer />

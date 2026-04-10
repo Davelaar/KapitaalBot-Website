@@ -5,6 +5,8 @@
 
   /* Brand / instrument accent */
   --brand: #59f8fc;
+  /* Text op volle accent (knoppen, user-bubbles): donker op neon-cyaan */
+  --on-brand: #0b1020;
   --brand-hover: #43e7ec;
   --brand-active: #2fd7dd;
   --brand-soft-light: rgba(89, 248, 252, 0.1);
@@ -56,6 +58,9 @@
   --chip-bad-bg: var(--danger-soft-dark);
   --chip-neutral-bg: rgba(50, 65, 95, 0.35);
 
+  /* Gauge / ring track (cockpit) */
+  --gauge-track: #2d3a52;
+
   /* Legacy compatibility — map to semantic tokens */
   --fg: var(--text);
   --muted: var(--text-muted);
@@ -69,103 +74,45 @@
 [data-theme="light"] {
   color-scheme: light;
 
-  --bg: #f3f6f8;
-  --bg-elevated: #f7fafb;
-  --surface: #fbfcfd;
-  --surface-soft: #eef3f5;
-  --surface-strong: #e8eef1;
-  --text: #152033;
-  --text-secondary: #445069;
-  --text-muted: #68748b;
-  --border: #d7e1e6;
-  --border-strong: #c7d4db;
-  --shadow-soft: 0 1px 2px rgba(16, 24, 40, 0.04), 0 6px 18px rgba(16, 24, 40, 0.04);
+  /* Satin studio light — niet flat white; sterk contrast voor leesbaarheid */
+  --bg: #e4e9ee;
+  --bg-elevated: #eceff4;
+  --surface: #f6f8fa;
+  --surface-soft: #eef1f5;
+  --surface-strong: #e2e7ed;
+  --text: #0a101c;
+  --text-secondary: #2c3848;
+  --text-muted: #4a5568;
+  --border: #c1cad4;
+  --border-strong: #a7b2bf;
+  --shadow-soft: 0 1px 2px rgba(15, 23, 42, 0.05), 0 8px 22px rgba(15, 23, 42, 0.06);
+
+  /* Op licht: iets diepere teal voor accent/links (WCAG); charts blijven koel */
+  --brand: #0a8f9a;
+  --on-brand: #ffffff;
+  --brand-hover: #067a85;
+  --brand-active: #056a73;
+  --brand-soft-light: rgba(10, 143, 154, 0.12);
+  --brand-soft-dark: rgba(10, 143, 154, 0.08);
+  --brand-border-light: rgba(10, 143, 154, 0.28);
+  --brand-border-dark: rgba(10, 143, 154, 0.38);
+  --brand-glow-subtle: 0 0 0 1px rgba(10, 143, 154, 0.12), 0 0 10px rgba(10, 143, 154, 0.05);
+
+  --gauge-track: #b9c4d0;
 
   --chip-good-bg: var(--success-soft-light);
   --chip-warn-bg: var(--warning-soft-light);
   --chip-bad-bg: var(--danger-soft-light);
-  --chip-neutral-bg: rgba(232, 238, 241, 0.9);
+  --chip-neutral-bg: rgba(226, 231, 237, 0.95);
 
-  --pie-1: #0d9fa8;
-  --pie-2: #4d64d8;
-  --pie-3: #6d5fc7;
+  --pie-1: #0a8f9a;
+  --pie-2: #4d5fc4;
+  --pie-3: #6b4fc4;
   --pie-4: #2d7a5e;
   --pie-5: #8a6a0f;
-  --pie-6: #a33d48;
-  --pie-7: #4a6bab;
-  --pie-8: #5c6678;
-}
-
-/*
- * Data-dashboard: altijd titanium/graphite cockpit (negeert site light-mode).
- * Zonder deze scope erven cockpit + cards lichte tokens → onleesbaar contrast.
- */
-main.kb-dashboard-shell {
-  color-scheme: dark;
-  --brand: #59f8fc;
-  --brand-hover: #43e7ec;
-  --brand-active: #2fd7dd;
-  --brand-soft-light: rgba(89, 248, 252, 0.1);
-  --brand-soft-dark: rgba(89, 248, 252, 0.14);
-  --brand-border-light: rgba(89, 248, 252, 0.22);
-  --brand-border-dark: rgba(89, 248, 252, 0.28);
-  --brand-glow-subtle: 0 0 0 1px rgba(89, 248, 252, 0.16), 0 0 12px rgba(89, 248, 252, 0.08);
-  --bg: #0b1020;
-  --bg-elevated: #12192b;
-  --surface: #161f33;
-  --surface-soft: #1b2640;
-  --surface-strong: #202c46;
-  --text: #e7edf7;
-  --text-secondary: #c5d0e5;
-  --text-muted: #9aa8c4;
-  --border: #26324b;
-  --border-strong: #3d4f73;
-  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.35), 0 12px 28px rgba(0, 0, 0, 0.22);
-  --success: #3e8f6e;
-  --success-soft-light: rgba(62, 143, 110, 0.1);
-  --success-soft-dark: rgba(62, 143, 110, 0.2);
-  --warning: #c9a227;
-  --warning-soft-light: rgba(201, 162, 39, 0.12);
-  --warning-soft-dark: rgba(201, 162, 39, 0.18);
-  --danger: #e85d6c;
-  --danger-soft-light: rgba(232, 93, 108, 0.12);
-  --danger-soft-dark: rgba(232, 93, 108, 0.22);
-  --info: #5c8cf8;
-  --info-soft-light: rgba(92, 140, 248, 0.1);
-  --info-soft-dark: rgba(92, 140, 248, 0.16);
-  --pie-1: #59f8fc;
-  --pie-2: #6b8cff;
-  --pie-3: #9b8cff;
-  --pie-4: #4caf7a;
-  --pie-5: #d4a82a;
-  --pie-6: #e85d6c;
-  --pie-7: #7a9fd4;
-  --pie-8: #8896b0;
-  --chip-good-bg: var(--success-soft-dark);
-  --chip-warn-bg: var(--warning-soft-dark);
-  --chip-bad-bg: var(--danger-soft-dark);
-  --chip-neutral-bg: rgba(50, 65, 95, 0.45);
-  --fg: var(--text);
-  --muted: var(--text-muted);
-  --accent: var(--brand);
-  --card-bg: var(--surface);
-  --freshness-good: var(--success);
-  --freshness-warn: var(--warning);
-  --freshness-stale: var(--danger);
-  background: var(--bg);
-  color: var(--text);
-  border-radius: 0;
-  box-shadow: inset 0 1px 0 rgba(89, 248, 252, 0.04);
-}
-
-main.kb-dashboard-shell a[href] {
-  color: var(--brand);
-  text-decoration: none !important;
-}
-
-main.kb-dashboard-shell a[href]:hover {
-  text-decoration: underline !important;
-  text-underline-offset: 0.12em;
+  --pie-6: #b83b48;
+  --pie-7: #3d5a9e;
+  --pie-8: #5a6575;
 }
 
 * {
@@ -188,6 +135,34 @@ body {
   color: var(--text);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Hele app volgt één thema: zelfde canvas onder header / content / footer */
+.kb-app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.kb-app-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background: var(--bg);
+}
+
+nav.kb-breadcrumbs {
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border);
+}
+
+footer.kb-site-footer {
+  margin-top: auto;
+  background: var(--bg-elevated);
+  border-top: 1px solid var(--border-strong);
 }
 
 :focus-visible {
@@ -277,9 +252,7 @@ main {
 
 .card--accent-top {
   border-top: 1px solid var(--brand-border-dark);
-  box-shadow:
-    var(--shadow-soft),
-    inset 0 1px 0 0 rgba(89, 248, 252, 0.06);
+  box-shadow: var(--shadow-soft), inset 0 1px 0 0 var(--brand-soft-dark);
 }
 
 @media (max-width: 640px) {
@@ -884,9 +857,7 @@ textarea {
 
 .cockpit-panel--accent-top {
   border-top: 1px solid var(--brand-border-dark);
-  box-shadow:
-    var(--shadow-soft),
-    inset 0 1px 0 rgba(89, 248, 252, 0.07);
+  box-shadow: var(--shadow-soft), inset 0 1px 0 var(--brand-soft-dark);
 }
 
 .cockpit-panel--tight {
@@ -903,7 +874,7 @@ textarea {
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #c8d4ea;
+  color: var(--text-secondary);
 }
 
 .cockpit-panel__title--inline {
@@ -1094,7 +1065,7 @@ textarea {
   border-radius: 4px;
   border: 1px solid var(--border-strong);
   color: var(--text-secondary);
-  background: #1a2438;
+  background: var(--surface-strong);
   transition:
     border-color 0.15s ease,
     color 0.15s ease,
@@ -1102,17 +1073,25 @@ textarea {
 }
 
 .cockpit-cta--allow.is-active {
-  color: #b8e6d4;
-  border-color: rgba(62, 143, 110, 0.65);
-  background: rgba(62, 143, 110, 0.22);
-  box-shadow: 0 0 0 1px rgba(89, 248, 252, 0.14);
+  color: var(--success);
+  border-color: rgba(62, 143, 110, 0.55);
+  background: var(--success-soft-dark);
+  box-shadow: 0 0 0 1px var(--brand-border-light);
+}
+
+[data-theme="light"] .cockpit-cta--allow.is-active {
+  background: var(--success-soft-light);
 }
 
 .cockpit-cta--halt.is-active {
-  color: #ffd6da;
-  border-color: rgba(232, 93, 108, 0.65);
-  background: rgba(232, 93, 108, 0.2);
-  box-shadow: 0 0 0 1px rgba(232, 93, 108, 0.18);
+  color: var(--danger);
+  border-color: rgba(201, 75, 89, 0.5);
+  background: var(--danger-soft-dark);
+  box-shadow: 0 0 0 1px rgba(201, 75, 89, 0.15);
+}
+
+[data-theme="light"] .cockpit-cta--halt.is-active {
+  background: var(--danger-soft-light);
 }
 
 .cockpit-cta-hint {
@@ -1188,10 +1167,14 @@ textarea {
 }
 
 .cockpit-badge--halt {
-  color: #0b1020;
-  background: #e85d6c;
-  border: 1px solid rgba(255, 180, 188, 0.45);
+  color: #f8fafc;
+  background: var(--danger);
+  border: 1px solid rgba(201, 75, 89, 0.45);
   font-weight: 800;
+}
+
+[data-theme="light"] .cockpit-badge--halt {
+  color: #fff;
 }
 
 .cockpit-state-cards {
@@ -1231,10 +1214,7 @@ textarea {
 }
 
 .cockpit-state-card--allow.is-lit {
-  box-shadow:
-    var(--shadow-soft),
-    0 0 0 1px rgba(89, 248, 252, 0.14),
-    0 0 20px rgba(89, 248, 252, 0.06);
+  box-shadow: var(--shadow-soft), 0 0 0 1px var(--brand-border-dark);
 }
 
 .cockpit-state-card--halt {
@@ -1245,10 +1225,7 @@ textarea {
 .cockpit-state-card--halt.is-lit {
   opacity: 1;
   border-color: rgba(201, 75, 89, 0.55);
-  box-shadow:
-    var(--shadow-soft),
-    0 0 0 1px rgba(201, 75, 89, 0.12),
-    0 0 18px rgba(201, 75, 89, 0.08);
+  box-shadow: var(--shadow-soft), 0 0 0 1px rgba(201, 75, 89, 0.2);
 }
 
 .cockpit-state-card__head {

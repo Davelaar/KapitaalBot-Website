@@ -171,7 +171,7 @@ export function Tier2RequestsAdmin({ initialRequests }: Props) {
                       borderRadius: 999,
                       border: "none",
                       background: "var(--accent)",
-                      color: "#0f1419",
+                      color: "var(--on-brand)",
                       fontSize: "0.85rem",
                       fontWeight: 600,
                       cursor: busyEmail === r.email ? "not-allowed" : "pointer",
