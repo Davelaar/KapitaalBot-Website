@@ -29,6 +29,11 @@ function top(rows: LabelCount[] | null | undefined, n = 6): LabelCount[] {
   return [...rows].sort((a, b) => b.count - a.count).slice(0, n);
 }
 
+function formatHorizonSec(sec: number | null | undefined): string {
+  if (sec == null || sec <= 0) return "—";
+  return String(sec);
+}
+
 function card(title: string, body: ReactNode) {
   return (
     <section className="card" style={{ padding: "1rem 1.25rem" }}>
@@ -62,6 +67,16 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
 
   const winners = trading?.symbol_pnl_day_utc_top_winners ?? [];
   const losers = trading?.symbol_pnl_day_utc_top_losers ?? [];
+  const pnlDayEmpty = winners.length === 0 && losers.length === 0;
+
+  const edgeCandidates = dataBundle?.edgeboard?.candidates ?? [];
+  const edgeSortedDesc = [...edgeCandidates].sort(
+    (a, b) => b.best_expected_net_edge_bps - a.best_expected_net_edge_bps,
+  );
+  const edgeBest3 = edgeSortedDesc.slice(0, 3);
+  const edgeWorst3 = [...edgeCandidates]
+    .sort((a, b) => a.best_expected_net_edge_bps - b.best_expected_net_edge_bps)
+    .slice(0, 3);
 
   return (
     <div style={{ display: "grid", gap: "1rem" }}>
@@ -69,9 +84,7 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
         isNl ? "Live Route Board" : "Live Route Board",
         <>
           <p style={{ marginTop: 0, color: "var(--muted)", fontSize: "0.9rem" }}>
-            {isNl
-              ? "Alle gerankschikte signalen uit de snapshot (research edgeboard of decision-fallback). Scroll voor de volledige lijst."
-              : "All ranked signals from the snapshot (research edgeboard or decision fallback). Scroll for the full list."}
+            {t(locale, "dashboard.routeBoardIntro")}
           </p>
           <p style={{ margin: "0 0 0.5rem", fontSize: "0.8rem", color: "var(--accent)", fontWeight: 600 }}>
             {t(locale, "dashboard.refreshNote")}
@@ -89,7 +102,7 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.85rem" }}>
                 <thead style={{ position: "sticky", top: 0, background: "var(--card-bg)", zIndex: 1 }}>
                   <tr>
-                    {["#", "Symbol", "Route", "Edge (bps)", "Confidence", "Reason"].map((h) => (
+                    {["#", "Symbol", "Route", t(locale, "dashboard.routeColHorizon"), "Edge (bps)", "Confidence", "Reason"].map((h) => (
                       <th key={h} style={{ textAlign: "left", padding: "0.35rem", borderBottom: "1px solid var(--border)" }}>
                         {h}
                       </th>
@@ -98,10 +111,11 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
                 </thead>
                 <tbody>
                   {edgeSignals.map((s, idx) => (
-                    <tr key={`${idx}-${s.symbol}-${s.rank}-${s.route_name}`}>
+                    <tr key={`${idx}-${s.symbol}-${s.rank}-${s.route_name}-${s.horizon_sec}`}>
                       <td style={{ padding: "0.35rem", borderBottom: "1px solid var(--border)" }}>{s.rank}</td>
                       <td style={{ padding: "0.35rem", borderBottom: "1px solid var(--border)" }}>{s.symbol}</td>
                       <td style={{ padding: "0.35rem", borderBottom: "1px solid var(--border)" }}>{s.route_name}</td>
+                      <td style={{ padding: "0.35rem", borderBottom: "1px solid var(--border)" }}>{formatHorizonSec(s.horizon_sec)}</td>
                       <td style={{ padding: "0.35rem", borderBottom: "1px solid var(--border)" }}>{s.expected_net_edge_bps.toFixed(1)}</td>
                       <td style={{ padding: "0.35rem", borderBottom: "1px solid var(--border)" }}>{s.confidence.toFixed(2)}</td>
                       <td style={{ padding: "0.35rem", borderBottom: "1px solid var(--border)" }}>{s.dominant_reason_code ?? "—"}</td>
@@ -119,9 +133,47 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
         </>,
       )}
 
+      {edgeCandidates.length > 0
+        ? card(
+            t(locale, "dashboard.edgeCandidatesTitle"),
+            <>
+              <p style={{ marginTop: 0, color: "var(--muted)", fontSize: "0.85rem" }}>{t(locale, "dashboard.edgeCandidatesIntro")}</p>
+              <div style={{ display: "grid", gap: "0.75rem", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))" }}>
+                <div>
+                  <p style={{ margin: "0 0 0.35rem", fontWeight: 600, color: "var(--freshness-good)", fontSize: "0.9rem" }}>
+                    {t(locale, "dashboard.edgeCandidatesBest")}
+                  </p>
+                  <ul style={{ margin: 0, paddingLeft: "1.1rem", fontSize: "0.85rem" }}>
+                    {edgeBest3.map((c) => (
+                      <li key={`b-${c.symbol}`}>
+                        <strong>{c.symbol}</strong> · {c.best_expected_net_edge_bps.toFixed(1)} bps · conf {c.best_confidence.toFixed(2)}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <p style={{ margin: "0 0 0.35rem", fontWeight: 600, color: "var(--freshness-stale)", fontSize: "0.9rem" }}>
+                    {t(locale, "dashboard.edgeCandidatesWorst")}
+                  </p>
+                  <ul style={{ margin: 0, paddingLeft: "1.1rem", fontSize: "0.85rem" }}>
+                    {edgeWorst3.map((c) => (
+                      <li key={`w-${c.symbol}`}>
+                        <strong>{c.symbol}</strong> · {c.best_expected_net_edge_bps.toFixed(1)} bps · conf {c.best_confidence.toFixed(2)}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </>,
+          )
+        : null}
+
       {card(t(locale, "dashboard.dailyPnlTitle"), (
         <>
           <p style={{ marginTop: 0, color: "var(--muted)", fontSize: "0.85rem" }}>{t(locale, "dashboard.dailyPnlUtcNote")}</p>
+          {pnlDayEmpty ? (
+            <p style={{ margin: "0 0 0.75rem", color: "var(--muted)", fontSize: "0.82rem" }}>{t(locale, "dashboard.dailyPnlEmpty")}</p>
+          ) : null}
           <div style={{ display: "grid", gap: "0.75rem", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))" }}>
             <div>
               <p style={{ margin: "0 0 0.35rem", fontWeight: 600, color: "var(--freshness-good)", fontSize: "0.9rem" }}>

@@ -385,6 +385,15 @@ export interface Tier2EdgeboardSignalRow {
   freshness_ms?: number | null;
 }
 
+export interface Tier2EdgeboardCandidateRow {
+  symbol: string;
+  best_rank: number;
+  best_expected_net_edge_bps: number;
+  best_confidence: number;
+  preferred_horizon_sec?: number | null;
+  exit_bias_tag?: string | null;
+}
+
 export interface Tier2EdgeboardSection {
   source_db: string;
   available: boolean;
@@ -401,6 +410,8 @@ export interface Tier2EdgeboardSection {
   training_examples_24h?: number | null;
   outcomes_24h?: number | null;
   top_signals: Tier2EdgeboardSignalRow[];
+  /** Per-symbol rollup (best route per symbol); may be absent in older exports. */
+  candidates?: Tier2EdgeboardCandidateRow[] | null;
 }
 
 /** Single bundle for Tier 2 Data menu (ingest + decision aggregates). */

@@ -332,7 +332,17 @@ const strings: Record<Locale, Record<string, string>> = {
     "dashboard.refreshNote":
       "Pagina vernieuwt automatisch elke minuut (server-snapshots + cache). Kritieke route-data volgt de export op de bot.",
     "dashboard.routeBoardMeta":
-      "Bron: tier2_data_bundle.edgeboard — volledige gerankschikte lijst; eerste ~10 rijen zichtbaar zonder scrollen.",
+      "Bron: tier2_data_bundle.edgeboard — export filtert op zichtbare research-snapshot en op symbolen uit de ingest-run (live universum). Elke rij = symbool × route × horizon.",
+    "dashboard.routeBoardIntro":
+      "Zelfde symbool kan vaker voorkomen: dat zijn verschillende routes of horizons. Horizon 0 of — = decision-fallback (geen research-horizon).",
+    "dashboard.routeColHorizon": "Horizon (s)",
+    "dashboard.edgeCandidatesTitle": "Route-kandidaten (edge, per symbool)",
+    "dashboard.edgeCandidatesIntro":
+      "Beste en zwakste kandidaten uit edgeboard.candidates (geaggregeerd per symbool). Dit is geen PnL — zie het blok eronder voor realized PnL vandaag (UTC).",
+    "dashboard.edgeCandidatesBest": "Sterkste edge (net bps)",
+    "dashboard.edgeCandidatesWorst": "Zwakste edge (net bps)",
+    "dashboard.dailyPnlEmpty":
+      "Geen realized PnL voor de lopende UTC-dag in de export (geen gesloten posities vandaag, of nog geen export). Dit is geen voorspelling.",
     "dashboard.dailyPnlTitle": "Realized PnL vandaag (UTC-dag)",
     "dashboard.dailyPnlUtcNote":
       "Top 3 winnaars en verliezers op basis van som realized_pnl_quote per symbool voor de lopende UTC-kalenderdag (beslissings-DB). Geen voorspelling; alleen gesloten/verwerkte PnL-rijen.",
@@ -702,7 +712,17 @@ const strings: Record<Locale, Record<string, string>> = {
     "dashboard.refreshNote":
       "This page auto-refreshes every minute (server snapshots + cache). Critical route data follows the bot export cadence.",
     "dashboard.routeBoardMeta":
-      "Source: tier2_data_bundle.edgeboard — full ranked list; about the first 10 rows visible without scrolling.",
+      "Source: tier2_data_bundle.edgeboard — export uses the visible research snapshot and filters to ingest run symbols (live universe). Each row = symbol × route × horizon.",
+    "dashboard.routeBoardIntro":
+      "The same symbol can appear many times: different routes or horizons. Horizon 0 or — means decision fallback (no research horizon).",
+    "dashboard.routeColHorizon": "Horizon (s)",
+    "dashboard.edgeCandidatesTitle": "Route candidates (edge, per symbol)",
+    "dashboard.edgeCandidatesIntro":
+      "Strongest and weakest candidates from edgeboard.candidates (rolled up per symbol). This is not PnL — see below for realized PnL today (UTC).",
+    "dashboard.edgeCandidatesBest": "Strongest edge (net bps)",
+    "dashboard.edgeCandidatesWorst": "Weakest edge (net bps)",
+    "dashboard.dailyPnlEmpty":
+      "No realized PnL for the current UTC day in this export (no closes today yet, or export not refreshed). Not a forecast.",
     "dashboard.dailyPnlTitle": "Realized PnL today (UTC day)",
     "dashboard.dailyPnlUtcNote":
       "Top 3 winners and losers from summed realized_pnl_quote per symbol for the current UTC calendar day (decision DB). Not a forecast; only closed/processed PnL rows.",
@@ -1072,7 +1092,17 @@ const strings: Record<Locale, Record<string, string>> = {
     "dashboard.refreshNote":
       "Seite aktualisiert automatisch jede Minute (Server-Snapshots + Cache). Routen-Daten folgen dem Bot-Export.",
     "dashboard.routeBoardMeta":
-      "Quelle: tier2_data_bundle.edgeboard — vollständige Rangliste; ca. die ersten 10 Zeilen ohne Scroll sichtbar.",
+      "Quelle: tier2_data_bundle.edgeboard — Export nutzt sichtbaren Research-Snapshot und filtert auf Ingest-Run-Symbole (Live-Universum). Jede Zeile = Symbol × Route × Horizont.",
+    "dashboard.routeBoardIntro":
+      "Dasselbe Symbol kann oft vorkommen: verschiedene Routen oder Horizonte. Horizont 0 oder — = Decision-Fallback (kein Research-Horizont).",
+    "dashboard.routeColHorizon": "Horizont (s)",
+    "dashboard.edgeCandidatesTitle": "Routen-Kandidaten (Edge, pro Symbol)",
+    "dashboard.edgeCandidatesIntro":
+      "Stärkste/schwächste Kandidaten aus edgeboard.candidates (pro Symbol aggregiert). Kein PnL — realized PnL siehe unten (UTC-Tag).",
+    "dashboard.edgeCandidatesBest": "Stärkster Edge (net bps)",
+    "dashboard.edgeCandidatesWorst": "Schwächster Edge (net bps)",
+    "dashboard.dailyPnlEmpty":
+      "Kein realisiertes PnL für den laufenden UTC-Tag in diesem Export (noch keine Schließungen oder alter Snapshot). Keine Prognose.",
     "dashboard.dailyPnlTitle": "Realisiertes PnL heute (UTC-Tag)",
     "dashboard.dailyPnlUtcNote":
       "Top-3 Gewinner/Verlierer aus Summe realized_pnl_quote pro Symbol für den laufenden UTC-Kalendertag (Decision-DB).",
@@ -1442,7 +1472,17 @@ const strings: Record<Locale, Record<string, string>> = {
     "dashboard.refreshNote":
       "La page se rafraîchit automatiquement chaque minute (snapshots serveur + cache). Les données route suivent l’export bot.",
     "dashboard.routeBoardMeta":
-      "Source : tier2_data_bundle.edgeboard — liste classée complète ; ~10 premières lignes visibles sans défilement.",
+      "Source : tier2_data_bundle.edgeboard — export filtré sur snapshot research visible et symboles du run ingest (univers live). Chaque ligne = symbole × route × horizon.",
+    "dashboard.routeBoardIntro":
+      "Le même symbole peut apparaître souvent : routes ou horizons différents. Horizon 0 ou — = repli decision (pas d’horizon research).",
+    "dashboard.routeColHorizon": "Horizon (s)",
+    "dashboard.edgeCandidatesTitle": "Candidats route (edge, par symbole)",
+    "dashboard.edgeCandidatesIntro":
+      "Meilleurs et plus faibles candidats depuis edgeboard.candidates (agrégés par symbole). Pas du PnL — voir ci-dessous le PnL réalisé aujourd’hui (UTC).",
+    "dashboard.edgeCandidatesBest": "Edge net le plus fort (bps)",
+    "dashboard.edgeCandidatesWorst": "Edge net le plus faible (bps)",
+    "dashboard.dailyPnlEmpty":
+      "Pas de PnL réalisé pour le jour UTC en cours dans cet export (pas de clôtures aujourd’hui ou snapshot pas à jour). Pas une prévision.",
     "dashboard.dailyPnlTitle": "PnL réalisé aujourd’hui (jour UTC)",
     "dashboard.dailyPnlUtcNote":
       "Top 3 gagnants/perdants : somme realized_pnl_quote par symbole pour le jour UTC en cours (DB décision).",
