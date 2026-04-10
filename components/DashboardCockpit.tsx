@@ -45,7 +45,7 @@ function MiniBars({ equity, fallbackHeights }: { equity: EquityPoint[] | null | 
   const pts = equity?.length ? equity.slice(-16) : null;
   let heights: number[] = [];
   if (pts && pts.length > 1) {
-    const vals = pts.map((p) => p.v);
+    const vals = pts.map((p) => p.value);
     const min = Math.min(...vals);
     const max = Math.max(...vals);
     const range = max - min || 1;
