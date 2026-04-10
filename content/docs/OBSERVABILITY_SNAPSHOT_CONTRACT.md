@@ -89,6 +89,10 @@ DOC_ROLE: observability_contract
 - `top_reject_reasons_last_hour` (optioneel): top reject-verdeling voor explainability.
 - `why_no_trade_top_last_hour` (optioneel): geaggregeerde no-trade oorzaken.
 - `route_wins_last_hour` (optioneel): geaggregeerde verdeling van route-keuzes.
+- `symbol_pnl_day_utc_top_winners` / `symbol_pnl_day_utc_top_losers` (optioneel): top 3 per lopende UTC-dag (`realized_pnl`).
+- `slippage_variance_24h` (optioneel): decision-DB, Δ = fill-slippage minus CDV `slippage_bps_estimate` (funnel → `decision_vector_id`); `notable_examples` met grootste |Δ|.
+- `hold_time_vs_horizon_24h` (optioneel): gesloten `realized_pnl` 24h; median/p90 hold en % boven 1m/3m/15m benchmarks (nog niet per-route horizon).
+- `fee_impact_24h` (optioneel): som fees uit fills 24h, netto PnL 24h, ratio fees/|net PnL|.
 
 ### 3.6 public_demo_trades
 

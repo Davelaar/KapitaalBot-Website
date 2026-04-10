@@ -96,6 +96,40 @@ export interface SymbolPnlDayRow {
   realized_pnl_quote: number;
 }
 
+/** Fill slippage vs CDV `slippage_bps_estimate` (24h, decision DB). */
+export interface SlippageExampleRow {
+  symbol: string;
+  expected_slippage_bps: number;
+  realized_slippage_bps: number;
+  /** realized − expected (positive = worse than model). */
+  delta_bps: number;
+}
+
+export interface SlippageVariance24h {
+  sample_n: number;
+  mean_delta_bps?: number | null;
+  median_delta_bps?: number | null;
+  notable_examples?: SlippageExampleRow[];
+}
+
+/** Closed `realized_pnl` rows in 24h; benchmarks are fixed 1m / 3m / 15m (not per-route yet). */
+export interface HoldTimeVsHorizon24h {
+  closed_positions_n: number;
+  median_hold_secs?: number | null;
+  p90_hold_secs?: number | null;
+  pct_hold_over_1m?: number | null;
+  pct_hold_over_3m?: number | null;
+  pct_hold_over_15m?: number | null;
+}
+
+export interface FeeImpact24h {
+  fees_paid_quote: number;
+  realized_pnl_net_quote: number;
+  /** fees / |net PnL| when denominator meaningful. */
+  fee_to_abs_net_pnl_ratio?: number | null;
+  fills_with_fee_count: number;
+}
+
 export interface PublicTradingSnapshot {
   contract_version: string;
   exported_at: string;
@@ -111,6 +145,9 @@ export interface PublicTradingSnapshot {
   /** Top symbols by realized PnL for current UTC calendar day (quote ccy). */
   symbol_pnl_day_utc_top_winners?: SymbolPnlDayRow[];
   symbol_pnl_day_utc_top_losers?: SymbolPnlDayRow[];
+  slippage_variance_24h?: SlippageVariance24h | null;
+  hold_time_vs_horizon_24h?: HoldTimeVsHorizon24h | null;
+  fee_impact_24h?: FeeImpact24h | null;
 }
 
 export interface DemoTradeRow {

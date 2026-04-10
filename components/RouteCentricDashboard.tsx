@@ -14,6 +14,7 @@ import type {
   Tier2DataBundle,
 } from "@/lib/snapshots";
 import { labelCountsToPieSegments, pieSegmentsTotal, SimplePieChart } from "@/components/SimplePieChart";
+import { ExecutionEconomicsStrip } from "@/components/ExecutionEconomicsStrip";
 
 type Props = {
   locale: Locale;
@@ -204,6 +205,8 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
             </>,
           )
         : null}
+
+      <ExecutionEconomicsStrip locale={locale} trading={trading} />
 
       {card(t(locale, "dashboard.dailyPnlTitle"), (
         <>
