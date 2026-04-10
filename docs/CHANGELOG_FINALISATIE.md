@@ -1,5 +1,14 @@
 # Changelog — Website finalisatie
 
+## 2026-04-10 — Data-dashboard: route board, pies, auto-refresh, zachtere light mode
+
+- **Waarom** — Publieke Data-pagina moet **alle** gerankschikte route-signalen tonen (scroll), **minimaal elke minuut** verversen na server-snapshots, en waar zinvol **pie charts** gebruiken; light mode was te fel voor avondgebruik.
+- **Wat (website)** — `DashboardAutoRefresh` (`router.refresh` elke 60s) op `/dashboard` en `/dashboard/tier2`. **Live Route Board**: volledige `edgeboard.top_signals`-tabel met sticky header + scroll; Tier 2 idem. **SVG-piecharts** (`SimplePieChart`) voor funnel-fase, decision codes, regime, strategie, path tape; Tier 2 extra: order status, fill side, safety per mode, path tape. **Light theme** in `globals.css`: gedempte grijs-blauwe achtergronden + `--pie-*` kleuren per thema. **i18n** NL/EN/DE/FR voor refresh-/PnL-teksten.
+- **Wat (engine-export, aparte repo)** — `public_trading_snapshot.json`: optionele `symbol_pnl_day_utc_top_winners` / `symbol_pnl_day_utc_top_losers` (top 3 per UTC-dag uit `realized_pnl`). Dashboard toont blok “Realized PnL vandaag (UTC-dag)” zodra de bot die velden exporteert.
+- **Website commit (feature)** — `7072807` (*feat(dashboard): scrollable route board, 60s refresh, pies, calmer light theme*). *Finalisatie/changelog voor deze release staat op `main` in dezelfde push.*
+- **Engine commits (Krakenbot)** — `e13851f` (*feat(observability): UTC-day symbol PnL top winners/losers in public trading export*); `f62136f` (*docs: changelog NL/EN/DE/FR + CHANGELOG_ENGINE for public trading UTC-day PnL*).
+- **Deploy server** — `/srv/krakenbot`: `git pull --ff-only`, `cargo build --release`, observability-export (timer of `systemctl start krakenbot-observability-export.service`). `/srv/KapitaalBot-Website`: `git pull --ff-only`, `npm ci` of `npm install`, `npm run build`, `systemctl restart kapitaalbot-web.service`. Live: `curl -sfL -o /dev/null -w '%{http_code}\n' https://kapitaalbot.nl/nl/dashboard` → 200.
+
 ## 2026-04-01 — Docs SSOT: sync vanuit Krakenbot-repo bij elke build
 
 - **Probleem** — `content/docs/*.md` (o.a. ENGINE_SSOT) was een oude handmatige kopie; de live site toonde niet de actuele bot-`docs/`.
