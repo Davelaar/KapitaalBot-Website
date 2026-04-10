@@ -16,6 +16,7 @@
     "mermaid": "^11.0.0",
     "jsdom": "^24.1.0",
     "next": "14.2.35",
+    "styled-jsx": "5.1.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-markdown": "^9.0.1",
