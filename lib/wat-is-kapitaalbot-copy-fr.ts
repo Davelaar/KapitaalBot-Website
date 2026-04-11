@@ -41,4 +41,26 @@ export const watIsKapitaalbotFr: Record<string, string> = {
   "watkap.closing": "Choisissez la discipline. Choisissez l’architecture. Choisissez KapitaalBot.",
 
   "watkap.breadcrumb": "Qu’est-ce que c’est (et pas) ?",
+
+  "watkap.heroAlt":
+    "Infographie : des données de marché brutes via filtres, chaîne de blocage et explainabilité vers de rares opportunités d’exécution.",
+
+  "watkap.canonH1": "Qu’est-ce que KapitaalBot ?",
+  "watkap.canonIntro":
+    "KapitaalBot n’est pas un simple bot de momentum ou de scalping. C’est un moteur de sélection de routes sensible au timing, multi-stratégie et multi-régime.",
+  "watkap.canonDefTitle": "Définition canonique",
+  "watkap.canonDef1": "Classement sensible au timing des candidats routes.",
+  "watkap.canonDef2": "Contexte multi-stratégie et multi-régime comme entrée de décision.",
+  "watkap.canonDef3": "État de route comme vérité opérationnelle pour l’observabilité.",
+  "watkap.canonDef4": "Explainabilité via why-no-trade, gains de routes et raisons de rejet.",
+  "watkap.canonDef5": "Contexte de position et sécurité comme contraintes d’exécution.",
+  "watkap.canonNotTitle": "Ce que KapitaalBot n’est pas",
+  "watkap.canonNot1": "Pas un bot indicateur mono-stratégie.",
+  "watkap.canonNot2": "Pas un modèle tableau de bord symbole/flux d’abord comme vérité principale.",
+  "watkap.canonNot3": "Pas de code source public ni de couche de tuning privée reproductible.",
+  "watkap.canonNot4": "Pas de conseil en investissement ni de service de signaux.",
+  "watkap.canonFitTitle": "Rôle de cette page dans le canon",
+  "watkap.canonFitP":
+    "Cette page donne la définition centrale. Pour l’observabilité opérationnelle, utilisez le tableau de bord. Pour la pile/latence, la SPEC. Pour les détails contractuels, les Docs. Pour les questions cause/effet, la FAQ.",
+  "watkap.canonKnowledge": "Savoir",
 };

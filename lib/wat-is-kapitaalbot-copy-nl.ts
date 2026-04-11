@@ -41,4 +41,26 @@ export const watIsKapitaalbotNl: Record<string, string> = {
   "watkap.closing": "Kies voor discipline. Kies voor architectuur. Kies voor KapitaalBot.",
 
   "watkap.breadcrumb": "Wat is het (wel / niet)?",
+
+  "watkap.heroAlt":
+    "Infographic: van ruwe marktdata via filters, blocker-chain en explainability naar zeldzame execution-kansen.",
+
+  "watkap.canonH1": "Wat is KapitaalBot?",
+  "watkap.canonIntro":
+    "KapitaalBot is geen eenvoudige momentum- of scalpingbot. Het is een timing-aware, multistrategy, multiregime route-selection engine.",
+  "watkap.canonDefTitle": "Canonieke definitie",
+  "watkap.canonDef1": "Timing-aware ranking van routekandidaten.",
+  "watkap.canonDef2": "Multistrategy en multiregime context als beslisinput.",
+  "watkap.canonDef3": "Route-state als operationele waarheid voor observability.",
+  "watkap.canonDef4": "Explainability via why-no-trade, route wins en reject reasons.",
+  "watkap.canonDef5": "Position-context en safety als randvoorwaarden voor execution.",
+  "watkap.canonNotTitle": "Wat KapitaalBot niet is",
+  "watkap.canonNot1": "Geen single-strategy indicatorbot.",
+  "watkap.canonNot2": "Geen symbol/feed-first dashboardmodel als hoofdwaarheid.",
+  "watkap.canonNot3": "Geen publieke broncode of reproduceerbare private tuninglaag.",
+  "watkap.canonNot4": "Geen beleggingsadvies of signaaldienst.",
+  "watkap.canonFitTitle": "Hoe deze pagina past in de canon",
+  "watkap.canonFitP":
+    "Deze pagina geeft de kern-definitie. Voor operationele observability gebruik je Dashboard. Voor stack/latency gebruik je SPEC. Voor contractuele details gebruik je Docs. Voor oorzaak/gevolg-vragen gebruik je FAQ.",
+  "watkap.canonKnowledge": "Kennis",
 };

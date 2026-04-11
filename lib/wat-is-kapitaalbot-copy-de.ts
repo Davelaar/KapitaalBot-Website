@@ -41,4 +41,26 @@ export const watIsKapitaalbotDe: Record<string, string> = {
   "watkap.closing": "Disziplin wählen. Architektur wählen. KapitaalBot wählen.",
 
   "watkap.breadcrumb": "Was es ist (und nicht)",
+
+  "watkap.heroAlt":
+    "Infografik: von Rohmarktdaten über Filter, Blocker-Kette und Explainability zu seltenen Ausführungschancen.",
+
+  "watkap.canonH1": "Was ist KapitaalBot?",
+  "watkap.canonIntro":
+    "KapitaalBot ist kein einfacher Momentum- oder Scalping-Bot. Es ist eine timing-bewusste, multistrategische, multiregime Route-Selection-Engine.",
+  "watkap.canonDefTitle": "Kanonische Definition",
+  "watkap.canonDef1": "Timing-bewusstes Ranking von Routen-Kandidaten.",
+  "watkap.canonDef2": "Multistrategie- und Multiregime-Kontext als Entscheidungsinput.",
+  "watkap.canonDef3": "Route-State als operative Wahrheit für Observability.",
+  "watkap.canonDef4": "Explainability über Why-no-trade, Route-Wins und Ablehnungsgründe.",
+  "watkap.canonDef5": "Positionskontext und Safety als Randbedingungen für die Ausführung.",
+  "watkap.canonNotTitle": "Was KapitaalBot nicht ist",
+  "watkap.canonNot1": "Kein Single-Strategy-Indikator-Bot.",
+  "watkap.canonNot2": "Kein Symbol/Feed-first-Dashboardmodell als Hauptwahrheit.",
+  "watkap.canonNot3": "Kein öffentlicher Quellcode oder reproduzierbare private Tuning-Schicht.",
+  "watkap.canonNot4": "Keine Anlageberatung oder Signaldienst.",
+  "watkap.canonFitTitle": "Einordnung in die Kanon-Seiten",
+  "watkap.canonFitP":
+    "Diese Seite liefert die Kern-Definition. Für operative Observability nutzen Sie das Dashboard. Für Stack/Latency die SPEC. Für vertragliche Details die Docs. Für Ursache/Wirkung die FAQ.",
+  "watkap.canonKnowledge": "Wissen",
 };
