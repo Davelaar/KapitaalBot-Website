@@ -177,6 +177,12 @@
   }
 }
 
+html {
+  overflow-x: hidden;
+  overflow-y: auto;
+  scroll-padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+}
+
 html,
 body {
   margin: 0;
@@ -192,25 +198,34 @@ body {
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
+  min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
 }
 
 /* Hele app volgt één thema: zelfde canvas onder header / content / footer */
 .kb-app-shell {
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   background: var(--bg);
   color: var(--text);
+  /* Nooit verticale inhoud buiten de shell knippen: document moet kunnen scrollen */
+  overflow-x: hidden;
+  overflow-y: visible;
 }
 
 .kb-app-main {
-  flex: 1;
+  /* 1 1 0% kan in kolom-flex een “gevulde” hoofdzone geven die langer pagina’s afkapt */
+  flex: 1 0 auto;
   display: flex;
   flex-direction: column;
   width: 100%;
   min-width: 0;
+  min-height: min-content;
   background: var(--bg);
+  overflow-x: hidden;
+  overflow-y: visible;
 }
 
 nav.kb-breadcrumbs {
@@ -222,6 +237,7 @@ footer.kb-site-footer {
   margin-top: auto;
   background: var(--bg-elevated);
   border-top: 1px solid var(--border-strong);
+  flex-shrink: 0;
 }
 
 :focus-visible {
@@ -440,7 +456,7 @@ main {
   min-width: 0;
   margin: 0 auto;
   padding: 1rem 1.5rem;
-  padding-bottom: 2rem;
+  padding-bottom: calc(2.5rem + env(safe-area-inset-bottom, 0px));
 }
 
 /* —— Top bar —— */
@@ -501,6 +517,10 @@ main {
   min-width: 0;
   max-width: 100%;
   box-sizing: border-box;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  /* Horizontale “bleed” van lange tokens binnen de kaart houden */
+  overflow-x: hidden;
   transition:
     border-color 0.15s ease,
     box-shadow 0.15s ease;
@@ -533,7 +553,10 @@ main {
 .home-page-root {
   min-width: 0;
   max-width: 100%;
-  overflow-x: clip;
+  /* clip + visible op andere as kan in engines scroll/overflow rare maken; hidden is voldoende */
+  overflow-x: hidden;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .metric-card__value {
@@ -852,7 +875,8 @@ textarea {
   max-width: 100%;
   box-sizing: border-box;
   overflow-x: auto;
-  overflow-y: hidden;
+  /* hidden hier knipt titel/ondertitel af; verticaal laten doorlopen */
+  overflow-y: visible;
   -webkit-overflow-scrolling: touch;
   padding: 14px 18px;
   border: 1px solid var(--border-strong);
@@ -954,11 +978,14 @@ textarea {
   background: #ffffff;
   color: #1a1a1a;
   padding: 1rem 1.5rem;
+  padding-bottom: max(1rem, calc(1rem + env(safe-area-inset-bottom, 0px)));
   margin-top: auto;
   width: 100%;
   font-size: clamp(14px, 2vw, 16px);
   line-height: 1.5;
   max-width: 100%;
+  flex-shrink: 0;
+  overflow-wrap: anywhere;
 }
 
 .compliance-banner__inner {
