@@ -1330,11 +1330,14 @@ textarea {
   min-width: 0;
   display: flex;
   flex-direction: column;
+  /* Geen verticale stretch: anders vult het meters-paneel de volle rijhoogte met lege ruimte */
+  align-self: start;
+  width: 100%;
 }
 
 .cockpit-col-right > .cockpit-panel {
-  flex: 1 1 auto;
-  min-height: 0;
+  flex: 0 0 auto;
+  width: 100%;
 }
 
 .cockpit-bottom-left {
@@ -1351,6 +1354,8 @@ textarea {
   min-width: 0;
   display: flex;
   flex-direction: column;
+  align-self: start;
+  width: 100%;
 }
 
 .cockpit-panel {
@@ -1740,8 +1745,8 @@ textarea {
   display: flex;
   flex-direction: column;
   gap: 0.85rem;
-  flex: 1 1 auto;
-  min-height: 0;
+  flex: 0 0 auto;
+  width: 100%;
 }
 
 .cockpit-bottom-left > .cockpit-panel {

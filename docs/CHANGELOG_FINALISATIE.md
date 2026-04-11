@@ -1,5 +1,10 @@
 # Changelog — Website finalisatie
 
+## 2026-04-10 — Dashboard cockpit: rechterkolom zonder kunstmatige leegte
+
+- **Waarom** — Het meters-/intent-paneel kreeg `flex: 1` binnen een op `stretch` gezette gridrij en vulde daardoor dezelfde hoogte als de linkerkolom met lege ruimte onder de gauges.
+- **Wat** — `globals.css`: `.cockpit-col-right` en `.cockpit-bottom-right` met `align-self: start` + `width: 100%`; rechter `.cockpit-panel` en `.cockpit-state-cards` `flex: 0 0 auto` i.p.v. groeien naar resthoogte.
+
 ## 2026-04-10 — Over: wat-is article layout, FundMe `/over/fundme`, bunq-donatie-CTA
 
 - **Nav (update)** — **FundMe** ook als eigen item in de hoofd-menubalk (desktop + mobiel), naast FAQ; label `nav.fundme` (= «FundMe»). Dropdown «Over» blijft de uitgebreide FundMe-/ondersteuningstekst tonen (`nav.over.fundme`).
