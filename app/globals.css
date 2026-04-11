@@ -503,6 +503,24 @@ main {
 }
 
 /* —— Surfaces —— */
+
+/* /over/wat-is-kapitaalbot — responsive hero (mobile portrait / desktop landscape) */
+.wat-is-kapitaalbot-hero {
+  margin-block: 0 1.25rem;
+  margin-inline: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+}
+
+.wat-is-kapitaalbot-hero img {
+  display: block;
+  width: 100%;
+  height: auto;
+  vertical-align: middle;
+}
+
 .card {
   background:
     var(--surface-sheen-top),

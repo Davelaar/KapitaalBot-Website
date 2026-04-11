@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { parseLocaleParam, withLocale } from "@/lib/locale-path";
 import { buildPageMetadata } from "@/lib/page-metadata";
+import { getSiteUrl } from "@/lib/site";
 import type { Locale } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
@@ -12,7 +13,9 @@ export async function generateMetadata({
 }) {
   const locale = parseLocaleParam(params.locale);
   const isNl = locale === "nl";
-  return buildPageMetadata({
+  const base = getSiteUrl().replace(/\/+$/, "");
+  const ogImage = `${base}/images/over/wat-is-kapitaalbot-desktop.jpg`;
+  const meta = buildPageMetadata({
     locale,
     title: isNl
       ? "Wat is KapitaalBot? — canonieke definitie"
@@ -25,6 +28,20 @@ export async function generateMetadata({
       ? "KapitaalBot definitie, route-selection engine, timing-aware trading runtime, explainability"
       : "KapitaalBot definition, route-selection engine, timing-aware trading runtime, explainability",
   });
+  const heroAlt = isNl
+    ? "Infographic: van ruwe marktdata via filters, blocker-chain en explainability naar zeldzame execution-kansen."
+    : "Infographic: from raw market data through filters, a blocker chain, and explainability to rare execution opportunities.";
+  return {
+    ...meta,
+    openGraph: {
+      ...meta.openGraph,
+      images: [{ url: ogImage, width: 1024, height: 558, alt: heroAlt }],
+    },
+    twitter: {
+      ...meta.twitter,
+      images: [ogImage],
+    },
+  };
 }
 
 export default async function WatIsKapitaalbotPage({ params }: { params: { locale: string } }) {
@@ -44,6 +61,10 @@ export default async function WatIsKapitaalbotPage({ params }: { params: { local
   };
   const listStyle = { ...pStyle, paddingLeft: "1.25rem", marginTop: 0, marginBottom: "0.25rem" };
 
+  const heroAlt = isNl
+    ? "Infographic: van ruwe marktdata via filters, blocker-chain en explainability naar zeldzame execution-kansen."
+    : "Infographic: from raw market data through filters, a blocker chain, and explainability to rare execution opportunities.";
+
   return (
     <main style={{ maxWidth: 720, margin: "0 auto", padding: "0 1.25rem 2.5rem" }}>
       <nav style={{ marginBottom: "1.5rem" }}>
@@ -53,6 +74,20 @@ export default async function WatIsKapitaalbotPage({ params }: { params: { local
       </nav>
 
       <article>
+        <figure className="wat-is-kapitaalbot-hero">
+          <picture>
+            <source media="(max-width: 767px)" type="image/webp" srcSet="/images/over/wat-is-kapitaalbot-mobile.webp" />
+            <source media="(max-width: 767px)" srcSet="/images/over/wat-is-kapitaalbot-mobile.jpg" />
+            <source type="image/webp" srcSet="/images/over/wat-is-kapitaalbot-desktop.webp" />
+            <img
+              src="/images/over/wat-is-kapitaalbot-desktop.jpg"
+              alt={heroAlt}
+              width={1024}
+              height={558}
+              decoding="async"
+            />
+          </picture>
+        </figure>
         <h1 style={{ fontSize: "1.75rem", marginBottom: "1rem", fontWeight: 600, lineHeight: 1.25 }}>
           {isNl ? "Wat is KapitaalBot?" : "What is KapitaalBot?"}
         </h1>
