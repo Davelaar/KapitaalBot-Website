@@ -28,7 +28,7 @@ export function DashboardIntro({
         {t(locale, "dashboard.intro2")}
       </p>
       {delaySecs != null && (
-        <p style={{ color: "var(--accent)", marginBottom: "1.5rem", fontSize: "0.9375rem", fontWeight: 600 }}>
+        <p className="kb-intro-delay" style={{ marginBottom: "1.5rem", fontSize: "0.9375rem" }}>
           {t(locale, "dashboard.delayPrefix")}
           <span style={{ fontFamily: "monospace" }}>ca. {formatDelaySeconds(delaySecs)}</span>
         </p>

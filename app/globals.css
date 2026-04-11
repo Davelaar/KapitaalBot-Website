@@ -69,6 +69,14 @@
   --freshness-good: var(--success);
   --freshness-warn: var(--warning);
   --freshness-stale: var(--danger);
+
+  /* WCAG: small text / links on dark bg & surfaces (PageSpeed a11y) */
+  --text-link: #b5eef3;
+  --text-link-hover: #d2f8fb;
+  --text-emphasis: #c9d6ee;
+  --semantic-ok-fg: #b5e8d2;
+  --semantic-warn-fg: #f0d577;
+  --semantic-bad-fg: #ffb3bc;
 }
 
 [data-theme="light"] {
@@ -113,10 +121,32 @@
   --pie-6: #b83b48;
   --pie-7: #3d5a9e;
   --pie-8: #5a6575;
+
+  /* WCAG: links & status text on light surfaces */
+  --text-link: #034854;
+  --text-link-hover: #022f36;
+  --text-emphasis: #0a1628;
+  --semantic-ok-fg: #0d4a36;
+  --semantic-warn-fg: #5c4500;
+  --semantic-bad-fg: #6b1a26;
 }
 
 * {
   box-sizing: border-box;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:focus-within {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 html,
@@ -173,8 +203,93 @@ footer.kb-site-footer {
 /* WCAG: links not identified by color alone (main + footer); nav/header exempt */
 main a[href],
 footer a[href] {
+  color: var(--text-link);
   text-decoration: underline !important;
   text-underline-offset: 0.15em;
+}
+
+main a[href]:hover,
+footer a[href]:hover {
+  color: var(--text-link-hover);
+}
+
+/* Explicit link utility (overrides inline no-underline from legacy components) */
+.kb-text-link {
+  color: var(--text-link) !important;
+  text-decoration: underline !important;
+  text-underline-offset: 0.15em;
+  font-weight: 600;
+}
+
+.kb-text-link:hover {
+  color: var(--text-link-hover) !important;
+}
+
+.kb-intro-delay {
+  color: var(--text-link);
+  font-weight: 600;
+}
+
+.kb-refresh-note {
+  margin: 0 0 0.5rem;
+  font-size: 0.8rem;
+  color: var(--text-emphasis);
+  font-weight: 600;
+}
+
+.kb-callout-warn {
+  margin: 0 0 0.5rem;
+  font-size: 0.8rem;
+  color: var(--semantic-bad-fg);
+  font-weight: 600;
+}
+
+.kb-section-title-ok {
+  margin: 0 0 0.35rem;
+  font-weight: 600;
+  color: var(--semantic-ok-fg);
+  font-size: 0.9rem;
+}
+
+.kb-section-title-bad {
+  margin: 0 0 0.35rem;
+  font-weight: 600;
+  color: var(--semantic-bad-fg);
+  font-size: 0.9rem;
+}
+
+.kb-fresh-muted {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.kb-fresh-ok {
+  color: var(--semantic-ok-fg);
+  font-size: 0.8rem;
+}
+
+.kb-fresh-warn {
+  color: var(--semantic-warn-fg);
+  font-size: 0.8rem;
+}
+
+.kb-fresh-bad {
+  color: var(--semantic-bad-fg);
+  font-size: 0.8rem;
+}
+
+.kb-num-neg {
+  color: var(--semantic-bad-fg);
+}
+
+.kb-feed-ok {
+  color: var(--semantic-ok-fg);
+  font-weight: 400;
+}
+
+.kb-feed-stale {
+  color: var(--semantic-bad-fg);
+  font-weight: 700;
 }
 
 .site-header a[href],
@@ -384,17 +499,17 @@ textarea {
 
 .kb-chip--good {
   background: var(--chip-good-bg);
-  color: var(--success);
+  color: var(--semantic-ok-fg);
 }
 
 .kb-chip--warn {
   background: var(--chip-warn-bg);
-  color: var(--warning);
+  color: var(--semantic-warn-fg);
 }
 
 .kb-chip--stale {
   background: var(--chip-bad-bg);
-  color: var(--danger);
+  color: var(--semantic-bad-fg);
 }
 
 .kb-chip--neutral {
@@ -417,7 +532,7 @@ textarea {
 
 .kb-state-allow {
   background: var(--chip-good-bg);
-  color: var(--success);
+  color: var(--semantic-ok-fg);
   border: 1px solid rgba(62, 143, 110, 0.28);
 }
 
@@ -429,7 +544,7 @@ textarea {
 
 .kb-state-halt {
   background: var(--chip-bad-bg);
-  color: var(--danger);
+  color: var(--semantic-bad-fg);
   border: 1px solid rgba(201, 75, 89, 0.35);
 }
 
@@ -794,7 +909,7 @@ textarea {
   font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--brand);
+  color: var(--text-link);
 }
 
 .cockpit-delay {
@@ -804,7 +919,7 @@ textarea {
 }
 
 .cockpit-delay__mono {
-  color: var(--brand);
+  color: var(--text-link);
   font-weight: 600;
   font-family: ui-monospace, "SF Mono", Menlo, monospace;
 }
@@ -990,7 +1105,7 @@ textarea {
 }
 
 .cockpit-metric-list__v.brand {
-  color: var(--brand);
+  color: var(--text-link);
 }
 
 .cockpit-bars-label {
@@ -1073,7 +1188,7 @@ textarea {
 }
 
 .cockpit-cta--allow.is-active {
-  color: var(--success);
+  color: var(--semantic-ok-fg);
   border-color: rgba(62, 143, 110, 0.55);
   background: var(--success-soft-dark);
   box-shadow: 0 0 0 1px var(--brand-border-light);
@@ -1084,7 +1199,7 @@ textarea {
 }
 
 .cockpit-cta--halt.is-active {
-  color: var(--danger);
+  color: var(--semantic-bad-fg);
   border-color: rgba(201, 75, 89, 0.5);
   background: var(--danger-soft-dark);
   box-shadow: 0 0 0 1px rgba(201, 75, 89, 0.15);
@@ -1155,7 +1270,7 @@ textarea {
 }
 
 .cockpit-badge--allow {
-  color: var(--success);
+  color: var(--semantic-ok-fg);
   background: var(--success-soft-dark);
   border: 1px solid rgba(62, 143, 110, 0.35);
 }
@@ -1243,21 +1358,21 @@ textarea {
 }
 
 .cockpit-state-card--allow .cockpit-state-card__head h3 {
-  color: var(--brand);
+  color: var(--text-link);
 }
 
 .cockpit-state-card--halt .cockpit-state-card__head h3 {
-  color: var(--danger);
+  color: var(--semantic-bad-fg);
 }
 
 .cockpit-state-card__icon {
   font-size: 1.1rem;
-  color: var(--brand);
+  color: var(--text-link);
   opacity: 0.9;
 }
 
 .cockpit-state-card__icon--halt {
-  color: var(--danger);
+  color: var(--semantic-bad-fg);
 }
 
 .cockpit-state-card__line {
@@ -1278,7 +1393,7 @@ textarea {
   padding: 0.1rem 0.35rem;
   border-radius: 3px;
   background: var(--brand-soft-dark);
-  color: var(--brand);
+  color: var(--text-link);
   border: 1px solid var(--brand-border-light);
 }
 

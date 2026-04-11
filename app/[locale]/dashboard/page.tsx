@@ -28,7 +28,7 @@ export default async function DashboardPage({ params }: { params: { locale: stri
     <DashboardAutoRefresh intervalMs={60_000}>
       <main>
         <nav style={{ marginBottom: "1.25rem" }}>
-          <Link href={withLocale(locale, "/")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+          <Link href={withLocale(locale, "/")} className="kb-text-link">
             ← {t(locale, "nav.system")}
           </Link>
         </nav>

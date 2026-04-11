@@ -3,6 +3,7 @@
 import Script from "next/script";
 import type { Locale } from "@/lib/i18n";
 import { getKapitaalbotGaMeasurementId } from "@/lib/analytics";
+import { DeferredStylesheet } from "@/components/DeferredStylesheet";
 
 /**
  * Analytics priority:
@@ -42,6 +43,7 @@ export function Analytics({ locale }: { locale: Locale }) {
   if (gaId) {
     return (
       <>
+        <DeferredStylesheet href="/analytics/kapitaalbot-analytics.css" />
         <Script id="kapitaalbot-analytics-locale" strategy="afterInteractive">
           {`window.__KAPITAALBOT_LOCALE__=${JSON.stringify(locale)};`}
         </Script>

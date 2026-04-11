@@ -52,7 +52,6 @@ export default async function LocaleLayout({
 
   return (
     <>
-      {gaId ? <link rel="stylesheet" href="/analytics/kapitaalbot-analytics.css" /> : null}
       <div data-kapitaalbot-site-root className="kb-app-shell">
         <NavBar />
         <div className="kb-app-main">

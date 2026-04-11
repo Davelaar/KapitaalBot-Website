@@ -4,6 +4,7 @@ const path = require("path");
 const nextConfig = {
   reactStrictMode: true,
   compress: true,
+  poweredByHeader: false,
   webpack: (config) => {
     // Ensure `@/*` resolves on all build hosts (matches tsconfig paths).
     config.resolve.alias["@"] = path.resolve(__dirname);

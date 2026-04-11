@@ -43,11 +43,11 @@ function formatFreshnessMs(ms: number | null | undefined): string {
   return `${Math.round(secs / 60)}m`;
 }
 
-function freshnessColor(ms: number | null | undefined): string {
-  if (ms == null) return "var(--text-muted)";
-  if (ms <= 300_000) return "var(--success)";
-  if (ms <= 3_600_000) return "var(--warning)";
-  return "var(--danger)";
+function freshnessClass(ms: number | null | undefined): string {
+  if (ms == null) return "kb-fresh-muted";
+  if (ms <= 300_000) return "kb-fresh-ok";
+  if (ms <= 3_600_000) return "kb-fresh-warn";
+  return "kb-fresh-bad";
 }
 
 const FEED_FRESHNESS_STALE_THRESHOLD_SECS = 60;
@@ -110,11 +110,9 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
           <p style={{ marginTop: 0, color: "var(--muted)", fontSize: "0.9rem" }}>
             {t(locale, "dashboard.routeBoardIntro")}
           </p>
-          <p style={{ margin: "0 0 0.5rem", fontSize: "0.8rem", color: "var(--accent)", fontWeight: 600 }}>
-            {t(locale, "dashboard.refreshNote")}
-          </p>
+          <p className="kb-refresh-note">{t(locale, "dashboard.refreshNote")}</p>
           {isDecisionFallback && (
-            <p style={{ margin: "0 0 0.5rem", fontSize: "0.8rem", color: "var(--danger)", fontWeight: 600 }}>
+            <p className="kb-callout-warn">
               {isNl
                 ? "Bron: decision fallback — research snapshot is verlopen. Edge/confidence semantiek verschilt van research."
                 : "Source: decision fallback — research snapshot expired. Edge/confidence semantics differ from research."}
@@ -153,10 +151,10 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
                       <td>{s.symbol}</td>
                       <td>{s.route_name}</td>
                       <td>{formatHorizonSec(s.horizon_sec)}</td>
-                      <td style={{ color: s.expected_net_edge_bps < 0 ? "var(--danger)" : undefined }}>{s.expected_net_edge_bps.toFixed(1)}</td>
+                      <td className={s.expected_net_edge_bps < 0 ? "kb-num-neg" : undefined}>{s.expected_net_edge_bps.toFixed(1)}</td>
                       <td>{s.confidence.toFixed(2)}</td>
                       <td>{s.dominant_reason_code ?? "—"}</td>
-                      <td style={{ color: freshnessColor(s.freshness_ms), fontSize: "0.8rem" }}>{formatFreshnessMs(s.freshness_ms)}</td>
+                      <td className={freshnessClass(s.freshness_ms)}>{formatFreshnessMs(s.freshness_ms)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -178,9 +176,7 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
               <p style={{ marginTop: 0, color: "var(--muted)", fontSize: "0.85rem" }}>{t(locale, "dashboard.edgeCandidatesIntro")}</p>
               <div style={{ display: "grid", gap: "0.75rem", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))" }}>
                 <div>
-                  <p style={{ margin: "0 0 0.35rem", fontWeight: 600, color: "var(--success)", fontSize: "0.9rem" }}>
-                    {t(locale, "dashboard.edgeCandidatesBest")}
-                  </p>
+                  <p className="kb-section-title-ok">{t(locale, "dashboard.edgeCandidatesBest")}</p>
                   <ul style={{ margin: 0, paddingLeft: "1.1rem", fontSize: "0.85rem" }}>
                     {edgeBest3.map((c) => (
                       <li key={`b-${c.symbol}`}>
@@ -190,9 +186,7 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
                   </ul>
                 </div>
                 <div>
-                  <p style={{ margin: "0 0 0.35rem", fontWeight: 600, color: "var(--danger)", fontSize: "0.9rem" }}>
-                    {t(locale, "dashboard.edgeCandidatesWorst")}
-                  </p>
+                  <p className="kb-section-title-bad">{t(locale, "dashboard.edgeCandidatesWorst")}</p>
                   <ul style={{ margin: 0, paddingLeft: "1.1rem", fontSize: "0.85rem" }}>
                     {edgeWorst3.map((c) => (
                       <li key={`w-${c.symbol}`}>
@@ -216,9 +210,7 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
           ) : null}
           <div style={{ display: "grid", gap: "0.75rem", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))" }}>
             <div>
-              <p style={{ margin: "0 0 0.35rem", fontWeight: 600, color: "var(--success)", fontSize: "0.9rem" }}>
-                {t(locale, "dashboard.topWinners")}
-              </p>
+              <p className="kb-section-title-ok">{t(locale, "dashboard.topWinners")}</p>
               {winners.length ? (
                 <ul style={{ margin: 0, paddingLeft: "1.1rem", fontSize: "0.85rem" }}>
                   {winners.map((w) => (
@@ -232,9 +224,7 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
               )}
             </div>
             <div>
-              <p style={{ margin: "0 0 0.35rem", fontWeight: 600, color: "var(--danger)", fontSize: "0.9rem" }}>
-                {t(locale, "dashboard.topLosers")}
-              </p>
+              <p className="kb-section-title-bad">{t(locale, "dashboard.topLosers")}</p>
               {losers.length ? (
                 <ul style={{ margin: 0, paddingLeft: "1.1rem", fontSize: "0.85rem" }}>
                   {losers.map((w) => (
@@ -360,7 +350,7 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
             </p>
             <p style={{ margin: 0, fontSize: "0.85rem" }}>
               <strong>{isNl ? "Feed freshness (ticker/trade): " : "Feed freshness (ticker/trade): "}</strong>
-              <span style={{ color: feedStale ? "var(--danger)" : "var(--success)", fontWeight: feedStale ? 700 : 400 }}>
+              <span className={feedStale ? "kb-feed-stale" : "kb-feed-ok"}>
                 {feedFreshnessSecs != null ? `${feedFreshnessSecs}s` : "—"}
                 {feedStale ? (isNl ? " — STALE" : " — STALE") : ""}
               </span>
@@ -447,11 +437,11 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
               : "Public drilldown to route lineage and decision context (without reproducible tuning values)."}
           </p>
           <p style={{ margin: 0, fontSize: "0.9rem" }}>
-            <Link href={withLocale(locale, "/spec")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+            <Link href={withLocale(locale, "/spec")} className="kb-text-link">
               {isNl ? "Open de SPEC-pagina voor canonieke runtime-specificatie" : "Open the SPEC page for canonical runtime specification"}
             </Link>
             {" · "}
-            <Link href={withLocale(locale, "/docs")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+            <Link href={withLocale(locale, "/docs")} className="kb-text-link">
               {isNl ? "Bekijk de publieke architectuurdocumentatie" : "Read the public architecture documentation"}
             </Link>
           </p>
