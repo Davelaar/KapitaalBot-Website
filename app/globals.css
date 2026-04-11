@@ -498,6 +498,9 @@ main {
   padding: 1rem 1.25rem;
   margin-bottom: 1rem;
   box-shadow: var(--card-shadow-depth);
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
   transition:
     border-color 0.15s ease,
     box-shadow 0.15s ease;
@@ -521,8 +524,16 @@ main {
 
 .metric-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 160px), 1fr));
   gap: 1rem;
+  min-width: 0;
+}
+
+/* Homepage + long prose: avoid viewport blowout from unbroken strings */
+.home-page-root {
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: clip;
 }
 
 .metric-card__value {
@@ -776,6 +787,10 @@ textarea {
 .markdown-body {
   color: var(--text);
   line-height: 1.65;
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .markdown-body h1,
@@ -854,10 +869,11 @@ textarea {
   overflow-x: auto;
 }
 
+/* Let SVG keep intrinsic width; parent .mermaid-wrapper scrolls horizontally on narrow viewports */
 .markdown-body .mermaid-diagram svg {
-  max-width: 100% !important;
-  width: auto !important;
-  height: auto !important;
+  max-width: none;
+  width: auto;
+  height: auto;
   min-width: 0;
   display: block;
   box-sizing: border-box;

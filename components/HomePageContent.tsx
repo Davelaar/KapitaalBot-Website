@@ -49,7 +49,7 @@ flowchart LR
 `;
 
   return (
-    <>
+    <div className="home-page-root">
       <section style={{ marginBottom: "2rem", padding: "1.5rem 1.25rem" }} className="card">
         <h1 style={{ fontSize: "1.5rem", marginBottom: "0.5rem", fontWeight: 600 }}>
           {t(locale, "hero.headline")}
@@ -200,6 +200,6 @@ flowchart LR
           <Link href={withLocale(locale, "/tier2-request")} className="kb-text-link">{t(locale, "nav.access")}</Link>.
         </p>
       </section>
-    </>
+    </div>
   );
 }

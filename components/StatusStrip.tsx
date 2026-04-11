@@ -49,9 +49,10 @@ export default function StatusStrip({ status, locale = "nl" }: StatusStripProps)
         marginBottom: "1rem",
         padding: "1rem 1.25rem",
         display: "grid",
-        gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
+        gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 140px), 1fr))",
         gap: "1rem",
         alignItems: "center",
+        minWidth: 0,
       }}
     >
       <div>
@@ -97,7 +98,7 @@ export default function StatusStrip({ status, locale = "nl" }: StatusStripProps)
         <div style={{ fontSize: "0.75rem", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.02em" }}>
           {t(locale, "status.snapshot")}
         </div>
-        <div style={{ fontSize: "0.8125rem", fontFamily: "monospace" }}>
+        <div className="kb-dash-prose" style={{ fontSize: "0.8125rem", fontFamily: "monospace" }}>
           {status.exported_at}
         </div>
       </div>

@@ -10,7 +10,13 @@ export interface RecentExecutionSectionProps {
   maxFills?: number;
 }
 
-const tableWrap: CSSProperties = { overflowX: "auto", marginTop: "0.5rem" };
+const tableWrap: CSSProperties = {
+  overflowX: "auto",
+  marginTop: "0.5rem",
+  maxWidth: "100%",
+  minWidth: 0,
+  WebkitOverflowScrolling: "touch",
+};
 const th: CSSProperties = {
   textAlign: "left",
   fontSize: "0.75rem",
@@ -53,32 +59,32 @@ export default function RecentExecutionSection({
   }
 
   return (
-    <section style={{ marginTop: "1.5rem", display: "grid", gap: "1rem" }}>
-      <div className="card" style={{ padding: "1rem 1.25rem" }}>
+    <section style={{ marginTop: "1.5rem", display: "grid", gap: "1rem", minWidth: 0 }}>
+      <div className="card" style={{ padding: "1rem 1.25rem", minWidth: 0 }}>
         <h2 style={{ fontSize: "1rem", marginBottom: "0.5rem" }}>
           {isNl ? "Why-No-Trade en route-uitkomst (1h)" : "Why-No-Trade and route outcome (1h)"}
         </h2>
-        <p style={{ margin: 0, color: "var(--muted)", fontSize: "0.875rem", lineHeight: 1.6 }}>
+        <p className="kb-dash-prose" style={{ margin: 0, color: "var(--muted)", fontSize: "0.875rem", lineHeight: 1.6 }}>
           <strong>{isNl ? "Reject reasons: " : "Reject reasons: "}</strong>
           {rejectReasons.length ? rejectReasons.map((r) => `${r.label} (${r.count})`).join(" · ") : "—"}
         </p>
-        <p style={{ margin: "0.4rem 0 0", color: "var(--muted)", fontSize: "0.875rem", lineHeight: 1.6 }}>
+        <p className="kb-dash-prose" style={{ margin: "0.4rem 0 0", color: "var(--muted)", fontSize: "0.875rem", lineHeight: 1.6 }}>
           <strong>{isNl ? "Why-No-Trade: " : "Why-No-Trade: "}</strong>
           {whyNoTrade.length ? whyNoTrade.map((r) => `${r.label} (${r.count})`).join(" · ") : "—"}
         </p>
-        <p style={{ margin: "0.4rem 0 0", color: "var(--muted)", fontSize: "0.875rem", lineHeight: 1.6 }}>
+        <p className="kb-dash-prose" style={{ margin: "0.4rem 0 0", color: "var(--muted)", fontSize: "0.875rem", lineHeight: 1.6 }}>
           <strong>{isNl ? "Route wins: " : "Route wins: "}</strong>
           {routeWins.length ? routeWins.map((r) => `${r.label} (${r.count})`).join(" · ") : "—"}
         </p>
       </div>
 
       {orders.length > 0 && (
-        <div className="card" style={{ padding: "1rem 1.25rem" }}>
+        <div className="card" style={{ padding: "1rem 1.25rem", minWidth: 0 }}>
           <h2 style={{ fontSize: "1.05rem", marginBottom: "0.5rem" }}>
             {isNl ? "Recente execution context" : "Recent execution context"}
           </h2>
-          <div style={tableWrap}>
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <div className="kb-table-scroll" style={tableWrap}>
+            <table className="kb-table">
               <thead>
                 <tr>
                   {[
@@ -117,12 +123,12 @@ export default function RecentExecutionSection({
       )}
 
       {fills.length > 0 && (
-        <div className="card" style={{ padding: "1rem 1.25rem" }}>
+        <div className="card" style={{ padding: "1rem 1.25rem", minWidth: 0 }}>
           <h2 style={{ fontSize: "1.05rem", marginBottom: "0.5rem" }}>
             {isNl ? "Recente fill outcomes" : "Recent fill outcomes"}
           </h2>
-          <div style={tableWrap}>
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <div className="kb-table-scroll" style={tableWrap}>
+            <table className="kb-table">
               <thead>
                 <tr>
                   {[

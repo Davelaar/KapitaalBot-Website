@@ -166,7 +166,7 @@ export default function MetricCardGrid({
     (tickerCount >= 50 || tradeCountRaw >= 50);
 
   return (
-    <section>
+    <section style={{ minWidth: 0 }}>
       <h2 style={{ fontSize: "1.25rem", marginBottom: "1rem" }}>
         {t(locale, "metrics.title")}
       </h2>
@@ -174,8 +174,9 @@ export default function MetricCardGrid({
         className="metric-grid"
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 160px), 1fr))",
           gap: "1rem",
+          minWidth: 0,
         }}
       >
         <MetricCard
