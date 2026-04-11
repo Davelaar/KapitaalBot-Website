@@ -1,9 +1,15 @@
 # Changelog — Website finalisatie
 
+## 2026-04-10 — Dashboard cockpit: lege strip vullen + tabel volle breedte
+
+- **Waarom** — CSS Grid maakt **rij 2** zo hoog als de **hoogste** kolom; “automatisch inschuiven” gebeurt niet zolang de rechtercel geen inhoud heeft die die ruimte claimt. Een lege rechthoek onder de meters is dus normaal grid-gedrag, geen bug.
+- **Wat** — `DashboardCockpit.tsx`: **Toestaan/Geblokkeerd**-kaarten verplaatst naar **binnen** `.cockpit-col-right` onder het meters-paneel; `margin-top: auto` op de state-cards zodat ze de verticale strip naar beneden vullen. **Execu-tietabel** op rij 3 met `grid-column: 1 / -1` (volle breedte). Mobiel: `margin-top` op cards weer normaal gap i.p.v. auto.
+- **Eerdere tussenstap** — Eerst alleen shrink-wrap zonder inhoudsverplaatsing (`5fdc79a`); deze layout gebruikt de vrijgekomen ruimte inhoudelijk.
+
 ## 2026-04-10 — Dashboard cockpit: rechterkolom zonder kunstmatige leegte
 
 - **Waarom** — Het meters-/intent-paneel kreeg `flex: 1` binnen een op `stretch` gezette gridrij en vulde daardoor dezelfde hoogte als de linkerkolom met lege ruimte onder de gauges.
-- **Wat** — `globals.css`: `.cockpit-col-right` en `.cockpit-bottom-right` met `align-self: start` + `width: 100%`; rechter `.cockpit-panel` en `.cockpit-state-cards` `flex: 0 0 auto` i.p.v. groeien naar resthoogte.
+- **Wat (tussen)** — `globals.css`: shrink-wrap rechterkolom (`5fdc79a`); zie hierboven voor definitieve vulling + tabel over beide kolommen.
 
 ## 2026-04-10 — Over: wat-is article layout, FundMe `/over/fundme`, bunq-donatie-CTA
 

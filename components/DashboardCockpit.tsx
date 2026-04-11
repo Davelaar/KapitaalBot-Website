@@ -302,6 +302,30 @@ export function DashboardCockpit({
                   : cockpitT(locale, "cardIntentEntry")}
             </p>
           </section>
+          <div className="cockpit-state-cards">
+            <section className={`cockpit-state-card cockpit-state-card--allow${allowActive && !haltActive ? " is-lit" : ""}`}>
+              <div className="cockpit-state-card__head">
+                <span className="cockpit-state-card__icon" aria-hidden>
+                  ◎
+                </span>
+                <h3>{cockpitT(locale, "cardAllow")}</h3>
+              </div>
+              <p className="cockpit-state-card__line">{cockpitT(locale, "cardExchange")}</p>
+              <p className="cockpit-state-card__line muted small">{cockpitT(locale, "cardIntentEntry")}</p>
+              <span className="cockpit-state-card__conf">{cockpitT(locale, "cardConf")}</span>
+            </section>
+            <section className={`cockpit-state-card cockpit-state-card--halt${haltActive ? " is-lit" : ""}`}>
+              <div className="cockpit-state-card__head">
+                <span className="cockpit-state-card__icon cockpit-state-card__icon--halt" aria-hidden>
+                  ◎
+                </span>
+                <h3>{cockpitT(locale, "cardHalt")}</h3>
+              </div>
+              <p className="cockpit-state-card__line">{cockpitT(locale, "cardExchange")}</p>
+              <p className="cockpit-state-card__line muted small">{cockpitT(locale, "cardIntentBlocked")}</p>
+              <span className="cockpit-state-card__conf">{cockpitT(locale, "cardConf")}</span>
+            </section>
+          </div>
       </div>
 
       <div className="cockpit-bottom-left">
@@ -343,33 +367,6 @@ export function DashboardCockpit({
             </div>
           )}
         </section>
-      </div>
-
-      <div className="cockpit-bottom-right">
-        <div className="cockpit-state-cards">
-          <section className={`cockpit-state-card cockpit-state-card--allow${allowActive && !haltActive ? " is-lit" : ""}`}>
-            <div className="cockpit-state-card__head">
-              <span className="cockpit-state-card__icon" aria-hidden>
-                ◎
-              </span>
-              <h3>{cockpitT(locale, "cardAllow")}</h3>
-            </div>
-            <p className="cockpit-state-card__line">{cockpitT(locale, "cardExchange")}</p>
-            <p className="cockpit-state-card__line muted small">{cockpitT(locale, "cardIntentEntry")}</p>
-            <span className="cockpit-state-card__conf">{cockpitT(locale, "cardConf")}</span>
-          </section>
-          <section className={`cockpit-state-card cockpit-state-card--halt${haltActive ? " is-lit" : ""}`}>
-            <div className="cockpit-state-card__head">
-              <span className="cockpit-state-card__icon cockpit-state-card__icon--halt" aria-hidden>
-                ◎
-              </span>
-              <h3>{cockpitT(locale, "cardHalt")}</h3>
-            </div>
-            <p className="cockpit-state-card__line">{cockpitT(locale, "cardExchange")}</p>
-            <p className="cockpit-state-card__line muted small">{cockpitT(locale, "cardIntentBlocked")}</p>
-            <span className="cockpit-state-card__conf">{cockpitT(locale, "cardConf")}</span>
-          </section>
-        </div>
       </div>
     </div>
   );
