@@ -181,6 +181,7 @@ body {
   display: flex;
   flex-direction: column;
   width: 100%;
+  min-width: 0;
   background: var(--bg);
 }
 
@@ -408,6 +409,7 @@ footer a[href]:hover {
 main {
   width: 100%;
   max-width: 1440px;
+  min-width: 0;
   margin: 0 auto;
   padding: 1rem 1.5rem;
   padding-bottom: 2rem;
@@ -699,6 +701,44 @@ textarea {
   background: var(--brand-soft-light);
 }
 
+/* Wide tables: stay inside viewport; scroll inside card (needs parent min-width:0 in grids) */
+.kb-table-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+  min-width: 0;
+  -webkit-overflow-scrolling: touch;
+}
+
+.kb-table-scroll .kb-table {
+  width: max-content;
+  min-width: 100%;
+}
+
+.route-centric-dashboard {
+  min-width: 0;
+}
+
+.route-centric-dashboard > .card {
+  min-width: 0;
+}
+
+.route-centric-dashboard .card {
+  min-width: 0;
+}
+
+.tier2-dashboard-grid {
+  min-width: 0;
+}
+
+.tier2-dashboard-grid > .card {
+  min-width: 0;
+}
+
+.kb-dash-prose {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
 /* —— Docs / markdown —— */
 .markdown-body {
   color: var(--text);
@@ -984,6 +1024,7 @@ textarea {
   gap: 1rem;
   align-items: stretch;
   margin-bottom: 2rem;
+  min-width: 0;
 }
 
 .cockpit-root .mono {
@@ -1326,12 +1367,16 @@ textarea {
 
 .cockpit-table-scroll {
   overflow-x: auto;
+  max-width: 100%;
+  min-width: 0;
+  -webkit-overflow-scrolling: touch;
   margin: 0 -0.15rem;
   padding: 0 0.15rem;
 }
 
 .cockpit-dense-table {
-  width: 100%;
+  width: max-content;
+  min-width: 100%;
   border-collapse: collapse;
   font-size: 0.8125rem;
 }

@@ -54,7 +54,7 @@ const FEED_FRESHNESS_STALE_THRESHOLD_SECS = 60;
 
 function card(title: string, body: ReactNode) {
   return (
-    <section className="card" style={{ padding: "1rem 1.25rem" }}>
+    <section className="card" style={{ padding: "1rem 1.25rem", minWidth: 0 }}>
       <h2 style={{ fontSize: "1.1rem", marginBottom: "0.5rem" }}>{title}</h2>
       {body}
     </section>
@@ -103,14 +103,14 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
     .slice(0, 3);
 
   return (
-    <div style={{ display: "grid", gap: "1rem" }}>
+    <div className="route-centric-dashboard" style={{ display: "grid", gap: "1rem", minWidth: 0 }}>
       {card(
         isNl ? "Live Route Board" : "Live Route Board",
         <>
-          <p style={{ marginTop: 0, color: "var(--muted)", fontSize: "0.9rem" }}>
+          <p className="kb-dash-prose" style={{ marginTop: 0, color: "var(--muted)", fontSize: "0.9rem" }}>
             {t(locale, "dashboard.routeBoardIntro")}
           </p>
-          <p className="kb-refresh-note">{t(locale, "dashboard.refreshNote")}</p>
+          <p className="kb-refresh-note kb-dash-prose">{t(locale, "dashboard.refreshNote")}</p>
           {isDecisionFallback && (
             <p className="kb-callout-warn">
               {isNl
@@ -126,8 +126,8 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
           )}
           {edgeSignals.length > 0 ? (
             <div
+              className="kb-table-scroll"
               style={{
-                overflowX: "auto",
                 maxHeight: "min(70vh, 28rem)",
                 overflowY: "auto",
                 border: "1px solid var(--border)",
@@ -165,7 +165,9 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
               {isNl ? "Nog geen publieke edgeboard-signalen beschikbaar." : "No public edgeboard signals available yet."}
             </p>
           )}
-          <p style={{ margin: "0.5rem 0 0", fontSize: "0.75rem", color: "var(--muted)" }}>{t(locale, "dashboard.routeBoardMeta")}</p>
+          <p className="kb-dash-prose" style={{ margin: "0.5rem 0 0", fontSize: "0.75rem", color: "var(--muted)" }}>
+            {t(locale, "dashboard.routeBoardMeta")}
+          </p>
         </>,
       )}
 
@@ -174,7 +176,14 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
             t(locale, "dashboard.edgeCandidatesTitle"),
             <>
               <p style={{ marginTop: 0, color: "var(--muted)", fontSize: "0.85rem" }}>{t(locale, "dashboard.edgeCandidatesIntro")}</p>
-              <div style={{ display: "grid", gap: "0.75rem", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))" }}>
+              <div
+                style={{
+                  display: "grid",
+                  gap: "0.75rem",
+                  gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,220px),1fr))",
+                  minWidth: 0,
+                }}
+              >
                 <div>
                   <p className="kb-section-title-ok">{t(locale, "dashboard.edgeCandidatesBest")}</p>
                   <ul style={{ margin: 0, paddingLeft: "1.1rem", fontSize: "0.85rem" }}>
@@ -208,7 +217,14 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
           {pnlDayEmpty ? (
             <p style={{ margin: "0 0 0.75rem", color: "var(--muted)", fontSize: "0.82rem" }}>{t(locale, "dashboard.dailyPnlEmpty")}</p>
           ) : null}
-          <div style={{ display: "grid", gap: "0.75rem", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))" }}>
+          <div
+            style={{
+              display: "grid",
+              gap: "0.75rem",
+              gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,220px),1fr))",
+              minWidth: 0,
+            }}
+          >
             <div>
               <p className="kb-section-title-ok">{t(locale, "dashboard.topWinners")}</p>
               {winners.length ? (
@@ -241,7 +257,14 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
         </>
       ))}
 
-      <div style={{ display: "grid", gap: "1rem", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))" }}>
+      <div
+        style={{
+          display: "grid",
+          gap: "1rem",
+          gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,280px),1fr))",
+          minWidth: 0,
+        }}
+      >
         <section className="card" style={{ padding: "1rem 1.25rem" }}>
           <h2 style={{ fontSize: "1.05rem", marginBottom: "0.5rem" }}>{isNl ? "Verdeling (funnel)" : "Distribution (funnel)"}</h2>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "1.25rem", justifyContent: "flex-start" }}>
@@ -282,7 +305,14 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
         </section>
       </div>
 
-      <div style={{ display: "grid", gap: "1rem", gridTemplateColumns: "repeat(auto-fit,minmax(340px,1fr))" }}>
+      <div
+        style={{
+          display: "grid",
+          gap: "1rem",
+          gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,340px),1fr))",
+          minWidth: 0,
+        }}
+      >
         {card(
           isNl ? "Why-No-Trade / Rejections" : "Why-No-Trade / Rejections",
           <>
@@ -339,7 +369,14 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
         )}
       </div>
 
-      <div style={{ display: "grid", gap: "1rem", gridTemplateColumns: "repeat(auto-fit,minmax(340px,1fr))" }}>
+      <div
+        style={{
+          display: "grid",
+          gap: "1rem",
+          gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,340px),1fr))",
+          minWidth: 0,
+        }}
+      >
         {card(
           isNl ? "Timing & Execution Viability" : "Timing & Execution Viability",
           <>
@@ -390,7 +427,14 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
         )}
       </div>
 
-      <div style={{ display: "grid", gap: "1rem", gridTemplateColumns: "repeat(auto-fit,minmax(340px,1fr))" }}>
+      <div
+        style={{
+          display: "grid",
+          gap: "1rem",
+          gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,340px),1fr))",
+          minWidth: 0,
+        }}
+      >
         {card(
           isNl ? "Execution / Fill Quality" : "Execution / Fill Quality",
           <>

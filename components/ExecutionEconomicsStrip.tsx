@@ -86,8 +86,15 @@ export function ExecutionEconomicsStrip({ locale, trading }: Props) {
     t(locale, key === "expected" ? "dashboard.econ.slipExpectedShort" : "dashboard.econ.slipRealizedShort");
 
   return (
-    <div style={{ display: "grid", gap: "1rem", gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))" }}>
-      <section className="card" style={{ padding: "1rem 1.25rem" }}>
+    <div
+      style={{
+        display: "grid",
+        gap: "1rem",
+        gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,300px),1fr))",
+        minWidth: 0,
+      }}
+    >
+      <section className="card" style={{ padding: "1rem 1.25rem", minWidth: 0 }}>
         <h2 style={{ fontSize: "1.05rem", marginBottom: "0.35rem" }}>{t(locale, "dashboard.econ.slippageTitle")}</h2>
         <p style={{ marginTop: 0, color: "var(--muted)", fontSize: "0.82rem" }}>{t(locale, "dashboard.econ.slippageIntro")}</p>
         <p style={{ margin: "0.35rem 0", fontSize: "0.88rem" }}>
@@ -113,7 +120,7 @@ export function ExecutionEconomicsStrip({ locale, trading }: Props) {
         )}
       </section>
 
-      <section className="card" style={{ padding: "1rem 1.25rem" }}>
+      <section className="card" style={{ padding: "1rem 1.25rem", minWidth: 0 }}>
         <h2 style={{ fontSize: "1.05rem", marginBottom: "0.35rem" }}>{t(locale, "dashboard.econ.holdTitle")}</h2>
         <p style={{ marginTop: 0, color: "var(--muted)", fontSize: "0.82rem" }}>{t(locale, "dashboard.econ.holdIntro")}</p>
         <p style={{ margin: "0.35rem 0", fontSize: "0.88rem" }}>
@@ -139,7 +146,7 @@ export function ExecutionEconomicsStrip({ locale, trading }: Props) {
         </ul>
       </section>
 
-      <section className="card" style={{ padding: "1rem 1.25rem" }}>
+      <section className="card" style={{ padding: "1rem 1.25rem", minWidth: 0 }}>
         <h2 style={{ fontSize: "1.05rem", marginBottom: "0.35rem" }}>{t(locale, "dashboard.econ.feeTitle")}</h2>
         <p style={{ marginTop: 0, color: "var(--muted)", fontSize: "0.82rem" }}>{t(locale, "dashboard.econ.feeIntro")}</p>
         <p style={{ margin: "0.35rem 0", fontSize: "0.88rem" }}>

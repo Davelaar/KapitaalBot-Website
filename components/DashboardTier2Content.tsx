@@ -123,8 +123,16 @@ export function DashboardTier2Content({ dataBundle, execution, latency, pnl, saf
         </div>
       </section>
 
-      <div style={{ display: "grid", gap: "1rem", gridTemplateColumns: "repeat(auto-fit,minmax(340px,1fr))" }}>
-        <section className="card" style={{ margin: 0 }}>
+      <div
+        className="tier2-dashboard-grid"
+        style={{
+          display: "grid",
+          gap: "1rem",
+          gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,340px),1fr))",
+          minWidth: 0,
+        }}
+      >
+        <section className="card" style={{ margin: 0, minWidth: 0 }}>
           <h2 style={{ fontSize: "1.05rem", marginBottom: "0.45rem" }}>Live Route Board</h2>
           <p style={{ margin: 0, color: "var(--muted)", fontSize: "0.85rem" }}>
             {dataBundle?.edgeboard?.available
@@ -135,15 +143,16 @@ export function DashboardTier2Content({ dataBundle, execution, latency, pnl, saf
           </p>
           {dataBundle?.edgeboard?.top_signals?.length ? (
             <div
+              className="kb-table-scroll"
               style={{
                 marginTop: "0.5rem",
                 maxHeight: "min(70vh, 26rem)",
-                overflow: "auto",
+                overflowY: "auto",
                 border: "1px solid var(--border)",
                 borderRadius: 8,
               }}
             >
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.82rem" }}>
+              <table className="kb-table" style={{ fontSize: "0.82rem" }}>
                 <thead style={{ position: "sticky", top: 0, background: "var(--card-bg)", zIndex: 1 }}>
                   <tr>
                     {["#", "Symbol", "Route", "Edge", "Conf", "Reason"].map((h) => (
@@ -170,7 +179,7 @@ export function DashboardTier2Content({ dataBundle, execution, latency, pnl, saf
           ) : null}
         </section>
 
-        <section className="card" style={{ margin: 0 }}>
+        <section className="card" style={{ margin: 0, minWidth: 0 }}>
           <h2 style={{ fontSize: "1.05rem", marginBottom: "0.45rem" }}>Why-No-Trade / Rejections</h2>
           <p style={{ margin: 0, color: "var(--muted)", fontSize: "0.85rem" }}>
             <strong>{isNl ? "Stage: " : "Stage: "}</strong>
@@ -182,7 +191,7 @@ export function DashboardTier2Content({ dataBundle, execution, latency, pnl, saf
           </p>
         </section>
 
-        <section className="card" style={{ margin: 0 }}>
+        <section className="card" style={{ margin: 0, minWidth: 0 }}>
           <h2 style={{ fontSize: "1.05rem", marginBottom: "0.45rem" }}>Position Context Board</h2>
           <p style={{ margin: 0, color: "var(--muted)", fontSize: "0.85rem" }}>
             Safety: N={safety?.safety_normal_count ?? "—"} · E={safety?.safety_exit_only_count ?? "—"} · B={safety?.safety_hard_blocked_count ?? "—"}
@@ -193,7 +202,7 @@ export function DashboardTier2Content({ dataBundle, execution, latency, pnl, saf
           </p>
         </section>
 
-        <section className="card" style={{ margin: 0 }}>
+        <section className="card" style={{ margin: 0, minWidth: 0 }}>
           <h2 style={{ fontSize: "1.05rem", marginBottom: "0.45rem" }}>Timing & Execution Viability</h2>
           <p style={{ margin: 0, color: "var(--muted)", fontSize: "0.85rem" }}>
             submit→ack avg: {latency?.submit_to_ack_ms_avg != null ? `${Math.round(latency.submit_to_ack_ms_avg)} ms` : "—"} · n={latency?.sample_count ?? "—"}
@@ -203,7 +212,7 @@ export function DashboardTier2Content({ dataBundle, execution, latency, pnl, saf
           </p>
         </section>
 
-        <section className="card" style={{ margin: 0 }}>
+        <section className="card" style={{ margin: 0, minWidth: 0 }}>
           <h2 style={{ fontSize: "1.05rem", marginBottom: "0.45rem" }}>Strategy / Regime Matrix</h2>
           <p style={{ margin: 0, color: "var(--muted)", fontSize: "0.85rem" }}>
             {isNl ? "Aanname op basis van route/context snapshots; geen realtime signaalfeed." : "Derived from route/context snapshots; not a realtime signal feed."}
@@ -214,7 +223,7 @@ export function DashboardTier2Content({ dataBundle, execution, latency, pnl, saf
           </p>
         </section>
 
-        <section className="card" style={{ margin: 0 }}>
+        <section className="card" style={{ margin: 0, minWidth: 0 }}>
           <h2 style={{ fontSize: "1.05rem", marginBottom: "0.45rem" }}>Execution / Fill Quality</h2>
           <p style={{ margin: 0, color: "var(--muted)", fontSize: "0.85rem" }}>
             order status: {row(execution?.orders_status_counts_24h)}
@@ -224,7 +233,7 @@ export function DashboardTier2Content({ dataBundle, execution, latency, pnl, saf
           </p>
         </section>
 
-        <section className="card" style={{ margin: 0 }}>
+        <section className="card" style={{ margin: 0, minWidth: 0 }}>
           <h2 style={{ fontSize: "1.05rem", marginBottom: "0.45rem" }}>Runtime Health</h2>
           <p style={{ margin: 0, color: "var(--muted)", fontSize: "0.85rem" }}>
             {isNl ? "Run health samples: " : "Run health samples: "}
@@ -236,7 +245,7 @@ export function DashboardTier2Content({ dataBundle, execution, latency, pnl, saf
           </p>
         </section>
 
-        <section className="card" style={{ margin: 0 }}>
+        <section className="card" style={{ margin: 0, minWidth: 0 }}>
           <h2 style={{ fontSize: "1.05rem", marginBottom: "0.45rem" }}>Route Drilldown / Lineage</h2>
           <p style={{ margin: 0, color: "var(--muted)", fontSize: "0.85rem" }}>
             {isNl
@@ -251,19 +260,19 @@ export function DashboardTier2Content({ dataBundle, execution, latency, pnl, saf
             </Link>
           </p>
         </section>
-      </div>
 
-      {pnl ? (
-        <section className="card" style={{ marginTop: "1rem" }}>
-          <h2 style={{ fontSize: "1.05rem", marginBottom: "0.45rem" }}>
-            {isNl ? "Economische context (publiek geaggregeerd)" : "Economic context (public aggregated)"}
-          </h2>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: "0.85rem" }}>
-            realized_pnl_quote_24h: {pnl.realized_pnl_quote_24h != null ? pnl.realized_pnl_quote_24h.toFixed(2) : "—"} · drawdown:{" "}
-            {pnl.drawdown_pct != null ? `${pnl.drawdown_pct.toFixed(2)}%` : "—"}
-          </p>
-        </section>
-      ) : null}
+        {pnl ? (
+          <section className="card" style={{ margin: 0, minWidth: 0 }}>
+            <h2 style={{ fontSize: "1.05rem", marginBottom: "0.45rem" }}>
+              {isNl ? "Economische context (publiek geaggregeerd)" : "Economic context (public aggregated)"}
+            </h2>
+            <p style={{ margin: 0, color: "var(--muted)", fontSize: "0.85rem" }}>
+              realized_pnl_quote_24h: {pnl.realized_pnl_quote_24h != null ? pnl.realized_pnl_quote_24h.toFixed(2) : "—"} · drawdown:{" "}
+              {pnl.drawdown_pct != null ? `${pnl.drawdown_pct.toFixed(2)}%` : "—"}
+            </p>
+          </section>
+        ) : null}
+      </div>
     </main>
   );
 }
