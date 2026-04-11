@@ -7,6 +7,7 @@ import { seoStrings } from "@/lib/seo-i18n";
 import { aboutStrings } from "@/lib/about-i18n";
 import { faqFundingStrings } from "@/lib/faq-funding-i18n";
 import { watIsKapitaalbotStrings } from "@/lib/wat-is-kapitaalbot-i18n";
+import { fundMeStrings } from "@/lib/fundme-i18n";
 
 export type Locale = "nl" | "en" | "de" | "fr";
 
@@ -31,6 +32,7 @@ const strings: Record<Locale, Record<string, string>> = {
     "nav.about": "Over",
     "nav.over.story": "Over KapitaalBot",
     "nav.over.truth": "Wat is het (wel / niet)?",
+    "nav.over.fundme": "FundMe / ondersteuning",
     "nav.menu.open": "Open menu",
     "nav.menu.close": "Close menu",
     "nav.access": "Toegang",
@@ -48,6 +50,8 @@ const strings: Record<Locale, Record<string, string>> = {
     "cta.tier2": "Vraag toegang (Tier 2)",
     "compliance.default": "Crypto is extreem volatiel. Sterke koersbewegingen kunnen snel tot grote verliezen leiden.",
     "compliance.ariaLabel": "Crypto-risicowaarschuwing",
+    "donate.cta": "Doneer…",
+    "donate.ariaLabel": "Doneer aan KapitaalBot via bunq (opent in een nieuw venster)",
     "faq.title": "FAQ",
     "faq.intro": "Veelgestelde vragen over de KapitaalBot-engine, observability en tiers. De chatbot hieronder kan aanvullende uitleg geven in meerdere talen (NL/EN/DE/FR), zonder strategiecode prijs te geven.",
     "faq.chat.title": "FAQ-chatbot",
@@ -440,6 +444,7 @@ const strings: Record<Locale, Record<string, string>> = {
     "nav.about": "About",
     "nav.over.story": "About KapitaalBot",
     "nav.over.truth": "What it is (and isn’t)",
+    "nav.over.fundme": "FundMe / support",
     "nav.menu.open": "Open menu",
     "nav.menu.close": "Close menu",
     "nav.access": "Access",
@@ -457,6 +462,8 @@ const strings: Record<Locale, Record<string, string>> = {
     "cta.tier2": "Request access (Tier 2)",
     "compliance.default": "Crypto is extremely volatile. Strong price movements can quickly lead to substantial losses.",
     "compliance.ariaLabel": "Crypto risk warning",
+    "donate.cta": "Donate…",
+    "donate.ariaLabel": "Donate to KapitaalBot via bunq (opens in a new window)",
     "faq.title": "FAQ",
     "faq.intro": "Frequently asked questions about the KapitaalBot engine, observability and tiers. The chatbot below can provide further explanation in multiple languages (NL/EN/DE/FR), without disclosing strategy code.",
     "faq.chat.title": "FAQ chatbot",
@@ -848,6 +855,7 @@ const strings: Record<Locale, Record<string, string>> = {
     "nav.about": "Über",
     "nav.over.story": "Über KapitaalBot",
     "nav.over.truth": "Was es ist (und nicht)",
+    "nav.over.fundme": "FundMe / Unterstützung",
     "nav.menu.open": "Menü öffnen",
     "nav.menu.close": "Menü schließen",
     "nav.access": "Zugang",
@@ -865,6 +873,8 @@ const strings: Record<Locale, Record<string, string>> = {
     "cta.tier2": "Zugang anfragen (Tier 2)",
     "compliance.default": "Krypto ist extrem volatil. Starke Kursbewegungen können schnell zu hohen Verlusten führen.",
     "compliance.ariaLabel": "Krypto-Risiko-Warnung",
+    "donate.cta": "Spenden…",
+    "donate.ariaLabel": "KapitaalBot über bunq unterstützen (öffnet in neuem Fenster)",
     "faq.title": "FAQ",
     "faq.intro": "Häufig gestellte Fragen zur KapitaalBot-Engine, Observability und Tiers. Der Chatbot unten kann weitere Erklärungen in mehreren Sprachen (NL/EN/DE/FR) geben, ohne Strategiecode preiszugeben.",
     "faq.chat.title": "FAQ-Chatbot",
@@ -1256,6 +1266,7 @@ const strings: Record<Locale, Record<string, string>> = {
     "nav.about": "À propos",
     "nav.over.story": "À propos de KapitaalBot",
     "nav.over.truth": "Qu’est-ce que c’est (et pas) ?",
+    "nav.over.fundme": "FundMe / soutien",
     "nav.menu.open": "Ouvrir le menu",
     "nav.menu.close": "Fermer le menu",
     "nav.access": "Accès",
@@ -1273,6 +1284,8 @@ const strings: Record<Locale, Record<string, string>> = {
     "cta.tier2": "Demander l'accès (Tier 2)",
     "compliance.default": "Les crypto sont extrêmement volatiles. De fortes variations de cours peuvent rapidement entraîner des pertes importantes.",
     "compliance.ariaLabel": "Avertissement sur le risque crypto",
+    "donate.cta": "Faire un don…",
+    "donate.ariaLabel": "Soutenir KapitaalBot via bunq (s’ouvre dans une nouvelle fenêtre)",
     "faq.title": "FAQ",
     "faq.intro": "Questions fréquentes sur le moteur KapitaalBot, l'observability et les tiers. Le chatbot ci-dessous peut fournir des explications supplémentaires en plusieurs langues (NL/EN/DE/FR), sans divulguer de code de stratégie.",
     "faq.chat.title": "Chatbot FAQ",
@@ -1656,16 +1669,19 @@ export function t(locale: Locale, key: string): string {
     seoStrings[locale]?.[key] ??
     aboutStrings[locale]?.[key] ??
     watIsKapitaalbotStrings[locale]?.[key] ??
+    fundMeStrings[locale]?.[key] ??
     faqFundingStrings[locale]?.[key] ??
     strings.en?.[key] ??
     seoStrings.en?.[key] ??
     aboutStrings.en?.[key] ??
     watIsKapitaalbotStrings.en?.[key] ??
+    fundMeStrings.en?.[key] ??
     faqFundingStrings.en?.[key] ??
     strings.nl[key] ??
     seoStrings.nl[key] ??
     aboutStrings.nl[key] ??
     watIsKapitaalbotStrings.nl[key] ??
+    fundMeStrings.nl[key] ??
     faqFundingStrings.nl[key] ??
     key
   );

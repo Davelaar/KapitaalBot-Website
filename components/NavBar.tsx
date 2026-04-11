@@ -139,6 +139,20 @@ export function NavBar() {
               >
                 {t(locale, "nav.over.truth")}
               </Link>
+              <Link
+                href={withLocale(locale, "/over/fundme")}
+                style={{
+                  display: "block",
+                  padding: "0.4rem 0.9rem",
+                  fontSize: "0.9rem",
+                  color: "var(--text)",
+                  textDecoration: "none",
+                  whiteSpace: "normal",
+                }}
+                onClick={() => setOverOpen(false)}
+              >
+                {t(locale, "nav.over.fundme")}
+              </Link>
             </div>
           )}
         </div>
@@ -274,6 +288,13 @@ export function NavBar() {
             onClick={() => setMobileOpen(false)}
           >
             {t(locale, "nav.over.truth")}
+          </Link>
+          <Link
+            href={withLocale(locale, "/over/fundme")}
+            className="mobile-nav-link mobile-nav-sub"
+            onClick={() => setMobileOpen(false)}
+          >
+            {t(locale, "nav.over.fundme")}
           </Link>
           <Link
             href={withLocale(locale, "/changelog")}

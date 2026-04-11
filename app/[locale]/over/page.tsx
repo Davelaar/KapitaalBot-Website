@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { parseLocaleParam, withLocale } from "@/lib/locale-path";
 import { buildPageMetadata } from "@/lib/page-metadata";
-import type { Locale } from "@/lib/i18n";
+import { t, type Locale } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
 
@@ -108,6 +108,9 @@ export default async function OverPage({ params }: { params: { locale: string } 
           </span>
           <Link href={withLocale(locale, "/over/wat-is-kapitaalbot")} className="kb-cta-row-btn kb-cta-row-btn--primary">
             {isNl ? "Wat is KapitaalBot?" : "What is KapitaalBot?"}
+          </Link>
+          <Link href={withLocale(locale, "/over/fundme")} className="kb-cta-row-btn">
+            {t(locale, "nav.over.fundme")}
           </Link>
           <Link href={withLocale(locale, "/spec")} className="kb-cta-row-btn">
             SPEC

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import ComplianceBanner from "@/components/ComplianceBanner";
+import { DonateFloatingCta } from "@/components/DonateFloatingCta";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { NavBar } from "@/components/NavBar";
 import { Footer } from "@/components/Footer";
@@ -88,6 +89,7 @@ export default async function LocaleLayout({
           }}
         />
       </div>
+      <DonateFloatingCta locale={lang} />
       <Analytics locale={lang} />
     </>
   );

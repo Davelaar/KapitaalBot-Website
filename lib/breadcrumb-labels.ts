@@ -11,6 +11,7 @@ const SEGMENT_KEYS: Record<string, string> = {
   faq: "faq.title",
   over: "nav.about",
   "wat-is-kapitaalbot": "watkap.breadcrumb",
+  fundme: "fundme.breadcrumb",
   contact: "contact.title",
   changelog: "changelog.title",
   "tier2-request": "nav.access",
