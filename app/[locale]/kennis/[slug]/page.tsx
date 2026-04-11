@@ -182,11 +182,11 @@ export default async function KennisArticlePage({
   return (
     <main>
       <nav style={{ marginBottom: "1.5rem", display: "flex", flexWrap: "wrap", gap: "0.5rem", alignItems: "center", fontSize: "0.875rem" }}>
-        <Link href={withLocale(locale, "/")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+        <Link href={withLocale(locale, "/")} className="kb-text-link">
           ← {isNl ? "Home" : "Home"}
         </Link>
         <span style={{ color: "var(--muted)" }}>/</span>
-        <Link href={withLocale(locale, "/kennis")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+        <Link href={withLocale(locale, "/kennis")} className="kb-text-link">
           {isNl ? "Kennis" : "Knowledge"}
         </Link>
       </nav>
@@ -216,23 +216,23 @@ export default async function KennisArticlePage({
         </ul>
 
         <p style={{ marginTop: "1.5rem", fontSize: "0.875rem", color: "var(--muted)" }}>
-          <Link href={withLocale(locale, "/kennis")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+          <Link href={withLocale(locale, "/kennis")} className="kb-text-link">
             ← {isNl ? "Kennis" : "Knowledge"}
           </Link>
           {" · "}
-          <Link href={withLocale(locale, "/dashboard")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+          <Link href={withLocale(locale, "/dashboard")} className="kb-text-link">
             {isNl ? "Dashboard" : "Dashboard"}
           </Link>
           {" · "}
-          <Link href={withLocale(locale, "/spec")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+          <Link href={withLocale(locale, "/spec")} className="kb-text-link">
             SPEC
           </Link>
           {" · "}
-          <Link href={withLocale(locale, "/docs")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+          <Link href={withLocale(locale, "/docs")} className="kb-text-link">
             {isNl ? "Docs" : "Docs"}
           </Link>
           {" · "}
-          <Link href={withLocale(locale, "/faq")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+          <Link href={withLocale(locale, "/faq")} className="kb-text-link">
             FAQ
           </Link>
         </p>

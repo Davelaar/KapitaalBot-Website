@@ -63,7 +63,7 @@ flowchart LR
         </div>
 
         <p style={{ marginTop: "1rem", fontSize: "0.8125rem", color: "var(--muted)" }}>
-          <Link href={withLocale(locale, "/dashboard")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+          <Link href={withLocale(locale, "/dashboard")} className="kb-text-link">
             {t(locale, "hero.dataLink")}
           </Link>
         </p>
@@ -75,24 +75,24 @@ flowchart LR
           {t(locale, "home.seoStrip.intro")}
         </p>
         <p style={{ margin: 0, fontSize: "0.875rem" }}>
-          <Link href={withLocale(locale, "/kennis/kraken-l3-orderbook-bot")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+          <Link href={withLocale(locale, "/kennis/kraken-l3-orderbook-bot")} className="kb-text-link">
             {t(locale, "home.seoStrip.anchor.l3")}
           </Link>
           {" · "}
-          <Link href={withLocale(locale, "/kennis/kraken-websocket-api-spot")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+          <Link href={withLocale(locale, "/kennis/kraken-websocket-api-spot")} className="kb-text-link">
             {t(locale, "home.seoStrip.anchor.ws")}
           </Link>
           {" · "}
-          <Link href={withLocale(locale, "/kennis/kraken-hybrid-maker-fees")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+          <Link href={withLocale(locale, "/kennis/kraken-hybrid-maker-fees")} className="kb-text-link">
             {t(locale, "home.seoStrip.anchor.maker")}
           </Link>
           {" · "}
-          <Link href={withLocale(locale, "/kennis/crypto-regime-detectie")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+          <Link href={withLocale(locale, "/kennis/crypto-regime-detectie")} className="kb-text-link">
             {t(locale, "home.seoStrip.anchor.regime")}
           </Link>
         </p>
         <p style={{ marginTop: "0.75rem", marginBottom: 0 }}>
-          <Link href={withLocale(locale, "/kennis")} style={{ color: "var(--accent)", textDecoration: "none", fontSize: "0.9rem", fontWeight: 600 }}>
+          <Link href={withLocale(locale, "/kennis")} className="kb-text-link" style={{ fontSize: "0.9rem", fontWeight: 600 }}>
             {t(locale, "home.seoStrip.cta")}
           </Link>
         </p>
@@ -108,19 +108,19 @@ flowchart LR
             : "Public documentation is functionally complete without source code or reproducible private tuning. Use the pages below as canonical truth for humans and AI."}
         </p>
         <p style={{ margin: 0, fontSize: "0.9rem" }}>
-          <Link href={withLocale(locale, "/dashboard")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+          <Link href={withLocale(locale, "/dashboard")} className="kb-text-link">
             {locale === "nl" ? "Live observability dashboard" : "Live observability dashboard"}
           </Link>
           {" · "}
-          <Link href={withLocale(locale, "/spec")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+          <Link href={withLocale(locale, "/spec")} className="kb-text-link">
             SPEC
           </Link>
           {" · "}
-          <Link href={withLocale(locale, "/docs")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+          <Link href={withLocale(locale, "/docs")} className="kb-text-link">
             {t(locale, "nav.architecture")}
           </Link>
           {" · "}
-          <Link href={withLocale(locale, "/faq")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+          <Link href={withLocale(locale, "/faq")} className="kb-text-link">
             FAQ
           </Link>
         </p>
@@ -197,7 +197,7 @@ flowchart LR
       <section style={{ marginTop: "1.5rem", paddingTop: "1rem", borderTop: "1px solid var(--border)" }}>
         <p style={{ fontSize: "0.875rem", color: "var(--muted)" }}>
           {t(locale, "home.access.text")}{" "}
-          <Link href={withLocale(locale, "/tier2-request")} style={{ color: "var(--accent)", textDecoration: "none" }}>{t(locale, "nav.access")}</Link>.
+          <Link href={withLocale(locale, "/tier2-request")} className="kb-text-link">{t(locale, "nav.access")}</Link>.
         </p>
       </section>
     </>

@@ -97,7 +97,7 @@ export function FaqChatbot() {
                 display: "inline-block",
                 padding: "0.35rem 0.6rem",
                 borderRadius: 8,
-                background: m.role === "user" ? "var(--accent)" : "var(--card-bg)",
+                background: m.role === "user" ? "var(--brand)" : "var(--card-bg)",
                 color: m.role === "user" ? "var(--on-brand)" : "var(--fg)",
                 fontSize: "0.875rem",
               }}
@@ -111,7 +111,7 @@ export function FaqChatbot() {
                   <span key={`${slug}-${i}`}>
                     <Link
                       href={withLocale(locale, `/docs/${sourceToDocSlug(slug)}`)}
-                      style={{ color: "var(--accent)", textDecoration: "none" }}
+                      className="kb-text-link"
                     >
                       {sourceToDocSlug(slug)}
                     </Link>
@@ -124,7 +124,7 @@ export function FaqChatbot() {
         ))}
       </div>
       {error && (
-        <p style={{ color: "#f97373", fontSize: "0.8rem", marginBottom: "0.5rem" }}>
+        <p className="kb-message-danger" style={{ marginBottom: "0.5rem" }}>
           {error}
         </p>
       )}
@@ -147,16 +147,8 @@ export function FaqChatbot() {
         <button
           type="submit"
           disabled={loading}
-          style={{
-            padding: "0.4rem 0.9rem",
-            background: "var(--accent)",
-            color: "#0f1419",
-            border: "none",
-            borderRadius: 8,
-            fontWeight: 600,
-            cursor: loading ? "default" : "pointer",
-            fontSize: "0.9rem",
-          }}
+          className="kb-btn-solid-brand kb-btn-solid-brand--compact"
+          style={{ cursor: loading ? "default" : "pointer" }}
         >
           {loading ? t(locale, "faq.chat.sending") : t(locale, "faq.chat.send")}
         </button>

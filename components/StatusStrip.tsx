@@ -58,7 +58,7 @@ export default function StatusStrip({ status, locale = "nl" }: StatusStripProps)
         <div style={{ fontSize: "0.75rem", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.02em" }}>
           {t(locale, "status.run")}
         </div>
-        <div style={{ fontSize: "1.125rem", fontWeight: 600, color: "var(--accent)" }}>
+        <div className="kb-status-headline">
           #{status.run_id ?? "—"}
         </div>
       </div>

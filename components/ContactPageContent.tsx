@@ -42,7 +42,7 @@ export function ContactPageContent() {
   return (
     <main>
       <nav style={{ marginBottom: "1.5rem" }}>
-        <Link href={withLocale(locale, "/")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+        <Link href={withLocale(locale, "/")} className="kb-text-link">
           ← {t(locale, "nav.home")}
         </Link>
       </nav>
@@ -50,7 +50,7 @@ export function ContactPageContent() {
       <p style={{ color: "var(--muted)", marginBottom: "1.5rem" }}>{t(locale, "contact.intro")}</p>
       <p style={{ color: "var(--muted)", marginBottom: "1.5rem", fontSize: "0.9rem", lineHeight: 1.6 }}>
         {t(locale, "contact.donationNote")}{" "}
-        <Link href={`${withLocale(locale, "/faq")}#funding`} style={{ color: "var(--accent)", textDecoration: "underline" }}>
+        <Link href={`${withLocale(locale, "/faq")}#funding`} className="kb-text-link">
           {t(locale, "contact.donationFaqLink")}
         </Link>
       </p>
@@ -131,7 +131,7 @@ export function ContactPageContent() {
       <section className="card" style={{ marginBottom: "1rem", padding: "1rem 1.25rem" }}>
         <p style={{ margin: 0, fontSize: "0.9rem", color: "var(--muted)" }}>
           {t(locale, "contact.accessNote")}{" "}
-          <Link href={withLocale(locale, "/tier2-request")} style={{ color: "var(--accent)", textDecoration: "none", fontWeight: 500 }}>
+          <Link href={withLocale(locale, "/tier2-request")} className="kb-text-link" style={{ fontWeight: 500 }}>
             {t(locale, "contact.accessLink")}
           </Link>
         </p>

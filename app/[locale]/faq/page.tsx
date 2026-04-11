@@ -80,7 +80,7 @@ export default async function FAQPage({ params }: { params: { locale: string } }
   return (
     <main>
       <nav style={{ marginBottom: "1.5rem" }}>
-        <Link href={withLocale(locale, "/")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+        <Link href={withLocale(locale, "/")} className="kb-text-link">
           ← {t(locale, "nav.home")}
         </Link>
       </nav>

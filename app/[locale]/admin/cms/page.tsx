@@ -20,7 +20,7 @@ export default async function AdminCmsPage({ params }: { params: { locale: strin
   return (
     <main>
       <nav style={{ marginBottom: "1.5rem" }}>
-        <Link href={withLocale(locale, "/admin")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+        <Link href={withLocale(locale, "/admin")} className="kb-text-link">
           ← Admin
         </Link>
       </nav>

@@ -47,7 +47,7 @@ export default async function WatIsKapitaalbotPage({ params }: { params: { local
   return (
     <main style={{ maxWidth: 720, margin: "0 auto", padding: "0 1.25rem 2.5rem" }}>
       <nav style={{ marginBottom: "1.5rem" }}>
-        <Link href={withLocale(locale, "/over")} style={{ color: "var(--accent)", textDecoration: "none", fontSize: "0.9rem" }}>
+        <Link href={withLocale(locale, "/over")} className="kb-text-link" style={{ fontSize: "0.9rem" }}>
           ← {isNl ? "Over KapitaalBot" : "About KapitaalBot"}
         </Link>
       </nav>
@@ -87,23 +87,23 @@ export default async function WatIsKapitaalbotPage({ params }: { params: { local
         </p>
 
         <p style={{ ...pStyle, marginTop: "1.25rem", fontSize: "0.9rem" }}>
-          <Link href={withLocale(locale, "/dashboard")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+          <Link href={withLocale(locale, "/dashboard")} className="kb-text-link">
             {isNl ? "Dashboard" : "Dashboard"}
           </Link>
           {" · "}
-          <Link href={withLocale(locale, "/spec")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+          <Link href={withLocale(locale, "/spec")} className="kb-text-link">
             SPEC
           </Link>
           {" · "}
-          <Link href={withLocale(locale, "/docs")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+          <Link href={withLocale(locale, "/docs")} className="kb-text-link">
             {isNl ? "Docs" : "Docs"}
           </Link>
           {" · "}
-          <Link href={withLocale(locale, "/faq")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+          <Link href={withLocale(locale, "/faq")} className="kb-text-link">
             FAQ
           </Link>
           {" · "}
-          <Link href={withLocale(locale, "/kennis")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+          <Link href={withLocale(locale, "/kennis")} className="kb-text-link">
             {isNl ? "Kennis" : "Knowledge"}
           </Link>
         </p>

@@ -24,7 +24,7 @@ export default async function Tier2RequestPage({ params }: { params: { locale: s
   return (
     <main>
       <nav style={{ marginBottom: "1.5rem" }}>
-        <Link href={withLocale(locale, "/")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+        <Link href={withLocale(locale, "/")} className="kb-text-link">
           ← {t(locale, "nav.system")}
         </Link>
       </nav>

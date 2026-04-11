@@ -53,7 +53,7 @@ export default function MarketSummary({ market }: MarketSummaryProps) {
           }}
         >
           <span style={{ fontSize: "0.875rem", color: "var(--muted)" }}>
-            Symbolen: <strong style={{ color: "var(--accent)" }}>{market.symbol_count}</strong>
+            Symbolen: <strong className="kb-metric-strong">{market.symbol_count}</strong>
           </span>
           {market.run_id != null && (
             <span style={{ fontSize: "0.875rem", color: "var(--muted)" }}>

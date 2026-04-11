@@ -77,7 +77,7 @@ export function Breadcrumbs() {
                     {it.label}
                   </span>
                 ) : (
-                  <Link href={it.href} style={{ color: "var(--accent)", textDecoration: "none" }}>
+                  <Link href={it.href} className="kb-text-link">
                     {it.label}
                   </Link>
                 )}

@@ -30,22 +30,10 @@ export default async function OverPage({ params }: { params: { locale: string } 
   const isNl = locale === "nl";
   const pStyle = { color: "var(--muted)", lineHeight: 1.65 as const, fontSize: "0.9375rem", marginBottom: "1rem" };
   const h2Style = { fontSize: "1.2rem", marginTop: "1.75rem", marginBottom: "0.75rem", fontWeight: 600 as const };
-  const ctaBtn = {
-    display: "inline-block",
-    padding: "0.5rem 1rem",
-    borderRadius: 8,
-    border: "1px solid var(--border)",
-    background: "var(--card-bg)",
-    color: "var(--fg)",
-    textDecoration: "none",
-    fontSize: "0.9rem",
-    fontWeight: 600,
-  };
-
   return (
     <main style={{ maxWidth: 720, margin: "0 auto", padding: "0 1.25rem 2.5rem" }}>
       <nav style={{ marginBottom: "1.5rem" }}>
-        <Link href={withLocale(locale, "/")} style={{ color: "var(--accent)", textDecoration: "none", fontSize: "0.9rem" }}>
+        <Link href={withLocale(locale, "/")} className="kb-text-link" style={{ fontSize: "0.9rem" }}>
           ← {isNl ? "Systeem" : "System"}
         </Link>
       </nav>
@@ -118,19 +106,19 @@ export default async function OverPage({ params }: { params: { locale: string } 
           <span style={{ width: "100%", fontSize: "0.85rem", color: "var(--muted)", marginBottom: "0.25rem" }}>
             {isNl ? "Canonieke ingangen" : "Canonical entry points"}
           </span>
-          <Link href={withLocale(locale, "/over/wat-is-kapitaalbot")} style={{ ...ctaBtn, borderColor: "var(--accent)", color: "var(--accent)" }}>
+          <Link href={withLocale(locale, "/over/wat-is-kapitaalbot")} className="kb-cta-row-btn kb-cta-row-btn--primary">
             {isNl ? "Wat is KapitaalBot?" : "What is KapitaalBot?"}
           </Link>
-          <Link href={withLocale(locale, "/spec")} style={ctaBtn}>
+          <Link href={withLocale(locale, "/spec")} className="kb-cta-row-btn">
             SPEC
           </Link>
-          <Link href={withLocale(locale, "/dashboard")} style={ctaBtn}>
+          <Link href={withLocale(locale, "/dashboard")} className="kb-cta-row-btn">
             {isNl ? "Dashboard" : "Dashboard"}
           </Link>
-          <Link href={withLocale(locale, "/docs")} style={ctaBtn}>
+          <Link href={withLocale(locale, "/docs")} className="kb-cta-row-btn">
             {isNl ? "Docs" : "Docs"}
           </Link>
-          <Link href={withLocale(locale, "/faq")} style={ctaBtn}>
+          <Link href={withLocale(locale, "/faq")} className="kb-cta-row-btn">
             FAQ
           </Link>
         </div>

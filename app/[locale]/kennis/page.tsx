@@ -80,7 +80,7 @@ export default async function KennisHubPage({ params }: { params: { locale: stri
   return (
     <main>
       <nav style={{ marginBottom: "1.5rem" }}>
-        <Link href={withLocale(locale, "/")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+        <Link href={withLocale(locale, "/")} className="kb-text-link">
           ← {isNl ? "Home" : "Home"}
         </Link>
       </nav>
@@ -116,19 +116,19 @@ export default async function KennisHubPage({ params }: { params: { locale: stri
           ))}
         </div>
         <p style={{ marginTop: "2rem", fontSize: "0.875rem", color: "var(--muted)" }}>
-          <Link href={withLocale(locale, "/dashboard")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+          <Link href={withLocale(locale, "/dashboard")} className="kb-text-link">
             {isNl ? "Dashboard" : "Dashboard"} →
           </Link>
           {" · "}
-          <Link href={withLocale(locale, "/spec")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+          <Link href={withLocale(locale, "/spec")} className="kb-text-link">
             SPEC
           </Link>
           {" · "}
-          <Link href={withLocale(locale, "/docs")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+          <Link href={withLocale(locale, "/docs")} className="kb-text-link">
             {isNl ? "Docs" : "Docs"}
           </Link>
           {" · "}
-          <Link href={withLocale(locale, "/faq")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+          <Link href={withLocale(locale, "/faq")} className="kb-text-link">
             FAQ
           </Link>
         </p>

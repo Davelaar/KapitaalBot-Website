@@ -73,7 +73,7 @@ export default async function DocsPage({ params }: { params: { locale: string } 
   return (
     <main>
       <nav style={{ marginBottom: "1.5rem" }}>
-        <Link href={withLocale(locale, "/")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+        <Link href={withLocale(locale, "/")} className="kb-text-link">
           ← {t(locale, "nav.home")}
         </Link>
       </nav>
@@ -81,7 +81,7 @@ export default async function DocsPage({ params }: { params: { locale: string } 
       <p style={{ color: "var(--muted)", marginBottom: "1.5rem" }}>
         {t(locale, "docs.intro")} {t(locale, "docs.page.introExtra")}
       </p>
-      <section className="card" style={{ marginBottom: "1rem", padding: "1rem 1.25rem", borderLeft: "4px solid var(--accent)" }}>
+      <section className="card" style={{ marginBottom: "1rem", padding: "1rem 1.25rem", borderLeft: "4px solid var(--brand)" }}>
         <h2 style={{ fontSize: "1.05rem", marginBottom: "0.45rem" }}>
           {locale === "nl" ? "Publieke documentatiegrens" : "Public documentation boundary"}
         </h2>
@@ -131,8 +131,8 @@ export default async function DocsPage({ params }: { params: { locale: string } 
                   <td style={{ padding: "0.4rem 0.25rem", verticalAlign: "top" }}>
                     <Link
                       href={withLocale(locale, `/docs/${slug}`)}
-                      className="docs-index-link"
-                      style={{ color: "var(--accent)", textDecoration: "none", fontSize: "0.9rem" }}
+                      className="docs-index-link kb-text-link"
+                      style={{ fontSize: "0.9rem" }}
                     >
                       {slug}.md
                     </Link>

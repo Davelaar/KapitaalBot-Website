@@ -170,7 +170,7 @@ export function Tier2RequestsAdmin({ initialRequests }: Props) {
                       padding: "0.25rem 0.9rem",
                       borderRadius: 999,
                       border: "none",
-                      background: "var(--accent)",
+                      background: "var(--brand)",
                       color: "var(--on-brand)",
                       fontSize: "0.85rem",
                       fontWeight: 600,

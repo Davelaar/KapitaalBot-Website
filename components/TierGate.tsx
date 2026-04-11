@@ -32,7 +32,7 @@ export async function TierGate({ kind, locale }: TierGateProps) {
           <Link href={loginHref} className="kb-btn kb-btn--secondary">
             {t(locale, "tier_gate.login")}
           </Link>
-          <Link href={withLocale(locale, "/")} style={{ color: "var(--accent)", textDecoration: "none", fontSize: "0.9375rem", alignSelf: "center" }}>
+          <Link href={withLocale(locale, "/")} className="kb-text-link" style={{ fontSize: "0.9375rem", alignSelf: "center" }}>
             ← {t(locale, "nav.home")}
           </Link>
         </div>

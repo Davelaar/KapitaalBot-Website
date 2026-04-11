@@ -119,7 +119,7 @@ export default async function ChangelogPage({ params }: { params: { locale: stri
   return (
     <main>
       <nav style={{ marginBottom: "1.5rem" }}>
-        <Link href={withLocale(locale, "/")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+        <Link href={withLocale(locale, "/")} className="kb-text-link">
           ← {ui.navBack}
         </Link>
       </nav>
@@ -181,7 +181,7 @@ export default async function ChangelogPage({ params }: { params: { locale: stri
                 <div style={{ marginTop: "0.2rem", color: "var(--fg)" }}>{entrySummary(e, locale)}</div>
                 {e.body && e.body.replace(/\s+/g, " ").trim().length > 0 ? (
                   <details style={{ marginTop: "0.35rem" }}>
-                    <summary style={{ cursor: "pointer", color: "var(--accent)" }}>
+                    <summary className="kb-summary-trigger">
                       {isNl ? "Toon commit body" : "Show commit body"}
                     </summary>
                     <pre

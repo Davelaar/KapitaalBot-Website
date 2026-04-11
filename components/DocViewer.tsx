@@ -48,7 +48,7 @@ const docViewerStyles = {
     marginBottom: "0.75rem",
   },
   blockquote: {
-    borderLeft: "4px solid var(--accent)",
+    borderLeft: "4px solid var(--brand)",
     marginLeft: 0,
     paddingLeft: "1rem",
     color: "var(--muted)",

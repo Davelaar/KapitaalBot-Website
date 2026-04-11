@@ -37,7 +37,7 @@ export default async function SpecPage({ params }: { params: { locale: string } 
   return (
     <main>
       <nav style={{ marginBottom: "1.25rem" }}>
-        <Link href={withLocale(locale, "/")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+        <Link href={withLocale(locale, "/")} className="kb-text-link">
           ← {isNl ? "Home" : "Home"}
         </Link>
       </nav>

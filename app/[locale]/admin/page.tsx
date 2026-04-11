@@ -68,7 +68,7 @@ export default async function AdminPage({
   return (
     <main>
       <nav style={{ marginBottom: "1.5rem" }}>
-        <Link href={withLocale(locale, "/dashboard")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+        <Link href={withLocale(locale, "/dashboard")} className="kb-text-link">
           ← {ui.navDashboard}
         </Link>
       </nav>
@@ -84,10 +84,10 @@ export default async function AdminPage({
           gap: "0.35rem",
         }}
       >
-        <Link href={withLocale(locale, "/admin/access")} style={{ color: "var(--accent)", textDecoration: "none", fontWeight: 600 }}>
+        <Link href={withLocale(locale, "/admin/access")} className="kb-text-link" style={{ fontWeight: 600 }}>
           {ui.linkAccess}
         </Link>
-        <Link href={withLocale(locale, "/admin/cms")} style={{ color: "var(--accent)", textDecoration: "none", fontWeight: 600 }}>
+        <Link href={withLocale(locale, "/admin/cms")} className="kb-text-link" style={{ fontWeight: 600 }}>
           {ui.linkCms}
         </Link>
       </section>

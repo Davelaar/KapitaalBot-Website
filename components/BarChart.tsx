@@ -16,7 +16,7 @@ export default function BarChart({
   title,
   items,
   maxBarWidthPx = 200,
-  accentColor = "var(--accent)",
+  accentColor = "var(--brand)",
 }: BarChartProps) {
   const total = items.reduce((s, x) => s + x.value, 0);
   const maxVal = Math.max(...items.map((i) => i.value), 1);

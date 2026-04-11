@@ -79,7 +79,7 @@ function MetricCard({ label, value, chip, progress }: MetricCardProps) {
             style={{
               height: "100%",
               width: `${Math.min(100, Math.max(0, progress))}%`,
-              background: "var(--accent)",
+              background: "var(--brand)",
               borderRadius: 2,
             }}
           />
@@ -228,7 +228,7 @@ export default function MetricCardGrid({
             marginTop: "0.75rem",
             fontSize: "0.8125rem",
             color: "var(--muted)",
-            borderLeft: "3px solid var(--accent)",
+            borderLeft: "3px solid var(--brand)",
             paddingLeft: "0.75rem",
           }}
         >

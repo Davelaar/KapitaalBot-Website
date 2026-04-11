@@ -22,10 +22,10 @@ export default async function AdminAccessPage({ params }: { params: { locale: st
   return (
     <main>
       <nav style={{ marginBottom: "1.5rem", display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
-        <Link href={withLocale(locale, "/admin")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+        <Link href={withLocale(locale, "/admin")} className="kb-text-link">
           ← {locale === "nl" ? "Admin" : locale === "en" ? "Admin" : locale === "de" ? "Admin" : "Admin"}
         </Link>
-        <Link href={withLocale(locale, "/dashboard")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+        <Link href={withLocale(locale, "/dashboard")} className="kb-text-link">
           ← {locale === "nl" ? "Dashboard" : locale === "en" ? "Dashboard" : locale === "de" ? "Dashboard" : "Dashboard"}
         </Link>
       </nav>

@@ -47,19 +47,7 @@ name: {debugName}
 message: {debugMessage}
 digest: {debugDigest}
         </pre>
-        <button
-          type="button"
-          onClick={reset}
-          style={{
-            padding: "0.5rem 1rem",
-            background: "var(--accent)",
-            color: "#0f1419",
-            border: "none",
-            borderRadius: 8,
-            fontWeight: 600,
-            cursor: "pointer",
-          }}
-        >
+        <button type="button" onClick={reset} className="kb-btn-solid-brand">
           {t(locale, "global.error.retry")}
         </button>
       </div>

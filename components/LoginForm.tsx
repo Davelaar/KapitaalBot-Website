@@ -52,7 +52,7 @@ export function LoginForm() {
   return (
     <>
       <nav style={{ marginBottom: "1.5rem" }}>
-        <Link href={withLocale(locale, "/")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+        <Link href={withLocale(locale, "/")} className="kb-text-link">
           ← {t(locale, "nav.home")}
         </Link>
       </nav>

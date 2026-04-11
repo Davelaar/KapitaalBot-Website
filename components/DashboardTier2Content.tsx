@@ -36,11 +36,11 @@ export function DashboardTier2Content({ dataBundle, execution, latency, pnl, saf
     return (
       <main>
         <nav style={{ marginBottom: "1.25rem" }}>
-          <Link href={withLocale(locale, "/dashboard")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+          <Link href={withLocale(locale, "/dashboard")} className="kb-text-link">
             ← {isNl ? "Dashboard" : "Dashboard"}
           </Link>
         </nav>
-        <section className="card" style={{ borderLeft: "4px solid var(--accent)" }}>
+        <section className="card" style={{ borderLeft: "4px solid var(--brand)" }}>
           <h1 style={{ fontSize: "1.35rem", marginBottom: "0.5rem" }}>
             {isNl ? "Tier 2 route-observability" : "Tier 2 route observability"}
           </h1>
@@ -57,7 +57,7 @@ export function DashboardTier2Content({ dataBundle, execution, latency, pnl, saf
   return (
     <main>
       <nav style={{ marginBottom: "1.25rem" }}>
-        <Link href={withLocale(locale, "/dashboard")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+        <Link href={withLocale(locale, "/dashboard")} className="kb-text-link">
           ← {isNl ? "Dashboard" : "Dashboard"}
         </Link>
       </nav>
@@ -70,12 +70,12 @@ export function DashboardTier2Content({ dataBundle, execution, latency, pnl, saf
           ? "Verdiepte operationele diagnose op basis van geaggregeerde snapshots. Deze pagina toont uitkomst- en oorzaakinformatie zonder broncode, zonder private accountdetails en zonder reproduceerbare tuning."
           : "Deep operational diagnostics from aggregated snapshots. This page shows outcomes and causes without source code, without private account details, and without reproducible tuning."}
       </p>
-      <p style={{ color: "var(--accent)", marginBottom: "1rem", fontSize: "0.88rem", fontWeight: 600 }}>
+      <p className="kb-refresh-note" style={{ marginBottom: "1rem", fontSize: "0.88rem" }}>
         {t(locale, "dashboard.refreshNote")}
       </p>
 
       {dataBundle && (
-        <section className="card" style={{ marginBottom: "1rem", borderLeft: "4px solid var(--accent)" }}>
+        <section className="card" style={{ marginBottom: "1rem", borderLeft: "4px solid var(--brand)" }}>
           <h2 style={{ fontSize: "1.1rem", marginBottom: "0.5rem" }}>
             {isNl ? "Data contract en bronnen" : "Data contract and sources"}
           </h2>
@@ -244,9 +244,9 @@ export function DashboardTier2Content({ dataBundle, execution, latency, pnl, saf
               : "Public drilldown remains aggregated. For canonical definitions: SPEC + docs."}
           </p>
           <p style={{ margin: "0.45rem 0 0", fontSize: "0.88rem" }}>
-            <Link href={withLocale(locale, "/spec")} style={{ color: "var(--accent)", textDecoration: "none" }}>SPEC</Link>
+            <Link href={withLocale(locale, "/spec")} className="kb-text-link">SPEC</Link>
             {" · "}
-            <Link href={withLocale(locale, "/docs")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+            <Link href={withLocale(locale, "/docs")} className="kb-text-link">
               {isNl ? "Publieke docs" : "Public docs"}
             </Link>
           </p>

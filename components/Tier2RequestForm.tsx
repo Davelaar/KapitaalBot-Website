@@ -124,22 +124,18 @@ export function Tier2RequestForm() {
           />
         </div>
         {error && (
-          <p style={{ margin: "0 0 0.75rem", color: "var(--freshness-stale)", fontSize: "0.875rem" }}>
+          <p className="kb-message-danger" style={{ margin: "0 0 0.75rem", fontSize: "0.875rem" }}>
             {error}
           </p>
         )}
         <button
           type="submit"
           disabled={loading}
+          className="kb-btn-solid-brand"
           style={{
             padding: "0.5rem 1.25rem",
-            background: "var(--accent)",
-            color: "var(--on-brand)",
-            border: "none",
-            borderRadius: "8px",
-            fontWeight: 600,
-            cursor: loading ? "not-allowed" : "pointer",
             fontSize: "0.9375rem",
+            cursor: loading ? "not-allowed" : "pointer",
             opacity: loading ? 0.8 : 1,
           }}
         >

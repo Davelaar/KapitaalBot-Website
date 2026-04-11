@@ -292,6 +292,114 @@ footer a[href]:hover {
   font-weight: 700;
 }
 
+/* Docs sidebar — theme-aware; avoid small-text --accent / hardcoded rgba */
+.docs-file-link {
+  display: block;
+  text-decoration: none !important;
+  color: var(--text) !important;
+  font-size: 0.86rem;
+  font-weight: 500;
+  padding: 0.2rem 0.25rem;
+  border-radius: 6px;
+}
+
+.docs-file-link:hover {
+  color: var(--text-link) !important;
+  text-decoration: underline !important;
+}
+
+.docs-file-link--active {
+  color: var(--text-link) !important;
+  font-weight: 700;
+  background: var(--brand-soft-dark);
+}
+
+[data-theme="light"] .docs-file-link--active {
+  background: var(--brand-soft-light);
+}
+
+/* CTA pill row (over / landing callouts) */
+.kb-cta-row-btn {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  text-decoration: none !important;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.kb-cta-row-btn:hover {
+  border-color: var(--text-link);
+  color: var(--text-link);
+  text-decoration: underline !important;
+}
+
+.kb-cta-row-btn--primary {
+  border-color: var(--text-link);
+  color: var(--text-link);
+}
+
+.kb-summary-trigger {
+  cursor: pointer;
+  list-style: none;
+  font-weight: 600;
+  color: var(--text-link);
+}
+
+.kb-summary-trigger::-webkit-details-marker {
+  display: none;
+}
+
+.kb-message-success {
+  color: var(--semantic-ok-fg);
+  font-size: 0.8rem;
+}
+
+.kb-message-danger {
+  color: var(--semantic-bad-fg);
+  font-size: 0.8rem;
+}
+
+.kb-metric-strong {
+  color: var(--text-link);
+  font-weight: 700;
+}
+
+.kb-status-headline {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-link);
+}
+
+/* Solid brand fill (chat send, error retry); text must follow --on-brand */
+.kb-btn-solid-brand {
+  padding: 0.5rem 1rem;
+  background: var(--brand);
+  color: var(--on-brand);
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.kb-btn-solid-brand:hover:not(:disabled) {
+  background: var(--brand-hover);
+}
+
+.kb-btn-solid-brand:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.kb-btn-solid-brand--compact {
+  padding: 0.4rem 0.9rem;
+  font-size: 0.9rem;
+}
+
 .site-header a[href],
 .site-header .mobile-nav-panel a[href] {
   text-decoration: none !important;

@@ -138,13 +138,10 @@ export default function CmsAdminEditor({
               type="button"
               disabled={saving}
               onClick={handleSave}
+              className="kb-btn-solid-brand"
               style={{
                 width: "100%",
                 padding: "0.6rem 1rem",
-                background: "var(--accent)",
-                color: "#0f1419",
-                border: "none",
-                borderRadius: "8px",
                 fontWeight: 700,
                 cursor: saving ? "default" : "pointer",
                 opacity: saving ? 0.85 : 1,

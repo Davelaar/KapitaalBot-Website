@@ -77,7 +77,7 @@ export default async function DocSlugPage({ params }: { params: { locale: string
   return (
     <main>
       <nav style={{ marginBottom: "1.5rem" }}>
-        <Link href={withLocale(locale, "/docs")} style={{ color: "var(--accent)", textDecoration: "none" }}>
+        <Link href={withLocale(locale, "/docs")} className="kb-text-link">
           ← {t(locale, "docs.title")}
         </Link>
       </nav>
@@ -94,17 +94,7 @@ export default async function DocSlugPage({ params }: { params: { locale: string
               <li key={s}>
                 <Link
                   href={withLocale(locale, `/docs/${s}`)}
-                  className="docs-file-link"
-                  style={{
-                    display: "block",
-                    textDecoration: "none",
-                    color: s === slug ? "var(--accent)" : "var(--fg)",
-                    fontSize: "0.86rem",
-                    fontWeight: s === slug ? 700 : 500,
-                    padding: "0.2rem 0.25rem",
-                    borderRadius: 6,
-                    background: s === slug ? "rgba(45,212,191,0.12)" : "transparent",
-                  }}
+                  className={`docs-file-link${s === slug ? " docs-file-link--active" : ""}`}
                 >
                   {s}.md
                 </Link>
