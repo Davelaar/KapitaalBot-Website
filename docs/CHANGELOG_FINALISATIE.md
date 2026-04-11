@@ -2,6 +2,7 @@
 
 ## 2026-04-10 — Over: wat-is article layout, FundMe `/over/fundme`, bunq-donatie-CTA
 
+- **Nav (update)** — **FundMe** ook als eigen item in de hoofd-menubalk (desktop + mobiel), naast FAQ; label `nav.fundme` (= «FundMe»). Dropdown «Over» blijft de uitgebreide FundMe-/ondersteuningstekst tonen (`nav.over.fundme`).
 - **Waarom** — Canonieke “wat is”-tekst als gestructureerde blokken (geen markdown); publieke FundMe/ondersteuningspagina viertalig; zichtbare donatie-link naar bunq; navigatie + sitemap sluiten daarop aan.
 - **Wat (website)** — `lib/wat-is-kapitaalbot-article/*` + `WatIsKapitaalbotArticleBody`; slankere `wat-is-kapitaalbot-copy-*` (SEO/breadcrumb/kennis); `app/[locale]/over/fundme` + `lib/fundme-*` + `FundMeArticleBody`; `DonateFloatingCta` + `.kb-donate-fab-anchor` (fixed viewport, buiten `kb-app-shell`); `NavBar` + `lib/i18n` (`nav.over.fundme`, `donate.*`); `breadcrumb-labels`, `sitemap`, `over/page` CTA; `globals.css` (donate + eerdere wat-is-pair-grid).
 - **Deploy server** — `/srv/KapitaalBot-Website`: `git pull --ff-only`, `npm ci` of `npm install`, `npm run build`, `systemctl restart kapitaalbot-web.service`. Live-check: o.a. `curl -sfL -o /dev/null -w '%{http_code}\n' https://kapitaalbot.nl/nl/over/fundme` → 200 en donatieknop rechtsonder zichtbaar.

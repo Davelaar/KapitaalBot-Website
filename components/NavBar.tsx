@@ -171,6 +171,9 @@ export function NavBar() {
         <Link href={withLocale(locale, "/faq")} className={`nav-link${active("/faq") ? " nav-link--active" : ""}`}>
           {t(locale, "nav.research")}
         </Link>
+        <Link href={withLocale(locale, "/over/fundme")} className={`nav-link${active("/over/fundme") ? " nav-link--active" : ""}`}>
+          {t(locale, "nav.fundme")}
+        </Link>
         <div style={{ position: "relative" }}>
           <button
             type="button"
@@ -330,6 +333,13 @@ export function NavBar() {
             onClick={() => setMobileOpen(false)}
           >
             {t(locale, "nav.research")}
+          </Link>
+          <Link
+            href={withLocale(locale, "/over/fundme")}
+            className={`mobile-nav-link${active("/over/fundme") ? " mobile-nav-link--active" : ""}`}
+            onClick={() => setMobileOpen(false)}
+          >
+            {t(locale, "nav.fundme")}
           </Link>
           <div className="mobile-nav-section">{t(locale, "nav.account") ?? "Account"}</div>
           <Link href={withLocale(locale, "/tier2-request")} className="mobile-nav-link mobile-nav-sub" onClick={() => setMobileOpen(false)}>
