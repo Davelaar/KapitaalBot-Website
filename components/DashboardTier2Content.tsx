@@ -30,6 +30,7 @@ function row(items: LabelCount[] | null | undefined): string {
 export function DashboardTier2Content({ dataBundle, execution, latency, pnl, safety }: DashboardTier2ContentProps) {
   const locale = useLocale();
   const isNl = locale === "nl";
+  const pieOther = t(locale, "dashboard.pieOther");
 
   const hasAny = !!(dataBundle || execution || latency || pnl || safety);
   if (!hasAny) {
@@ -92,32 +93,32 @@ export function DashboardTier2Content({ dataBundle, execution, latency, pnl, saf
         <div style={{ display: "flex", flexWrap: "wrap", gap: "1.25rem", alignItems: "flex-start" }}>
           <SimplePieChart
             title={isNl ? "Funnel-fase (24h)" : "Funnel stage (24h)"}
-            segments={labelCountsToPieSegments(dataBundle?.route_no_trade?.funnel_stage_counts_24h, 8)}
+            segments={labelCountsToPieSegments(dataBundle?.route_no_trade?.funnel_stage_counts_24h, 8, pieOther)}
             size={148}
           />
           <SimplePieChart
             title={isNl ? "Decision codes (24h)" : "Decision codes (24h)"}
-            segments={labelCountsToPieSegments(dataBundle?.route_no_trade?.funnel_decision_code_counts_24h, 8)}
+            segments={labelCountsToPieSegments(dataBundle?.route_no_trade?.funnel_decision_code_counts_24h, 8, pieOther)}
             size={148}
           />
           <SimplePieChart
             title={isNl ? "Order status (24h)" : "Order status (24h)"}
-            segments={labelCountsToPieSegments(execution?.orders_status_counts_24h, 8)}
+            segments={labelCountsToPieSegments(execution?.orders_status_counts_24h, 8, pieOther)}
             size={148}
           />
           <SimplePieChart
             title={isNl ? "Fill side (24h)" : "Fill side (24h)"}
-            segments={labelCountsToPieSegments(execution?.fills_side_counts_24h, 8)}
+            segments={labelCountsToPieSegments(execution?.fills_side_counts_24h, 8, pieOther)}
             size={148}
           />
           <SimplePieChart
             title={isNl ? "Safety per mode" : "Safety by mode"}
-            segments={labelCountsToPieSegments(dataBundle?.risk_capital?.symbol_safety_by_mode, 8)}
+            segments={labelCountsToPieSegments(dataBundle?.risk_capital?.symbol_safety_by_mode, 8, pieOther)}
             size={148}
           />
           <SimplePieChart
             title={isNl ? "Path tape (orders 24h)" : "Path tape (orders 24h)"}
-            segments={labelCountsToPieSegments(dataBundle?.path_doctrine?.orders_by_path_tape_24h, 8)}
+            segments={labelCountsToPieSegments(dataBundle?.path_doctrine?.orders_by_path_tape_24h, 8, pieOther)}
             size={148}
           />
         </div>

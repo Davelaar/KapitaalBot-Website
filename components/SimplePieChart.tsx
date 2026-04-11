@@ -37,6 +37,20 @@ function donutSlicePath(cx: number, cy: number, rOut: number, rIn: number, start
   return `M ${pStartOut.x} ${pStartOut.y} A ${rOut} ${rOut} 0 ${largeArc} 1 ${pEndOut.x} ${pEndOut.y} L ${pEndIn.x} ${pEndIn.y} A ${rIn} ${rIn} 0 ${largeArc} 0 ${pStartIn.x} ${pStartIn.y} Z`;
 }
 
+function formatCenterDisplay(centerValue: number | undefined, locale: string | undefined, centerLabel: string | undefined): string | undefined {
+  if (centerValue != null && Number.isFinite(centerValue)) {
+    try {
+      return new Intl.NumberFormat(locale || "en", {
+        notation: "compact",
+        maximumFractionDigits: 1,
+      }).format(centerValue);
+    } catch {
+      return String(Math.round(centerValue));
+    }
+  }
+  return centerLabel;
+}
+
 export function SimplePieChart({
   title,
   segments,
@@ -44,6 +58,8 @@ export function SimplePieChart({
   className,
   variant = "pie",
   centerLabel,
+  centerValue,
+  locale,
   showLegend = true,
 }: {
   title?: string;
@@ -52,16 +68,20 @@ export function SimplePieChart({
   className?: string;
   /** Donut charts suit aggregate distributions (funnel, regime, etc.). */
   variant?: "pie" | "donut";
-  /** Shown in donut hole (e.g. total count) — restraint: short text only. */
+  /** Shown in donut hole when `centerValue` is not set — keep short. */
   centerLabel?: string;
+  /** If set, hole shows a locale-aware compact number (preferred for large totals). */
+  centerValue?: number;
+  /** BCP 47 locale for compact number formatting (e.g. `nl`). */
+  locale?: string;
   showLegend?: boolean;
 }) {
   const positive = segments.filter((s) => s.value > 0);
   const sum = positive.reduce((a, s) => a + s.value, 0);
   const cx = size / 2;
   const cy = size / 2;
-  const rOut = size * 0.38;
-  const rIn = variant === "donut" ? size * 0.22 : 0;
+  const rOut = variant === "donut" ? size * 0.35 : size * 0.38;
+  const rIn = variant === "donut" ? size * 0.26 : 0;
 
   if (sum <= 0 || positive.length === 0) {
     return (
@@ -96,7 +116,15 @@ export function SimplePieChart({
 
   const label = `${title ?? "distribution"}: ${positive.map((s) => `${s.label} ${((s.value / sum) * 100).toFixed(0)}%`).join(", ")}`;
 
-  const centerFont = Math.max(11, Math.round(size * 0.1));
+  const displayCenter = formatCenterDisplay(centerValue, locale, centerLabel);
+  const holeDiameter = variant === "donut" && rIn > 0 ? 2 * rIn : size * 0.45;
+  const len = displayCenter?.length ?? 0;
+  const centerFont = (() => {
+    if (!displayCenter) return 11;
+    const byHole = Math.max(8, Math.min(Math.round(size * 0.11), Math.round(holeDiameter * (len > 8 ? 0.2 : len > 5 ? 0.24 : 0.3))));
+    const byLen = len > 10 ? 8 : len > 7 ? 9 : len > 5 ? 10 : 12;
+    return Math.max(8, Math.min(byHole, byLen, Math.round(size * 0.12)));
+  })();
 
   return (
     <div className={className} style={{ minWidth: size }} role="img" aria-label={label}>
@@ -108,7 +136,7 @@ export function SimplePieChart({
           {slices.map((sl, idx) => (
             <path key={idx} d={sl.path} fill={sl.color} stroke="var(--border-strong)" strokeWidth={0.5} />
           ))}
-          {variant === "donut" && centerLabel ? (
+          {variant === "donut" && displayCenter ? (
             <text
               x={cx}
               y={cy}
@@ -117,19 +145,19 @@ export function SimplePieChart({
               fill="var(--text-secondary)"
               style={{ fontSize: centerFont, fontWeight: 650, letterSpacing: "-0.02em" }}
             >
-              {centerLabel}
+              {displayCenter}
             </text>
           ) : null}
         </svg>
         {showLegend ? (
           <ul
+            className="kb-pie-legend"
             style={{
               margin: 0,
               padding: "0 0 0 1rem",
               fontSize: "0.78rem",
               color: "var(--text-muted)",
               listStyle: "disc",
-              maxWidth: "14rem",
             }}
           >
             {slices.map((sl, idx) => (
@@ -147,14 +175,18 @@ export function SimplePieChart({
   );
 }
 
-export function labelCountsToPieSegments(rows: { label: string; count: number }[] | null | undefined, maxSlices = 8): PieSegment[] {
+export function labelCountsToPieSegments(
+  rows: { label: string; count: number }[] | null | undefined,
+  maxSlices = 8,
+  otherLabel = "other",
+): PieSegment[] {
   if (!rows?.length) return [];
   const sorted = [...rows].sort((a, b) => b.count - a.count);
   const head = sorted.slice(0, maxSlices - 1);
   const tail = sorted.slice(maxSlices - 1);
   const otherSum = tail.reduce((a, r) => a + r.count, 0);
   const out: PieSegment[] = head.map((r) => ({ label: r.label, value: r.count }));
-  if (otherSum > 0) out.push({ label: "other", value: otherSum });
+  if (otherSum > 0) out.push({ label: otherLabel, value: otherSum });
   return out;
 }
 

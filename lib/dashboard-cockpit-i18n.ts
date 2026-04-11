@@ -1,93 +1,103 @@
 import type { Locale } from "@/lib/i18n";
 
-const cockpit: Record<
-  Locale,
-  Record<
-    | "tagline"
-    | "runtime"
-    | "exchange"
-    | "run"
-    | "epoch"
-    | "feed"
-    | "symbols"
-    | "regime"
-    | "strategy"
-    | "safety"
-    | "pnlTitle"
-    | "pnlWinners"
-    | "pnlLosers"
-    | "pnlEmpty"
-    | "barsCaption"
-    | "gaugeFlow"
-    | "gaugeOrders"
-    | "gaugeFeeds"
-    | "skip"
-    | "btnAllow"
-    | "btnHalt"
-    | "tableTitle"
-    | "colAction"
-    | "colExecution"
-    | "colReason"
-    | "colSignal"
-    | "colStatus"
-    | "badgeAllow"
-    | "badgeSkip"
-    | "badgeHalt"
-    | "cardAllow"
-    | "cardHalt"
-    | "cardExchange"
-    | "cardIntentEntry"
-    | "cardIntentGuard"
-    | "cardIntentBlocked"
-    | "cardConf"
-    | "noRows"
-    | "delay",
-    string
-  >
-> = {
+type CockpitKey =
+  | "tagline"
+  | "runtime"
+  | "exchange"
+  | "run"
+  | "epoch"
+  | "feed"
+  | "symbols"
+  | "regime"
+  | "strategy"
+  | "safety"
+  | "pnlTitle"
+  | "pnlWinners"
+  | "pnlLosers"
+  | "pnlEmpty"
+  | "barsCaption"
+  | "barsHint"
+  | "barsAria"
+  | "metricL3"
+  | "metricOrders24h"
+  | "metricTrades24h"
+  | "metricDD"
+  | "gaugeFlow"
+  | "gaugeFlowEmpty"
+  | "gaugeOrders"
+  | "gaugeFeeds"
+  | "btnAllow"
+  | "btnHalt"
+  | "tableTitle"
+  | "colAction"
+  | "colExecution"
+  | "colReason"
+  | "colSignal"
+  | "colStatus"
+  | "badgeAllow"
+  | "badgeSkip"
+  | "badgeHalt"
+  | "cardAllow"
+  | "cardHalt"
+  | "cardExchange"
+  | "cardIntentEntry"
+  | "cardIntentGuard"
+  | "cardIntentBlocked"
+  | "cardConf"
+  | "noRows"
+  | "delay";
+
+const cockpit: Record<Locale, Record<CockpitKey, string>> = {
   nl: {
-    tagline: "A Precision Trading System",
-    runtime: "Runtime context",
-    exchange: "Exchange",
+    tagline: "Precisiehandelssysteem",
+    runtime: "Runtime-context",
+    exchange: "Beurs",
     run: "Run",
     epoch: "Epoch",
     feed: "Feed-vertraging",
     symbols: "Symbolen (epoch)",
     regime: "Dominant regime",
-    strategy: "Strategieën actief",
+    strategy: "Actieve strategieën",
     safety: "Safety (N / E / B)",
-    pnlTitle: "PNL",
+    pnlTitle: "Dagresultaat (PnL)",
     pnlWinners: "Winnaars (dag)",
     pnlLosers: "Verliezers (dag)",
-    pnlEmpty: "Geen PnL-splits",
+    pnlEmpty: "Geen PnL-verdeling in deze export.",
     barsCaption: "Equity-trend (vertraagd)",
-    gaugeFlow: "Fill-rate",
-    gaugeOrders: "Orders 24h",
-    gaugeFeeds: "Feed OK",
-    skip: "SKIP",
-    btnAllow: "ALLOW",
-    btnHalt: "HALT",
-    tableTitle: "Execution surface",
+    barsHint:
+      "Elke staaf is één tijdstip in de vertraagde account-equity-reeks uit de export. Hoogte is min–max genormaliseerd binnen dit venster: geen eurobedrag per staaf, wel de vorm en relatieve beweging van de curve.",
+    barsAria: "Miniatuur equity-trend uit vertraagde snapshot; laatste punten, relatieve schaal.",
+    metricL3: "L3-dekking",
+    metricOrders24h: "Orders (24 u)",
+    metricTrades24h: "Trades (24 u)",
+    metricDD: "Drawdown",
+    gaugeFlow: "Fillratio",
+    gaugeFlowEmpty: "Geen",
+    gaugeOrders: "Orders (24 u)",
+    gaugeFeeds: "Feed frisheid",
+    btnAllow: "Toestaan",
+    btnHalt: "Stop",
+    tableTitle: "Executie-overzicht",
     colAction: "Actie",
     colExecution: "Symbool",
     colReason: "Route / reden",
     colSignal: "Signaal",
     colStatus: "Vers",
-    badgeAllow: "ALLOW",
-    badgeSkip: "SKIP",
-    badgeHalt: "HALT",
-    cardAllow: "ALLOW",
-    cardHalt: "HALT",
+    badgeAllow: "OK",
+    badgeSkip: "Overslaan",
+    badgeHalt: "STOP",
+    cardAllow: "Toegestaan",
+    cardHalt: "Geblokkeerd",
     cardExchange: "Kraken Spot",
     cardIntentEntry: "Intent: entry / evaluatie",
     cardIntentGuard: "Intent: exit-only / guard",
     cardIntentBlocked: "Intent: geblokkeerd — geen nieuwe risk",
-    cardConf: "CONF",
+    cardConf: "Confidence",
     noRows: "Geen rijen in snapshot.",
     delay: "Snapshot-vertraging",
   },
   en: {
-    tagline: "A Precision Trading System",
+    tagline: "A precision trading system",
     runtime: "Runtime context",
     exchange: "Exchange",
     run: "Run",
@@ -97,17 +107,24 @@ const cockpit: Record<
     regime: "Dominant regime",
     strategy: "Active strategies",
     safety: "Safety (N / E / B)",
-    pnlTitle: "PNL",
+    pnlTitle: "PnL (day)",
     pnlWinners: "Winners (day)",
     pnlLosers: "Losers (day)",
-    pnlEmpty: "No PnL split",
+    pnlEmpty: "No PnL split in this export.",
     barsCaption: "Equity trend (delayed)",
+    barsHint:
+      "Each bar is one timestamp from the delayed account equity series in the export. Bar height is min–max normalized inside this window: not euros per bar, but the shape and relative movement of the curve.",
+    barsAria: "Mini equity trend from delayed snapshot; last points, relative scale.",
+    metricL3: "L3 coverage",
+    metricOrders24h: "Orders (24h)",
+    metricTrades24h: "Trades (24h)",
+    metricDD: "Drawdown",
     gaugeFlow: "Fill rate",
+    gaugeFlowEmpty: "None",
     gaugeOrders: "Orders 24h",
-    gaugeFeeds: "Feed OK",
-    skip: "SKIP",
-    btnAllow: "ALLOW",
-    btnHalt: "HALT",
+    gaugeFeeds: "Feed health",
+    btnAllow: "Allow",
+    btnHalt: "Halt",
     tableTitle: "Execution surface",
     colAction: "Action",
     colExecution: "Symbol",
@@ -128,9 +145,9 @@ const cockpit: Record<
     delay: "Snapshot lag",
   },
   de: {
-    tagline: "A Precision Trading System",
+    tagline: "Präzisions-Handelssystem",
     runtime: "Runtime-Kontext",
-    exchange: "Exchange",
+    exchange: "Börse",
     run: "Run",
     epoch: "Epoch",
     feed: "Feed-Latenz",
@@ -138,38 +155,45 @@ const cockpit: Record<
     regime: "Dominantes Regime",
     strategy: "Aktive Strategien",
     safety: "Safety (N / E / B)",
-    pnlTitle: "PNL",
+    pnlTitle: "PnL (Tag)",
     pnlWinners: "Gewinner (Tag)",
     pnlLosers: "Verlierer (Tag)",
-    pnlEmpty: "Keine PnL-Aufteilung",
+    pnlEmpty: "Keine PnL-Aufteilung in diesem Export.",
     barsCaption: "Equity-Trend (verzögert)",
+    barsHint:
+      "Jeder Balken ist ein Zeitpunkt der verzögerten Account-Equity-Reihe aus dem Export. Die Höhe ist min–max-normalisiert in diesem Fenster: keine Euro pro Balken, sondern Form und relative Bewegung der Kurve.",
+    barsAria: "Mini-Equity-Trend aus verzögertem Snapshot; letzte Punkte, relative Skala.",
+    metricL3: "L3-Abdeckung",
+    metricOrders24h: "Orders (24h)",
+    metricTrades24h: "Trades (24h)",
+    metricDD: "Drawdown",
     gaugeFlow: "Fill-Rate",
+    gaugeFlowEmpty: "Keine",
     gaugeOrders: "Orders 24h",
-    gaugeFeeds: "Feed OK",
-    skip: "SKIP",
-    btnAllow: "ALLOW",
-    btnHalt: "HALT",
-    tableTitle: "Execution-Oberfläche",
+    gaugeFeeds: "Feed-Frische",
+    btnAllow: "Erlauben",
+    btnHalt: "Stopp",
+    tableTitle: "Execution-Übersicht",
     colAction: "Aktion",
     colExecution: "Symbol",
     colReason: "Route / Grund",
     colSignal: "Signal",
     colStatus: "Frische",
-    badgeAllow: "ALLOW",
-    badgeSkip: "SKIP",
-    badgeHalt: "HALT",
-    cardAllow: "ALLOW",
-    cardHalt: "HALT",
+    badgeAllow: "OK",
+    badgeSkip: "Überspringen",
+    badgeHalt: "STOP",
+    cardAllow: "Erlaubt",
+    cardHalt: "Blockiert",
     cardExchange: "Kraken Spot",
     cardIntentEntry: "Intent: Entry / Evaluierung",
     cardIntentGuard: "Intent: nur Exit / Guard",
     cardIntentBlocked: "Intent: blockiert — kein neues Risiko",
-    cardConf: "CONF",
+    cardConf: "Confidence",
     noRows: "Keine Zeilen im Snapshot.",
     delay: "Snapshot-Latenz",
   },
   fr: {
-    tagline: "A Precision Trading System",
+    tagline: "Système de trading de précision",
     runtime: "Contexte runtime",
     exchange: "Exchange",
     run: "Run",
@@ -179,38 +203,45 @@ const cockpit: Record<
     regime: "Régime dominant",
     strategy: "Stratégies actives",
     safety: "Safety (N / E / B)",
-    pnlTitle: "PNL",
+    pnlTitle: "PnL (jour)",
     pnlWinners: "Gagnants (jour)",
     pnlLosers: "Perdants (jour)",
-    pnlEmpty: "Pas de split PnL",
+    pnlEmpty: "Pas de ventilation PnL dans cet export.",
     barsCaption: "Tendance equity (différée)",
+    barsHint:
+      "Chaque barre est un instant de la série equity compte (différée) dans l’export. La hauteur est normalisée min–max dans cette fenêtre : pas d’euros par barre, mais la forme et le mouvement relatif de la courbe.",
+    barsAria: "Mini tendance equity depuis snapshot différé ; derniers points, échelle relative.",
+    metricL3: "Couverture L3",
+    metricOrders24h: "Ordres (24h)",
+    metricTrades24h: "Trades (24h)",
+    metricDD: "Drawdown",
     gaugeFlow: "Taux de fill",
+    gaugeFlowEmpty: "Aucun",
     gaugeOrders: "Ordres 24h",
-    gaugeFeeds: "Flux OK",
-    skip: "SKIP",
-    btnAllow: "ALLOW",
-    btnHalt: "HALT",
+    gaugeFeeds: "Fraîcheur flux",
+    btnAllow: "Autoriser",
+    btnHalt: "Arrêt",
     tableTitle: "Surface d’exécution",
     colAction: "Action",
     colExecution: "Symbole",
     colReason: "Route / raison",
     colSignal: "Signal",
     colStatus: "Fraîcheur",
-    badgeAllow: "ALLOW",
-    badgeSkip: "SKIP",
-    badgeHalt: "HALT",
-    cardAllow: "ALLOW",
-    cardHalt: "HALT",
+    badgeAllow: "OK",
+    badgeSkip: "Passer",
+    badgeHalt: "STOP",
+    cardAllow: "Autorisé",
+    cardHalt: "Bloqué",
     cardExchange: "Kraken Spot",
     cardIntentEntry: "Intent : entrée / évaluation",
     cardIntentGuard: "Intent : exit-only / garde",
     cardIntentBlocked: "Intent : bloqué — pas de nouveau risque",
-    cardConf: "CONF",
+    cardConf: "Confiance",
     noRows: "Aucune ligne dans le snapshot.",
     delay: "Latence snapshot",
   },
 };
 
-export function cockpitT(locale: Locale, key: keyof (typeof cockpit)["nl"]): string {
+export function cockpitT(locale: Locale, key: CockpitKey): string {
   return cockpit[locale][key] ?? cockpit.en[key] ?? key;
 }

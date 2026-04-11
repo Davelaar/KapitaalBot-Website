@@ -348,6 +348,7 @@ const strings: Record<Locale, Record<string, string>> = {
       "Top 3 winnaars en verliezers op basis van som realized_pnl_quote per symbool voor de lopende UTC-kalenderdag (beslissings-DB). Geen voorspelling; alleen gesloten/verwerkte PnL-rijen.",
     "dashboard.topWinners": "Top 3 winnaars (quote)",
     "dashboard.topLosers": "Top 3 verliezers (quote)",
+    "dashboard.pieOther": "Overig",
     "dashboard.execution.delayNote":
       "Execution-tabellen: tijden op 15 minuten afgerond (Tier 1). Order-ref = laatste tekens van client order id.",
     "dashboard.execution.ordersTitle": "Laatste 10 execution-orders",
@@ -755,6 +756,7 @@ const strings: Record<Locale, Record<string, string>> = {
       "Top 3 winners and losers from summed realized_pnl_quote per symbol for the current UTC calendar day (decision DB). Not a forecast; only closed/processed PnL rows.",
     "dashboard.topWinners": "Top 3 winners (quote)",
     "dashboard.topLosers": "Top 3 losers (quote)",
+    "dashboard.pieOther": "Other",
     "dashboard.execution.delayNote":
       "Execution tables: timestamps rounded to 15 minutes (Tier 1). Order ref = trailing characters of client order id.",
     "dashboard.execution.ordersTitle": "Last 10 execution orders",
@@ -1162,6 +1164,7 @@ const strings: Record<Locale, Record<string, string>> = {
       "Top-3 Gewinner/Verlierer aus Summe realized_pnl_quote pro Symbol für den laufenden UTC-Kalendertag (Decision-DB).",
     "dashboard.topWinners": "Top 3 Gewinner (Quote)",
     "dashboard.topLosers": "Top 3 Verlierer (Quote)",
+    "dashboard.pieOther": "Sonstige",
     "dashboard.execution.delayNote":
       "Execution-Tabellen: Zeitstempel auf 15 Minuten gerundet (Tier 1). Order-Ref = letzte Zeichen der Client-Order-ID.",
     "dashboard.execution.ordersTitle": "Letzte 10 Execution-Orders",
@@ -1569,6 +1572,7 @@ const strings: Record<Locale, Record<string, string>> = {
       "Top 3 gagnants/perdants : somme realized_pnl_quote par symbole pour le jour UTC en cours (DB décision).",
     "dashboard.topWinners": "Top 3 gagnants (quote)",
     "dashboard.topLosers": "Top 3 perdants (quote)",
+    "dashboard.pieOther": "Autres",
     "dashboard.execution.delayNote":
       "Tableaux d’exécution : horodatages arrondis à 15 minutes (Tier 1). Réf. ordre = derniers caractères de l’id client.",
     "dashboard.execution.ordersTitle": "10 derniers ordres d’exécution",

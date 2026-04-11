@@ -15,12 +15,12 @@
   --brand-border-dark: rgba(89, 248, 252, 0.28);
   --brand-glow-subtle: 0 0 0 1px rgba(89, 248, 252, 0.16), 0 0 12px rgba(89, 248, 252, 0.08);
 
-  /* Dark foundation */
-  --bg: #0b1020;
-  --bg-elevated: #12192b;
-  --surface: #161f33;
-  --surface-soft: #1b2640;
-  --surface-strong: #202c46;
+  /* Dark foundation — canvas iets “titanium black”, cards iets lichter voor scheiding */
+  --bg: #07080c;
+  --bg-elevated: #0c0e14;
+  --surface: #121622;
+  --surface-soft: #171b28;
+  --surface-strong: #1c2230;
   --text: #e7edf7;
   --text-secondary: #b8c3d9;
   --text-muted: #8b96ad;
@@ -78,16 +78,16 @@
   --semantic-warn-fg: #f0d577;
   --semantic-bad-fg: #ffb3bc;
 
-  /* Instrument depth — layered sheen + ambient glow (cards / cockpit) */
-  --surface-sheen-top: linear-gradient(180deg, rgba(255, 255, 255, 0.045) 0%, rgba(255, 255, 255, 0) 40%);
+  /* Instrument depth — layered sheen + ambient glow (cards / cockpit); hoger contrast basis vs. sheen */
+  --surface-sheen-top: linear-gradient(180deg, rgba(255, 255, 255, 0.078) 0%, rgba(255, 255, 255, 0) 44%);
   --surface-sheen-diagonal: linear-gradient(
     128deg,
-    rgba(89, 248, 252, 0.11) 0%,
-    rgba(89, 248, 252, 0.02) 34%,
+    rgba(89, 248, 252, 0.15) 0%,
+    rgba(89, 248, 252, 0.035) 34%,
     transparent 52%,
-    rgba(79, 124, 247, 0.06) 100%
+    rgba(79, 124, 247, 0.09) 100%
   );
-  --surface-sheen-radial: radial-gradient(ellipse 115% 72% at 50% -14%, rgba(89, 248, 252, 0.14), transparent 54%);
+  --surface-sheen-radial: radial-gradient(ellipse 115% 72% at 50% -14%, rgba(89, 248, 252, 0.2), transparent 56%);
   --card-shadow-depth:
     0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 10px 36px rgba(0, 0, 0, 0.28), 0 0 52px -18px rgba(89, 248, 252, 0.16);
   --card-shadow-hover:
@@ -1334,6 +1334,14 @@ textarea {
   color: var(--text-muted);
 }
 
+.cockpit-bars-hint {
+  margin: 0.35rem 0 0;
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+  max-width: 52ch;
+}
+
 .cockpit-mini-bars {
   display: flex;
   align-items: flex-end;
@@ -1354,17 +1362,19 @@ textarea {
 }
 
 .cockpit-gauges-row {
-  display: flex;
-  flex-wrap: nowrap;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  justify-items: center;
   align-items: flex-start;
-  gap: 0.35rem;
+  gap: 0.5rem 0.35rem;
+  width: 100%;
 }
 
 .cockpit-gauge {
   text-align: center;
   flex: 1 1 0;
   min-width: 0;
+  max-width: 100%;
 }
 
 .cockpit-gauge__foot {
@@ -1697,7 +1707,27 @@ textarea {
   }
 
   .cockpit-gauges-row {
-    flex-wrap: wrap;
-    justify-content: center;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
+}
+
+/* Smalle telefoons: meters niet laten botsen — 2 + 1 raster */
+@media (max-width: 420px) {
+  .cockpit-gauges-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.55rem 0.45rem;
+  }
+
+  .cockpit-gauges-row .cockpit-gauge:last-child {
+    grid-column: 1 / -1;
+    justify-self: center;
+  }
+}
+
+/* Legenda lange labels (funnel / decision codes) */
+.kb-pie-legend {
+  min-width: 0;
+  max-width: min(100%, 18rem);
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }

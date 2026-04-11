@@ -41,7 +41,15 @@ function edgeBadge(s: Tier2EdgeboardSignalRow): "allow" | "skip" | "halt" {
   return "allow";
 }
 
-function MiniBars({ equity, fallbackHeights }: { equity: EquityPoint[] | null | undefined; fallbackHeights: number[] }) {
+function MiniBars({
+  equity,
+  fallbackHeights,
+  ariaLabel,
+}: {
+  equity: EquityPoint[] | null | undefined;
+  fallbackHeights: number[];
+  ariaLabel: string;
+}) {
   const pts = equity?.length ? equity.slice(-16) : null;
   let heights: number[] = [];
   if (pts && pts.length > 1) {
@@ -54,7 +62,7 @@ function MiniBars({ equity, fallbackHeights }: { equity: EquityPoint[] | null | 
     heights = fallbackHeights.slice(0, 12);
   }
   return (
-    <div className="cockpit-mini-bars" role="img" aria-hidden>
+    <div className="cockpit-mini-bars" role="img" aria-label={ariaLabel}>
       {heights.map((h, i) => (
         <div
           key={i}
@@ -106,8 +114,7 @@ export function DashboardCockpit({
   const stratN = strategy?.strategy_count ?? strategy?.active_strategies?.length ?? 0;
 
   const pnlS = pnlSegments(trading, locale);
-  const pnlTotal =
-    pnlS.length > 0 ? pnlS.reduce((a, x) => a + x.value, 0).toLocaleString(undefined, { maximumFractionDigits: 0 }) : undefined;
+  const pnlTotalAbs = pnlS.length > 0 ? pnlS.reduce((a, x) => a + x.value, 0) : undefined;
 
   const edgeRows = (dataBundle?.edgeboard?.top_signals ?? []).slice(0, 10);
 
@@ -121,7 +128,7 @@ export function DashboardCockpit({
   );
 
   const flowCenter =
-    orders24 === 0 && trades24 === 0 ? cockpitT(locale, "skip") : `${fillPct}%`;
+    orders24 === 0 && trades24 === 0 ? cockpitT(locale, "gaugeFlowEmpty") : `${fillPct}%`;
   const ordersGaugePct = Math.min(100, Math.round((orders24 / Math.max(orders24, 120)) * 100));
   const ordersCenter = String(orders24);
   const feedCenter = freshSecs != null ? `${freshSecs}s` : "—";
@@ -220,7 +227,8 @@ export function DashboardCockpit({
                     segments={pnlS}
                     size={132}
                     variant="donut"
-                    centerLabel={pnlTotal}
+                    locale={locale}
+                    centerValue={pnlTotalAbs}
                     showLegend={false}
                     className="cockpit-pnl-chart"
                   />
@@ -230,25 +238,30 @@ export function DashboardCockpit({
               </div>
               <ul className="cockpit-metric-list">
                 <li>
-                  <span className="cockpit-metric-list__k">L3</span>
+                  <span className="cockpit-metric-list__k">{cockpitT(locale, "metricL3")}</span>
                   <span className="cockpit-metric-list__v brand">{l3Pct != null ? `${l3Pct}%` : "—"}</span>
                 </li>
                 <li>
-                  <span className="cockpit-metric-list__k">24h O</span>
+                  <span className="cockpit-metric-list__k">{cockpitT(locale, "metricOrders24h")}</span>
                   <span className="cockpit-metric-list__v">{orders24}</span>
                 </li>
                 <li>
-                  <span className="cockpit-metric-list__k">24h T</span>
+                  <span className="cockpit-metric-list__k">{cockpitT(locale, "metricTrades24h")}</span>
                   <span className="cockpit-metric-list__v">{trades24}</span>
                 </li>
                 <li>
-                  <span className="cockpit-metric-list__k">DD</span>
+                  <span className="cockpit-metric-list__k">{cockpitT(locale, "metricDD")}</span>
                   <span className="cockpit-metric-list__v">{trading?.drawdown_pct != null ? `${trading.drawdown_pct.toFixed(1)}%` : "—"}</span>
                 </li>
               </ul>
             </div>
             <p className="cockpit-bars-label">{cockpitT(locale, "barsCaption")}</p>
-            <MiniBars equity={trading?.equity_trend_delayed} fallbackHeights={fallbackBars} />
+            <MiniBars
+              equity={trading?.equity_trend_delayed}
+              fallbackHeights={fallbackBars}
+              ariaLabel={cockpitT(locale, "barsAria")}
+            />
+            <p className="cockpit-bars-hint">{cockpitT(locale, "barsHint")}</p>
           </section>
       </div>
 
@@ -259,22 +272,22 @@ export function DashboardCockpit({
                 pct={orders24 === 0 && trades24 === 0 ? 8 : fillPct}
                 centerPrimary={flowCenter}
                 footnote={cockpitT(locale, "gaugeFlow")}
-                size={124}
-                stroke={12}
+                size={108}
+                stroke={10}
               />
               <InstrumentGauge
                 pct={ordersGaugePct}
                 centerPrimary={ordersCenter}
                 footnote={cockpitT(locale, "gaugeOrders")}
-                size={124}
-                stroke={12}
+                size={108}
+                stroke={10}
               />
               <InstrumentGauge
                 pct={feedGaugePct}
                 centerPrimary={feedCenter}
                 footnote={cockpitT(locale, "gaugeFeeds")}
-                size={124}
-                stroke={12}
+                size={108}
+                stroke={10}
               />
             </div>
             <div className="cockpit-cta-row">

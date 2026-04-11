@@ -63,6 +63,7 @@ function card(title: string, body: ReactNode) {
 
 export function RouteCentricDashboard({ locale, status, regime, strategy, trading, dataBundle }: Props) {
   const isNl = locale === "nl";
+  const pieOther = t(locale, "dashboard.pieOther");
 
   const rejectTop = top(trading?.top_reject_reasons_last_hour, 8);
   const stageTop = top(dataBundle?.route_no_trade?.funnel_stage_counts_24h, 8);
@@ -80,14 +81,16 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
   const regimePie = labelCountsToPieSegments(
     activeRegimes.map((r) => ({ label: r.regime, count: r.count })),
     8,
+    pieOther,
   );
   const strategyPie = labelCountsToPieSegments(
     activeStrategies.map((s) => ({ label: s.strategy, count: s.count })),
     8,
+    pieOther,
   );
-  const funnelStagePie = labelCountsToPieSegments(dataBundle?.route_no_trade?.funnel_stage_counts_24h, 8);
-  const decisionPie = labelCountsToPieSegments(dataBundle?.route_no_trade?.funnel_decision_code_counts_24h, 8);
-  const pathTapePie = labelCountsToPieSegments(dataBundle?.path_doctrine?.orders_by_path_tape_24h, 8);
+  const funnelStagePie = labelCountsToPieSegments(dataBundle?.route_no_trade?.funnel_stage_counts_24h, 8, pieOther);
+  const decisionPie = labelCountsToPieSegments(dataBundle?.route_no_trade?.funnel_decision_code_counts_24h, 8, pieOther);
+  const pathTapePie = labelCountsToPieSegments(dataBundle?.path_doctrine?.orders_by_path_tape_24h, 8, pieOther);
 
   const winners = trading?.symbol_pnl_day_utc_top_winners ?? [];
   const losers = trading?.symbol_pnl_day_utc_top_losers ?? [];
@@ -267,20 +270,30 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
       >
         <section className="card" style={{ padding: "1rem 1.25rem" }}>
           <h2 style={{ fontSize: "1.05rem", marginBottom: "0.5rem" }}>{isNl ? "Verdeling (funnel)" : "Distribution (funnel)"}</h2>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "1.25rem", justifyContent: "flex-start" }}>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "1.5rem 1.25rem",
+              justifyContent: "flex-start",
+              alignItems: "flex-start",
+            }}
+          >
             <SimplePieChart
               title={isNl ? "Funnel-fase (24h)" : "Funnel stage (24h)"}
               segments={funnelStagePie}
               size={158}
               variant="donut"
-              centerLabel={pieSegmentsTotal(funnelStagePie) > 0 ? pieSegmentsTotal(funnelStagePie).toLocaleString() : undefined}
+              locale={locale}
+              centerValue={pieSegmentsTotal(funnelStagePie) > 0 ? pieSegmentsTotal(funnelStagePie) : undefined}
             />
             <SimplePieChart
               title={isNl ? "Decision codes (24h)" : "Decision codes (24h)"}
               segments={decisionPie}
               size={158}
               variant="donut"
-              centerLabel={pieSegmentsTotal(decisionPie) > 0 ? pieSegmentsTotal(decisionPie).toLocaleString() : undefined}
+              locale={locale}
+              centerValue={pieSegmentsTotal(decisionPie) > 0 ? pieSegmentsTotal(decisionPie) : undefined}
             />
           </div>
         </section>
@@ -292,14 +305,16 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
               segments={regimePie}
               size={158}
               variant="donut"
-              centerLabel={pieSegmentsTotal(regimePie) > 0 ? pieSegmentsTotal(regimePie).toLocaleString() : undefined}
+              locale={locale}
+              centerValue={pieSegmentsTotal(regimePie) > 0 ? pieSegmentsTotal(regimePie) : undefined}
             />
             <SimplePieChart
               title={isNl ? "Actieve strategieën" : "Active strategies"}
               segments={strategyPie}
               size={158}
               variant="donut"
-              centerLabel={pieSegmentsTotal(strategyPie) > 0 ? pieSegmentsTotal(strategyPie).toLocaleString() : undefined}
+              locale={locale}
+              centerValue={pieSegmentsTotal(strategyPie) > 0 ? pieSegmentsTotal(strategyPie) : undefined}
             />
           </div>
         </section>
@@ -347,7 +362,8 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
               segments={pathTapePie}
               size={152}
               variant="donut"
-              centerLabel={pieSegmentsTotal(pathTapePie) > 0 ? pieSegmentsTotal(pathTapePie).toLocaleString() : undefined}
+              locale={locale}
+              centerValue={pieSegmentsTotal(pathTapePie) > 0 ? pieSegmentsTotal(pathTapePie) : undefined}
             />
             <p style={{ margin: "0.45rem 0 0", fontSize: "0.85rem", display: "flex", flexWrap: "wrap", gap: "0.35rem", alignItems: "center" }}>
               <strong style={{ marginRight: "0.25rem" }}>Safety:</strong>
