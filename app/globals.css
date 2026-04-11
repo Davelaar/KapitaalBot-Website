@@ -77,6 +77,21 @@
   --semantic-ok-fg: #b5e8d2;
   --semantic-warn-fg: #f0d577;
   --semantic-bad-fg: #ffb3bc;
+
+  /* Instrument depth — layered sheen + ambient glow (cards / cockpit) */
+  --surface-sheen-top: linear-gradient(180deg, rgba(255, 255, 255, 0.045) 0%, rgba(255, 255, 255, 0) 40%);
+  --surface-sheen-diagonal: linear-gradient(
+    128deg,
+    rgba(89, 248, 252, 0.11) 0%,
+    rgba(89, 248, 252, 0.02) 34%,
+    transparent 52%,
+    rgba(79, 124, 247, 0.06) 100%
+  );
+  --surface-sheen-radial: radial-gradient(ellipse 115% 72% at 50% -14%, rgba(89, 248, 252, 0.14), transparent 54%);
+  --card-shadow-depth:
+    0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 10px 36px rgba(0, 0, 0, 0.28), 0 0 52px -18px rgba(89, 248, 252, 0.16);
+  --card-shadow-hover:
+    0 1px 0 rgba(255, 255, 255, 0.055) inset, 0 14px 42px rgba(0, 0, 0, 0.34), 0 0 60px -14px rgba(89, 248, 252, 0.24);
 }
 
 [data-theme="light"] {
@@ -129,6 +144,19 @@
   --semantic-ok-fg: #0d4a36;
   --semantic-warn-fg: #5c4500;
   --semantic-bad-fg: #6b1a26;
+
+  --surface-sheen-top: linear-gradient(180deg, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0) 44%);
+  --surface-sheen-diagonal: linear-gradient(
+    128deg,
+    rgba(10, 143, 154, 0.11) 0%,
+    transparent 46%,
+    rgba(77, 95, 196, 0.07) 100%
+  );
+  --surface-sheen-radial: radial-gradient(ellipse 105% 68% at 50% -10%, rgba(10, 143, 154, 0.11), transparent 50%);
+  --card-shadow-depth:
+    0 1px 0 rgba(255, 255, 255, 0.78) inset, 0 8px 28px rgba(15, 23, 42, 0.08), 0 0 44px -16px rgba(10, 143, 154, 0.14);
+  --card-shadow-hover:
+    0 1px 0 rgba(255, 255, 255, 0.92) inset, 0 12px 34px rgba(15, 23, 42, 0.1), 0 0 52px -12px rgba(10, 143, 154, 0.2);
 }
 
 * {
@@ -460,24 +488,29 @@ main {
 
 /* —— Surfaces —— */
 .card {
-  background: var(--surface);
+  background:
+    var(--surface-sheen-top),
+    var(--surface-sheen-radial),
+    var(--surface-sheen-diagonal),
+    var(--surface);
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 1rem 1.25rem;
   margin-bottom: 1rem;
-  box-shadow: var(--shadow-soft);
+  box-shadow: var(--card-shadow-depth);
   transition:
     border-color 0.15s ease,
     box-shadow 0.15s ease;
 }
 
 .card:hover {
-  border-color: var(--border-strong);
+  border-color: var(--brand-border-light);
+  box-shadow: var(--card-shadow-hover);
 }
 
 .card--accent-top {
   border-top: 1px solid var(--brand-border-dark);
-  box-shadow: var(--shadow-soft), inset 0 1px 0 0 var(--brand-soft-dark);
+  box-shadow: var(--card-shadow-depth), inset 0 1px 0 0 var(--brand-soft-dark);
 }
 
 @media (max-width: 640px) {
@@ -666,7 +699,7 @@ textarea {
 }
 
 .kb-table thead {
-  background: var(--surface-soft);
+  background: linear-gradient(180deg, var(--surface-strong) 0%, var(--surface-soft) 100%);
 }
 
 .kb-table th {
@@ -1040,8 +1073,15 @@ textarea {
   grid-column: 1 / -1;
   grid-row: 1;
   margin-bottom: 0;
-  padding-bottom: 0.25rem;
+  padding: 0 0 0.45rem;
   border-bottom: 1px solid var(--border-strong);
+  background: linear-gradient(180deg, rgba(89, 248, 252, 0.07) 0%, rgba(89, 248, 252, 0.02) 38%, transparent 78%);
+  box-shadow: 0 1px 0 rgba(89, 248, 252, 0.05);
+}
+
+[data-theme="light"] .cockpit-hero {
+  background: linear-gradient(180deg, rgba(10, 143, 154, 0.1) 0%, rgba(10, 143, 154, 0.03) 40%, transparent 78%);
+  box-shadow: 0 1px 0 rgba(10, 143, 154, 0.08);
 }
 
 .cockpit-brand {
@@ -1059,6 +1099,11 @@ textarea {
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--text-link);
+  text-shadow: 0 0 28px rgba(89, 248, 252, 0.28);
+}
+
+[data-theme="light"] .cockpit-tagline {
+  text-shadow: 0 0 20px rgba(10, 143, 154, 0.18);
 }
 
 .cockpit-delay {
@@ -1112,16 +1157,20 @@ textarea {
 }
 
 .cockpit-panel {
-  background: var(--surface);
+  background:
+    var(--surface-sheen-top),
+    var(--surface-sheen-radial),
+    var(--surface-sheen-diagonal),
+    var(--surface);
   border: 1px solid var(--border-strong);
   border-radius: 10px;
   padding: 1rem 1.15rem;
-  box-shadow: var(--shadow-soft);
+  box-shadow: var(--card-shadow-depth);
 }
 
 .cockpit-panel--accent-top {
   border-top: 1px solid var(--brand-border-dark);
-  box-shadow: var(--shadow-soft), inset 0 1px 0 var(--brand-soft-dark);
+  box-shadow: var(--card-shadow-depth), inset 0 1px 0 var(--brand-soft-dark);
 }
 
 .cockpit-panel--tight {
@@ -1188,14 +1237,17 @@ textarea {
 
 .cockpit-dot--green {
   background: var(--success);
+  box-shadow: 0 0 10px rgba(62, 143, 110, 0.35);
 }
 
 .cockpit-dot--amber {
   background: var(--warning);
+  box-shadow: 0 0 10px rgba(185, 133, 18, 0.32);
 }
 
 .cockpit-dot--red {
   background: var(--danger);
+  box-shadow: 0 0 10px rgba(201, 75, 89, 0.38);
 }
 
 .cockpit-overview-split {
@@ -1279,9 +1331,10 @@ textarea {
   flex: 1;
   min-width: 3px;
   max-width: 10px;
-  background: var(--brand);
+  background: linear-gradient(180deg, var(--brand-hover) 0%, var(--brand) 42%, var(--brand-active) 100%);
   border-radius: 1px 1px 0 0;
-  opacity: 0.55;
+  opacity: 0.62;
+  box-shadow: 0 0 8px rgba(89, 248, 252, 0.12);
 }
 
 .cockpit-gauges-row {
@@ -1308,7 +1361,11 @@ textarea {
 }
 
 .cockpit-gauge__arc {
-  filter: drop-shadow(0 0 4px rgba(89, 248, 252, 0.12));
+  filter: drop-shadow(0 0 5px rgba(89, 248, 252, 0.22)) drop-shadow(0 0 14px rgba(89, 248, 252, 0.12));
+}
+
+[data-theme="light"] .cockpit-gauge__arc {
+  filter: drop-shadow(0 0 4px rgba(10, 143, 154, 0.2)) drop-shadow(0 0 12px rgba(10, 143, 154, 0.1));
 }
 
 .cockpit-cta-row {
@@ -1329,7 +1386,7 @@ textarea {
   border-radius: 4px;
   border: 1px solid var(--border-strong);
   color: var(--text-secondary);
-  background: var(--surface-strong);
+  background: linear-gradient(180deg, var(--surface-strong) 0%, var(--surface) 100%);
   transition:
     border-color 0.15s ease,
     color 0.15s ease,
@@ -1339,23 +1396,49 @@ textarea {
 .cockpit-cta--allow.is-active {
   color: var(--semantic-ok-fg);
   border-color: rgba(62, 143, 110, 0.55);
-  background: var(--success-soft-dark);
-  box-shadow: 0 0 0 1px var(--brand-border-light);
+  background: linear-gradient(
+    165deg,
+    rgba(62, 143, 110, 0.38) 0%,
+    rgba(89, 248, 252, 0.14) 48%,
+    rgba(62, 143, 110, 0.22) 100%
+  );
+  box-shadow:
+    0 0 0 1px rgba(89, 248, 252, 0.2),
+    0 0 26px -2px rgba(89, 248, 252, 0.28);
 }
 
 [data-theme="light"] .cockpit-cta--allow.is-active {
-  background: var(--success-soft-light);
+  background: linear-gradient(
+    165deg,
+    rgba(45, 122, 94, 0.22) 0%,
+    rgba(10, 143, 154, 0.12) 50%,
+    rgba(45, 122, 94, 0.14) 100%
+  );
+  box-shadow: 0 0 0 1px rgba(10, 143, 154, 0.2), 0 0 22px -2px rgba(10, 143, 154, 0.18);
 }
 
 .cockpit-cta--halt.is-active {
   color: var(--semantic-bad-fg);
-  border-color: rgba(201, 75, 89, 0.5);
-  background: var(--danger-soft-dark);
-  box-shadow: 0 0 0 1px rgba(201, 75, 89, 0.15);
+  border-color: rgba(201, 75, 89, 0.55);
+  background: linear-gradient(
+    165deg,
+    rgba(201, 75, 89, 0.38) 0%,
+    rgba(201, 75, 89, 0.12) 52%,
+    rgba(120, 30, 45, 0.28) 100%
+  );
+  box-shadow:
+    0 0 0 1px rgba(201, 75, 89, 0.22),
+    0 0 26px -2px rgba(201, 75, 89, 0.3);
 }
 
 [data-theme="light"] .cockpit-cta--halt.is-active {
-  background: var(--danger-soft-light);
+  background: linear-gradient(
+    165deg,
+    rgba(184, 59, 72, 0.22) 0%,
+    rgba(201, 75, 89, 0.1) 50%,
+    rgba(184, 59, 72, 0.16) 100%
+  );
+  box-shadow: 0 0 0 1px rgba(184, 59, 72, 0.2), 0 0 22px -2px rgba(184, 59, 72, 0.18);
 }
 
 .cockpit-cta-hint {
@@ -1382,7 +1465,7 @@ textarea {
 }
 
 .cockpit-dense-table thead {
-  background: var(--surface-soft);
+  background: linear-gradient(180deg, var(--surface-strong) 0%, var(--surface-soft) 100%);
 }
 
 .cockpit-dense-table th {
@@ -1424,8 +1507,9 @@ textarea {
 
 .cockpit-badge--allow {
   color: var(--semantic-ok-fg);
-  background: var(--success-soft-dark);
-  border: 1px solid rgba(62, 143, 110, 0.35);
+  background: linear-gradient(180deg, rgba(62, 143, 110, 0.32), rgba(62, 143, 110, 0.12));
+  border: 1px solid rgba(62, 143, 110, 0.45);
+  box-shadow: 0 0 12px rgba(89, 248, 252, 0.1);
 }
 
 .cockpit-badge--skip {
@@ -1470,30 +1554,46 @@ textarea {
   padding: 1rem 1.1rem;
   border-radius: 10px;
   border: 1px solid var(--border-strong);
-  background: var(--surface);
-  box-shadow: var(--shadow-soft);
+  background: var(--surface-sheen-top), var(--surface);
+  box-shadow: var(--card-shadow-depth);
   transition:
     border-color 0.2s ease,
-    box-shadow 0.2s ease;
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
 }
 
 .cockpit-state-card--allow {
   border-top: 2px solid var(--brand-border-dark);
+  background:
+    radial-gradient(ellipse 95% 58% at 16% 0%, rgba(89, 248, 252, 0.18), transparent 58%),
+    var(--surface-sheen-top),
+    var(--surface-sheen-diagonal),
+    var(--surface);
 }
 
 .cockpit-state-card--allow.is-lit {
-  box-shadow: var(--shadow-soft), 0 0 0 1px var(--brand-border-dark);
+  box-shadow:
+    var(--card-shadow-depth),
+    0 0 0 1px var(--brand-border-dark),
+    0 0 36px -4px rgba(89, 248, 252, 0.32);
 }
 
 .cockpit-state-card--halt {
-  border-top: 2px solid rgba(232, 93, 108, 0.5);
+  border-top: 2px solid rgba(232, 93, 108, 0.55);
   opacity: 0.88;
+  background:
+    radial-gradient(ellipse 95% 58% at 88% 0%, rgba(201, 75, 89, 0.2), transparent 56%),
+    var(--surface-sheen-top),
+    var(--surface);
 }
 
 .cockpit-state-card--halt.is-lit {
   opacity: 1;
-  border-color: rgba(201, 75, 89, 0.55);
-  box-shadow: var(--shadow-soft), 0 0 0 1px rgba(201, 75, 89, 0.2);
+  border-color: rgba(201, 75, 89, 0.58);
+  box-shadow:
+    var(--card-shadow-depth),
+    0 0 0 1px rgba(201, 75, 89, 0.28),
+    0 0 36px -4px rgba(201, 75, 89, 0.28);
 }
 
 .cockpit-state-card__head {

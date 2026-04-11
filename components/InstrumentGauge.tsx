@@ -1,5 +1,7 @@
 "use client";
 
+import { useId } from "react";
+
 /** Thick ring gauge — cockpit instrument, not a soft chart. */
 export function InstrumentGauge({
   size = 124,
@@ -16,6 +18,7 @@ export function InstrumentGauge({
   centerSecondary?: string;
   footnote?: string;
 }) {
+  const gradId = useId().replace(/:/g, "");
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
   const p = Math.max(0, Math.min(100, pct));
@@ -25,6 +28,13 @@ export function InstrumentGauge({
   return (
     <div className="cockpit-gauge" style={{ width: size }}>
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="cockpit-gauge__svg">
+        <defs>
+          <linearGradient id={gradId} x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="var(--brand-hover)" />
+            <stop offset="45%" stopColor="var(--brand)" />
+            <stop offset="100%" stopColor="var(--brand-active)" />
+          </linearGradient>
+        </defs>
         <g transform={`rotate(-90 ${size / 2} ${size / 2})`}>
           <circle
             cx={size / 2}
@@ -39,7 +49,7 @@ export function InstrumentGauge({
             cy={size / 2}
             r={r}
             fill="none"
-            stroke="var(--brand)"
+            stroke={`url(#${gradId})`}
             strokeWidth={stroke}
             strokeLinecap="round"
             strokeDasharray={`${dash} ${gap}`}
