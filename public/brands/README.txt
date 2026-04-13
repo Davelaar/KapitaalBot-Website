@@ -1,1 +1,1 @@
-Kraken® marks: operator-supplied cockpit assets (desktop/mobile × light/dark), JPEG in repo. Trademarks belong to Payward Ltd. Link target: https://www.kraken.com
+Kraken® marks: cockpit assets (desktop/mobile × light/dark) as PNG. Trademarks belong to Payward Ltd. Link: https://www.kraken.com
