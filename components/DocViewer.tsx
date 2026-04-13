@@ -9,7 +9,8 @@ const docViewerStyles = {
   doc: {
     maxWidth: "100%",
     minWidth: 0,
-    overflowX: "auto" as const,
+    /* Do not make the whole article a horizontal scroll strip; contain wide blocks in pre/mermaid/table wrappers */
+    overflowX: "hidden" as const,
     lineHeight: 1.6,
     fontSize: "0.9375rem",
   },

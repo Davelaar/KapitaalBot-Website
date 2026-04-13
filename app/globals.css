@@ -1056,9 +1056,9 @@ textarea {
   overflow-x: auto;
 }
 
-/* Let SVG keep intrinsic width; parent .mermaid-wrapper scrolls horizontally on narrow viewports */
+/* Scale diagrams to the content column; optional pan inside .mermaid-diagram if still overflow */
 .markdown-body .mermaid-diagram svg {
-  max-width: none;
+  max-width: 100%;
   width: auto;
   height: auto;
   min-width: 0;
@@ -1101,9 +1101,9 @@ textarea {
   min-width: 0;
   width: 100%;
   max-width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior-x: contain;
+  /* Page should not scroll sideways; wide code/tables/mermaid scroll inside their own boxes */
+  overflow-x: hidden;
+  overflow-wrap: anywhere;
   box-sizing: border-box;
   contain: layout;
 }
