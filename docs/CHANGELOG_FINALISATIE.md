@@ -169,5 +169,5 @@
 1. Lokaal of op server: `npm run build` en `npm run lint` draaien; eventuele type/lint-fouten oplossen.
 2. Deploy via Git: commit + push, op server `git pull` + build + restart.
 3. Analytics: `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` of `NEXT_PUBLIC_UMAMI_WEBSITE_ID` zetten om script te activeren.
-4. Sitemap base URL in `app/sitemap.ts` controleren (nu snapdiscounts.nl).
+4. Sitemap base URL in `app/sitemap.ts` controleren (kapitaalbot.nl).
 5. Tier 3 auth implementeren wanneer admin-beveiliging vereist is.

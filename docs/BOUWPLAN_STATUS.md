@@ -11,7 +11,7 @@
 | # | Sectie | Status | Opmerking |
 |---|--------|--------|-----------|
 | 1 | **Setup / repo** | ✅ | Next.js 14 App Router, env OBSERVABILITY_EXPORT_DIR |
-| 2 | **Staging / productie** | ✅ | snapdiscounts.nl live; kapitaalbot.nl na migratie |
+| 2 | **Staging / productie** | ✅ | Productie op kapitaalbot.nl; staging/hosting operator-specifiek |
 | 3 | **Snapshot-contract** | ✅ | Alleen JSON read-model; zie OBSERVABILITY_SNAPSHOT_CONTRACT.md |
 | 4 | **Tier-model** | ✅ | Tier 1 (publiek), Tier 2 (aanvraag), Tier 3 (admin) |
 | 5 | **Homepage** | ✅ | Sober hero, What it is, How it works, System philosophy, Production notes (uit content/production_notes.json), Access subtiel |

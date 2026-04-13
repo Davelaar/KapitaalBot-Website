@@ -31,8 +31,8 @@ In de environment van de Next.js-app (bijv. `.env` of systemd `Environment=`):
 | **TIER2_SECRET** | Optioneel | De **toegangscode voor Tier 2**. Iedereen die deze code kent en op /login invoert, krijgt Tier 2-sessie. Je kiest zelf een sterk geheim (bijv. lange random string). Deze code kan (optioneel) worden meegestuurd in de webhook na goedkeuring. |
 | **TIER3_SECRET** | Optioneel | De **toegangscode voor Tier 3 (admin)**. Alleen voor beheerders. Andere code dan TIER2_SECRET. |
 | **TIER2_ACCESS_EMAIL_WEBHOOK** | Optioneel | URL van een service die de daadwerkelijke e-mail verstuurt na goedkeuring van een aanvraag. De website doet hier een POST na goedkeuring met `email`, `loginUrl` en (optioneel) `code`. |
-| **TIER2_LOGIN_URL** | Optioneel | Absolute URL naar de loginpagina (bijv. `https://snapdiscounts.nl/login`). Als niet gezet wordt `/login` of `NEXT_PUBLIC_BASE_URL + /login` gebruikt. |
-| **NEXT_PUBLIC_BASE_URL** | Optioneel | Basis-URL van de site (bijv. `https://snapdiscounts.nl`); gebruikt als fallback voor `loginUrl` in de webhook. |
+| **TIER2_LOGIN_URL** | Optioneel | Absolute URL naar de loginpagina (bijv. `https://kapitaalbot.nl/login`). Als niet gezet wordt `/login` of `NEXT_PUBLIC_BASE_URL + /login` gebruikt. |
+| **NEXT_PUBLIC_BASE_URL** | Optioneel | Basis-URL van de site (bijv. `https://kapitaalbot.nl`); gebruikt als fallback voor `loginUrl` in de webhook. |
 
 **Voorbeeld (geen echte geheimen gebruiken):**
 
@@ -41,8 +41,8 @@ TIER_COOKIE_SECRET=een-lange-random-string-minimaal-16-tekens
 TIER2_SECRET=een-andere-geheime-code-voor-tier2
 TIER3_SECRET=weer-een-andere-voor-admin
 TIER2_ACCESS_EMAIL_WEBHOOK=https://jouw-mail-service.example.com/hooks/tier2
-TIER2_LOGIN_URL=https://snapdiscounts.nl/login
-NEXT_PUBLIC_BASE_URL=https://snapdiscounts.nl
+TIER2_LOGIN_URL=https://kapitaalbot.nl/login
+NEXT_PUBLIC_BASE_URL=https://kapitaalbot.nl
 ```
 
 - Als **TIER2_SECRET** niet is gezet: niemand kan Tier 2-sessie krijgen (code wordt "Invalid code").
@@ -81,7 +81,7 @@ Om zelf als Tier 3 in te loggen en /admin te zien:
    systemctl restart kapitaalbot-web.service
    ```
 
-4. **Inloggen:** Ga naar **https://snapdiscounts.nl/login** (of je domein), voer de **TIER3_SECRET**-waarde in (de lange hex-string uit de scriptoutput). Je krijgt dan Tier 3-sessie en kunt **/admin** openen.
+4. **Inloggen:** Ga naar **`https://<jouw-publieke-domein>/login`** (zoals geconfigureerd in `NEXT_PUBLIC_BASE_URL`), voer de **TIER3_SECRET**-waarde in (de lange hex-string uit de scriptoutput). Je krijgt dan Tier 3-sessie en kunt **/admin** openen.
 
 **Let op:** Bewaar de TIER3_SECRET ergens veilig (bijv. password manager); zonder die waarde kun je niet opnieuw inloggen tenzij je een nieuwe genereert en op de server zet.
 

@@ -2,8 +2,7 @@
 
 Observability portal voor het autonome crypto trading systeem KapitaalBot. Engineering showcase, commercieel funnel, informatief platform (geen beleggingsproduct).
 
-- **Staging:** snapdiscounts.nl  
-- **Productie (na migratie):** kapitaalbot.nl  
+- **Publiek domein:** kapitaalbot.nl (staging/eigen host alleen via je eigen DNS/deploy; niet in repo vastgelegd)  
 - **Data:** Leest uitsluitend snapshot-JSON uit de export van KRAKENBOTMAART. Geen directe DB-queries.
 
 ## Setup

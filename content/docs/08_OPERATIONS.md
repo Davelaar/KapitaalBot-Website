@@ -4,7 +4,7 @@
 
 ---
 
-Dit document bevat de praktische instructies voor het beheren, deployen en troubleshootbaar houden van Krakenbot op de productie-server (`root@snapdiscounts.nl`).
+Dit document bevat de praktische instructies voor het beheren, deployen en troubleshootbaar houden van Krakenbot op de productieserver. **SSH-doel (user@host) staat niet in deze repo** — gebruik je interne runbook of zet `DEPLOY_HOST` voor scripts zoals `./scripts/deploy.sh`.
 
 ## Navigatiemenu
 
@@ -32,7 +32,7 @@ graph LR
 1. **Lokaal**: Wijzig code, run `cargo check`, commit en push.
 2. **Server**: Ga naar `/srv/krakenbot`.
 3. **Update**: `git pull --ff-only`.
-4. **Build**: `./scripts/deploy.sh` (voert build uit en herstart services).
+4. **Build**: `export DEPLOY_HOST=user@<host>` en `./scripts/deploy.sh` (pull + `cargo build --release` op de server). **Herstart** systemd-units daarna handmatig volgens runbook (het script herstart geen services).
 
 ---
 
