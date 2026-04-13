@@ -46,7 +46,11 @@ type CockpitKey =
   | "cardConf"
   | "noRows"
   | "delay"
-  | "krakenMarkAria";
+  | "krakenMarkAria"
+  | "krakenReferralPrefix"
+  | "krakenReferralMid"
+  | "krakenReferralLinkText"
+  | "krakenReferralLinkAria";
 
 const cockpit: Record<Locale, Record<CockpitKey, string>> = {
   nl: {
@@ -97,6 +101,11 @@ const cockpit: Record<Locale, Record<CockpitKey, string>> = {
     noRows: "Geen rijen in snapshot.",
     delay: "Snapshot-vertraging",
     krakenMarkAria: "Kraken — spotbeurs (website opent in een nieuw tabblad)",
+    krakenReferralPrefix: "Hey! Word lid met mij op Kraken en ontgrendel 100 EUR met code:",
+    krakenReferralMid: "of via",
+    krakenReferralLinkText: "deze link",
+    krakenReferralLinkAria:
+      "Kraken-uitnodiging: meld je aan via deze referral-link om de bonus te activeren (opent in een nieuw tabblad). Code: 2ttwcy3g.",
   },
   en: {
     tagline: "A precision trading system",
@@ -146,6 +155,11 @@ const cockpit: Record<Locale, Record<CockpitKey, string>> = {
     noRows: "No rows in snapshot.",
     delay: "Snapshot lag",
     krakenMarkAria: "Kraken — spot exchange (opens in a new tab)",
+    krakenReferralPrefix: "Hey! Join me on Kraken and unlock 100 EUR with code:",
+    krakenReferralMid: "or via",
+    krakenReferralLinkText: "this link",
+    krakenReferralLinkAria:
+      "Kraken invitation: sign up through this referral link to activate the bonus (opens in a new tab). Code: 2ttwcy3g.",
   },
   de: {
     tagline: "Präzisions-Handelssystem",
@@ -195,6 +209,11 @@ const cockpit: Record<Locale, Record<CockpitKey, string>> = {
     noRows: "Keine Zeilen im Snapshot.",
     delay: "Snapshot-Latenz",
     krakenMarkAria: "Kraken — Spot-Börse (Website öffnet in neuem Tab)",
+    krakenReferralPrefix: "Hey! Werde mit mir bei Kraken Mitglied und sichere dir 100 EUR mit Code:",
+    krakenReferralMid: "oder über",
+    krakenReferralLinkText: "diesen Link",
+    krakenReferralLinkAria:
+      "Kraken-Einladung: Registrierung über diesen Empfehlungslink für den Bonus (öffnet in neuem Tab). Code: 2ttwcy3g.",
   },
   fr: {
     tagline: "Système de trading de précision",
@@ -244,6 +263,11 @@ const cockpit: Record<Locale, Record<CockpitKey, string>> = {
     noRows: "Aucune ligne dans le snapshot.",
     delay: "Latence snapshot",
     krakenMarkAria: "Kraken — plateforme spot (site dans un nouvel onglet)",
+    krakenReferralPrefix: "Hey! Rejoins-moi sur Kraken et débloque 100 EUR avec le code :",
+    krakenReferralMid: "ou via",
+    krakenReferralLinkText: "ce lien",
+    krakenReferralLinkAria:
+      "Invitation Kraken : inscription via ce lien de parrainage pour activer le bonus (nouvel onglet). Code : 2ttwcy3g.",
   },
 };
 

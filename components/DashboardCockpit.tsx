@@ -150,7 +150,7 @@ export function DashboardCockpit({
               </p>
             )}
           </div>
-          <CockpitKrakenMark ariaLabel={cockpitT(locale, "krakenMarkAria")} />
+          <CockpitKrakenMark ariaLabel={cockpitT(locale, "krakenMarkAria")} locale={locale} />
         </div>
       </header>
 
