@@ -93,7 +93,6 @@ sequenceDiagram
 
     W->>I: Check Epoch & Freshness
     W->>D: Check Order/Position Alignment
-    
     alt Inconsistentie gedetecteerd
         W->>D: Mark Symbol ExitOnly
         W->>A: Send Critical Alert

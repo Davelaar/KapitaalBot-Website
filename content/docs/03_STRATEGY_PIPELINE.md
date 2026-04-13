@@ -84,7 +84,6 @@ graph TD
     Move[Verwachte Move] --> GrossEdge[Gross Edge]
     Costs[Fees + Spread + Slippage] --> GrossEdge
     GrossEdge --> NetEdge[Net Edge]
-    
     Features[Feature Strength] --> Confidence
     History[Historical Winrate] --> Confidence
     NetEdge --> FinalScore[Final Ranking Score]

@@ -96,8 +96,7 @@ flowchart LR
     Run["Run (Proces ID)"] --> Lineage["Lineage (Start-tijd)"]
     Lineage --> Epoch["Epoch (T0 - T1)"]
     Epoch --> Snapshot["Universe Snapshot"]
-    
-    Snapshot -- "Bepaalt" --> Symbols["Tradable Symbol Set"]
+    Snapshot -->|Bepaalt| Symbols["Tradable Symbol Set"]
 ```
 
 - **`ingest_runner`**: Verantwoordelijk voor het aanmaken van nieuwe epochs en het verversen van de universe op basis van instrument-data.

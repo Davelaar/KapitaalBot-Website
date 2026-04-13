@@ -56,14 +56,14 @@ stateDiagram-v2
     
     Open --> Cancelled: Status 'canceled'
     PendingAck --> Rejected: Status 'rejected'
-    Open --> Expired: Status 'expired' (Deadline)
+    Open --> Expired: Expired deadline reached
     
     Filled --> [*]
     Cancelled --> [*]
     Rejected --> [*]
     Expired --> [*]
 
-    Note right of PendingAck: De WS Method Response is slechts een ACK.<br/>De echte status komt uit de 'executions' feed.
+    Note right of PendingAck: WS method response is alleen ACK; executions feed is SSOT.
 ```
 
 ---

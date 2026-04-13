@@ -59,7 +59,13 @@ interface DocViewerProps {
   content: string;
 }
 
+/** react-markdown does not render raw HTML; engine docs use `<a name="...">` for anchors — strip so they are not shown as literal text. */
+function stripInvisibleAnchors(markdown: string): string {
+  return markdown.replace(/<a\s+name="[^"]*"\s*>\s*<\/a>\s*\n?/gi, "");
+}
+
 export default function DocViewer({ content }: DocViewerProps) {
+  const md = stripInvisibleAnchors(content);
   return (
     <article style={docViewerStyles.doc} className="doc-viewer markdown-body">
       <ReactMarkdown
@@ -103,7 +109,7 @@ export default function DocViewer({ content }: DocViewerProps) {
           blockquote: ({ children }) => <blockquote style={docViewerStyles.blockquote}>{children}</blockquote>,
         }}
       >
-        {content}
+        {md}
       </ReactMarkdown>
     </article>
   );

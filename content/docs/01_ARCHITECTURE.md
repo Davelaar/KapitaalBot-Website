@@ -153,7 +153,7 @@ stateDiagram-v2
     Cancelled --> [*]
     Rejected --> [*]
 
-    Note right of Submitted: DB-First: Order staat in DB<br/>vóór verzending naar Kraken.
+    Note right of Submitted: DB-first — order row in DB before Kraken submit.
 ```
 
 ---
