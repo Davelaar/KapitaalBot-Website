@@ -59,7 +59,7 @@ function parseDocIndex(): Record<string, string> {
   const lines = raw.split(/\r?\n/);
   const statusBySlug: Record<string, string> = {};
   for (const line of lines) {
-    // Table rows look like: | ENGINE_SSOT.md | SSOT | ...
+    // Table rows look like: | 01_ARCHITECTURE.md | ... | ...
     const parts = line
       .split("|")
       .map((p) => p.trim())

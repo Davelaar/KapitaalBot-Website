@@ -1,16 +1,16 @@
 #!/usr/bin/env node
 /**
- * Overwrite content/docs/*.md from the Krakenbot repo (same resolve order as
- * generate-bot-changelog.cjs). Website must not ship stale ENGINE_SSOT etc.
+ * Sync engine markdown from the Krakenbot repo into content/docs/.
  *
- * Override paths (website filename -> path inside bot repo):
+ * - Copies every docs/*.md from the bot repo (same basename).
+ * - Copies systemd/README.md → SYSTEMD_README.md.
+ * - If docs/OBSERVABILITY_SNAPSHOT_CONTRACT.md exists in the bot repo, copies it;
+ *   otherwise leaves the website copy untouched (contract may live only here until restored in bot).
+ *
+ * Usage: node scripts/sync-docs-from-bot.cjs [path/to/bot-repo]
  */
 const fs = require("fs");
 const path = require("path");
-
-const OVERRIDES = {
-  "SYSTEMD_README.md": "systemd/README.md",
-};
 
 function resolveBotRepo() {
   const repoArg = process.argv[2];
@@ -37,23 +37,42 @@ function resolveBotRepo() {
 
 const repo = resolveBotRepo();
 const destDir = path.join(__dirname, "..", "content", "docs");
-const names = fs
-  .readdirSync(destDir)
-  .filter((f) => f.endsWith(".md"))
-  .sort();
+const botDocsDir = path.join(repo, "docs");
+
+if (!fs.existsSync(botDocsDir)) {
+  console.error(`sync-docs-from-bot: bot docs dir missing: ${botDocsDir}`);
+  process.exit(1);
+}
+
+fs.mkdirSync(destDir, { recursive: true });
 
 let copied = 0;
-for (const file of names) {
-  const relInBot = OVERRIDES[file] || path.join("docs", file);
-  const src = path.join(repo, relInBot);
-  const dst = path.join(destDir, file);
-  if (!fs.existsSync(src)) {
-    console.error(`sync-docs-from-bot: MISSING in bot repo: ${src}`);
-    process.exit(1);
-  }
+for (const name of fs.readdirSync(botDocsDir).sort()) {
+  if (!name.endsWith(".md")) continue;
+  const src = path.join(botDocsDir, name);
+  const dst = path.join(destDir, name);
   fs.copyFileSync(src, dst);
   copied += 1;
 }
-console.log(
-  `sync-docs-from-bot: copied ${copied} markdown file(s) from ${repo}`,
-);
+
+const systemdSrc = path.join(repo, "systemd", "README.md");
+const systemdDst = path.join(destDir, "SYSTEMD_README.md");
+if (fs.existsSync(systemdSrc)) {
+  fs.copyFileSync(systemdSrc, systemdDst);
+  copied += 1;
+} else {
+  console.warn(`sync-docs-from-bot: skip SYSTEMD_README (missing ${systemdSrc})`);
+}
+
+const obsBot = path.join(botDocsDir, "OBSERVABILITY_SNAPSHOT_CONTRACT.md");
+const obsDst = path.join(destDir, "OBSERVABILITY_SNAPSHOT_CONTRACT.md");
+if (fs.existsSync(obsBot)) {
+  fs.copyFileSync(obsBot, obsDst);
+  copied += 1;
+} else {
+  console.warn(
+    "sync-docs-from-bot: OBSERVABILITY_SNAPSHOT_CONTRACT.md not in bot repo — keeping existing website file if present",
+  );
+}
+
+console.log(`sync-docs-from-bot: wrote ${copied} file(s) from ${repo}`);

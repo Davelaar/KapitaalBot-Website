@@ -1,6 +1,6 @@
 # Systemd — Krakenbot services
 
-**Rol van dit document:** Actuele systemd-units voor persistent ingest en execution attach. Operationeel. SSOT: [docs/ENGINE_SSOT.md](docs/ENGINE_SSOT.md). Runbook: [docs/LIVE_RUNBOOK_CURRENT.md](docs/LIVE_RUNBOOK_CURRENT.md).
+**Rol van dit document:** Actuele systemd-units voor persistent ingest en execution attach. Operationeel. Overzicht: [docs/01_ARCHITECTURE.md](../docs/01_ARCHITECTURE.md). Operations/runbook: [docs/08_OPERATIONS.md](../docs/08_OPERATIONS.md). Publieke status/observability: [kapitaalbot.nl/nl/dashboard](https://kapitaalbot.nl/nl/dashboard) (website, geen runtime-substituut voor logs/DB-proof).
 
 ---
 
@@ -9,7 +9,7 @@
 | Unit | Commando | Doel |
 |------|----------|------|
 | **krakenbot-ingest.service** | `krakenbot run-ingest` | Persistent ingest: public WS (ticker/trade/L2/L3), universe refresh, epoch/snapshot publish. Geen execution. |
-| **krakenbot-execution.service** | `krakenbot run-execution-live` met `EXECUTION_ONLY=1` | Execution attach: leest epochs/snapshots uit DB; geen eigen ingest. |
+| **krakenbot-execution.service** | `krakenbot run-execution-live` (`EXECUTION_ONLY=0` in unit) | Live execution: private WS, heap/poller, orders. Vereist draaiende ingest. |
 
 ---
 
@@ -32,7 +32,18 @@ sudo systemctl daemon-reload
 
 ## Env
 
-- Beide units laden **`EnvironmentFile=-/srv/krakenbot/.env`** (optioneel `-`). Extra keys: systemd **drop-in** met tweede `EnvironmentFile=` indien nodig.
+- Beide units laden **`EnvironmentFile=-/srv/krakenbot/.env`** (optioneel `-`). Extra keys: systemd **drop-in** onder `*.service.d/*.conf` of tweede `EnvironmentFile=` indien nodig.
+
+### Loop A (continuous edge refresh) — optionele drop-in
+
+Standaard staat **`CONTINUOUS_EDGE_REFRESH_ENABLE`** uit (`false` in config). Zet in **`.env`** of via drop-in (reproduceerbaar in Git):
+
+- **Voorbeeldbestand:** [`drop-in-examples/krakenbot-execution-continuous-edge-refresh.conf`](drop-in-examples/krakenbot-execution-continuous-edge-refresh.conf) — kopieer naar  
+  `/etc/systemd/system/krakenbot-execution.service.d/continuous-edge-refresh.conf`, daarna `daemon-reload` + `restart`.
+
+**Wat je wél ziet:** journal-regels `LOOP_A_EDGE_REFRESHER_STARTED`, `FLOW_HEAP_REFRESH_EVENT trigger=loop_a_material_mid` — dat is **heap/ranking**, geen orders.
+
+**Wat je niet automatisch ziet:** extra trades. Orders gaan via `flow_poller` → `flow_execute_single_candidate` (gates: MSP, safety, allocator, realism, enz.). Loop A verandert alleen hoe snel kandidaten op de heap worden bijgewerkt.
 - **Dual-DB verplicht:** `INGEST_DATABASE_URL` (ingest) én `DECISION_DATABASE_URL` (decision), of equivalente `INGEST_DB_*` + `DECISION_DB_*` zoals in [scripts/trading_env.sh](../scripts/trading_env.sh). Zonder tweede target start de binary niet.
 - Ingest: ook `KRAKEN_WS_PUBLIC_URL` (default mag in .env).
 - Execution: unit zet `EXECUTION_ONLY=1` en `EXECUTION_ENABLE=true`; API: `KRAKEN_API_KEY`, `KRAKEN_API_SECRET` in env.
