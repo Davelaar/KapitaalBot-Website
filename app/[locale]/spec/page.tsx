@@ -2,6 +2,7 @@ import Link from "next/link";
 import { MermaidLiveDiagram } from "@/components/MermaidLiveDiagram";
 import { parseLocaleParam, withLocale } from "@/lib/locale-path";
 import type { Locale } from "@/lib/i18n";
+import { t } from "@/lib/i18n";
 import { buildPageMetadata } from "@/lib/page-metadata";
 
 export const dynamic = "force-dynamic";
@@ -50,6 +51,18 @@ export default async function SpecPage({ params }: { params: { locale: string } 
           ? "Deze pagina is de canonieke publieke technische specificatie van KapitaalBot. De focus ligt op systeemgedrag, operationele architectuur en latency-eisen. Broncode, gevoelige tuningwaarden en private accountdetails blijven bewust buiten scope."
           : "This page is the canonical public technical specification of KapitaalBot. It focuses on system behavior, operational architecture, and latency requirements. Source code, sensitive tuning values, and private account details remain intentionally out of scope."}
       </p>
+      <p style={{ color: "var(--muted)", maxWidth: "78ch", lineHeight: 1.65, marginTop: "0.75rem" }}>
+        {isNl
+          ? "Diepgaande, bij de engine-bron synchrone documentatie (o.a. dual-pool DB, processen, datastromen):"
+          : "Deeper documentation synced from the engine (including dual-pool DB, processes, data flows):"}{" "}
+        <Link href={withLocale(locale, "/docs/DOC_INDEX")} className="kb-text-link">
+          {t(locale, "docs.meta.DOC_INDEX.label")}
+        </Link>
+        {" · "}
+        <Link href={withLocale(locale, "/docs/01_ARCHITECTURE")} className="kb-text-link">
+          {t(locale, "docs.meta.01_ARCHITECTURE.label")}
+        </Link>
+      </p>
 
       <section className="card" style={{ marginTop: "1rem", padding: "1rem 1.25rem" }}>
         <h2 style={{ fontSize: "1.2rem", marginBottom: "0.6rem" }}>
@@ -92,6 +105,11 @@ export default async function SpecPage({ params }: { params: { locale: string } 
           {isNl
             ? "KapitaalBot werkt als timing-aware, multistrategy route-selection engine met live route-state, regime-routering, position-context, execution choke en feedbackgedreven explainability."
             : "KapitaalBot operates as a timing-aware multistrategy route-selection engine with live route-state, regime routing, position context, execution choke, and feedback-driven explainability."}
+        </p>
+        <p style={{ color: "var(--muted)", lineHeight: 1.65, marginTop: "0.65rem" }}>
+          {isNl
+            ? "Het diagram hieronder is bewust compact. In productie scheiden aparte Postgres-pools ingest (marktruwdata) en decision (orders, fills, execution truth); details staan in Architectuur (01)."
+            : "The diagram below is intentionally compact. In production, separate Postgres pools isolate ingest (raw market data) from decision (orders, fills, execution truth); see Architecture (01) for detail."}
         </p>
         <div className="markdown-body" style={{ marginTop: "0.75rem" }}>
           <MermaidLiveDiagram chart={runtimeDiagram} seoKeyPrefix="spec.runtime.diagram" />
