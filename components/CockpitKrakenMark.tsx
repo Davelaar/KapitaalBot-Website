@@ -38,15 +38,15 @@ export function CockpitKrakenMark({ ariaLabel }: { ariaLabel: string }) {
 
   const src = narrow
     ? theme === "light"
-      ? "/brands/kraken-cockpit-mobile-light.png"
-      : "/brands/kraken-cockpit-mobile-dark.png"
+      ? "/brands/kraken_mobile.webp"
+      : "/brands/kraken_mobile_dark.webp"
     : theme === "light"
-      ? "/brands/kraken-cockpit-desktop-light.png"
-      : "/brands/kraken-cockpit-desktop-dark.png";
+      ? "/brands/kraken.webp"
+      : "/brands/kraken_dark.webp";
 
   const intrinsic = narrow
-    ? { width: 1015, height: 1024 }
-    : { width: 1024, height: 162 };
+    ? { width: 1290, height: 1302 }
+    : { width: 1292, height: 204 };
 
   return (
     <a
