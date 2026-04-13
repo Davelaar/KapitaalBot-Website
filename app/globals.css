@@ -1108,6 +1108,55 @@ textarea {
   contain: layout;
 }
 
+/* /docs/[slug]: one column + horizontal strip (no narrow sidebar stealing width) */
+.docs-article-page {
+  width: 100%;
+  max-width: min(56rem, 100%);
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.docs-inline-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.45rem;
+  padding: 0.25rem 0 0.75rem;
+  margin-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.docs-inline-nav__link {
+  display: inline-block;
+  font-size: clamp(0.72rem, 1.05vw, 0.82rem);
+  line-height: 1.2;
+  padding: 0.3rem 0.5rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: border-color 0.12s ease, color 0.12s ease;
+}
+
+.docs-inline-nav__link:hover {
+  border-color: var(--brand);
+  color: var(--fg);
+}
+
+.docs-inline-nav__link--active {
+  border-color: var(--brand);
+  color: var(--fg);
+  font-weight: 600;
+  background: color-mix(in srgb, var(--brand) 14%, transparent);
+}
+
+.docs-article-body {
+  overflow-x: hidden;
+  overflow-wrap: anywhere;
+}
+
 .doc-viewer.markdown-body {
   min-width: 0;
   max-width: 100%;
@@ -1216,6 +1265,20 @@ textarea {
 
   .docs-two-col {
     grid-template-columns: 1fr;
+  }
+
+  .docs-inline-nav {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    gap: 0.3rem;
+    padding-bottom: 0.55rem;
+    scrollbar-width: thin;
+  }
+
+  .docs-inline-nav__link {
+    flex: 0 0 auto;
   }
 
   .docs-index-table thead {

@@ -7,6 +7,7 @@ import DocViewer from "@/components/DocViewer";
 import { buildPageMetadata } from "@/lib/page-metadata";
 import { parseLocaleParam, withLocale } from "@/lib/locale-path";
 import { DOCS_META } from "@/lib/docs-catalog";
+import { sortDocSlugsForNav } from "@/lib/docs-nav-order";
 
 const DOCS_DIR = path.join(process.cwd(), "content", "docs");
 
@@ -58,48 +59,43 @@ export default async function DocSlugPage({ params }: { params: { locale: string
     notFound();
   }
 
+  const navSlugs = sortDocSlugsForNav(slugs);
+  const navAria = isNl ? "Documentatie — alle paginas" : "Documentation — all pages";
+
   return (
-    <main>
-      <nav style={{ marginBottom: "1.5rem" }}>
+    <main className="docs-article-page">
+      <nav style={{ marginBottom: "0.75rem" }}>
         <Link href={withLocale(locale, "/docs")} className="kb-text-link">
           ← {t(locale, "docs.title")}
         </Link>
       </nav>
-      <section className="docs-two-col" style={{ display: "grid", gap: "1rem", alignItems: "start" }}>
-        <aside className="card" style={{ position: "sticky", top: "1rem", marginBottom: 0 }}>
-          <h2 style={{ marginTop: 0, marginBottom: "0.75rem", fontSize: "1rem" }}>
-            {isNl ? "Documenten" : "Documents"}
-          </h2>
-          <ul
-            className="docs-file-list"
-            style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "0.25rem" }}
-          >
-            {slugs.map((s) => {
-              const title =
-                DOCS_META[s]?.labelKey != null ? t(locale, DOCS_META[s].labelKey) : `${s}.md`;
-              return (
-                <li key={s}>
-                  <Link
-                    href={withLocale(locale, `/docs/${s}`)}
-                    className={`docs-file-link${s === slug ? " docs-file-link--active" : ""}`}
-                    title={`${s}.md`}
-                  >
-                    {title}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </aside>
-        <article className="card" style={{ padding: "1rem 1.25rem", marginBottom: 0 }}>
-          <p style={{ marginTop: 0, marginBottom: "0.75rem", color: "var(--muted)", fontSize: "0.85rem", lineHeight: 1.6 }}>
-            {isNl
-              ? "Publieke docs zijn functioneel volledig en canoniek, maar bevatten geen broncode, geen private accountdetails en geen reproduceerbare tuning."
-              : "Public docs are functionally complete and canonical, but contain no source code, no private account details, and no reproducible tuning."}
-          </p>
-          <DocViewer content={content} />
-        </article>
-      </section>
+
+      <nav className="docs-inline-nav" aria-label={navAria}>
+        {navSlugs.map((s) => {
+          const label =
+            DOCS_META[s]?.labelKey != null ? t(locale, DOCS_META[s].labelKey) : `${s}.md`;
+          const active = s === slug;
+          return (
+            <Link
+              key={s}
+              href={withLocale(locale, `/docs/${s}`)}
+              className={`docs-inline-nav__link${active ? " docs-inline-nav__link--active" : ""}`}
+              title={`${s}.md`}
+            >
+              {label}
+            </Link>
+          );
+        })}
+      </nav>
+
+      <article className="card docs-article-body" style={{ padding: "1rem 1.25rem", marginBottom: 0 }}>
+        <p style={{ marginTop: 0, marginBottom: "0.75rem", color: "var(--muted)", fontSize: "0.85rem", lineHeight: 1.6 }}>
+          {isNl
+            ? "Publieke docs zijn functioneel volledig en canoniek, maar bevatten geen broncode, geen private accountdetails en geen reproduceerbare tuning."
+            : "Public docs are functionally complete and canonical, but contain no source code, no private account details, and no reproducible tuning."}
+        </p>
+        <DocViewer content={content} />
+      </article>
     </main>
   );
 }
