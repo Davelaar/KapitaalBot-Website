@@ -1,5 +1,11 @@
 # Changelog — Website finalisatie
 
+## 2026-04-14 — Git-stijl engine-docs (`00_MODULE_INVENTORY`) + catalog/i18n
+
+- **Waarom** — Engine `docs/` op `main` gebruikt nu `00_MODULE_INVENTORY.md` en uitgebreide 01–08-set; de site moest gesynchroniseerd worden en `MODULE_INVENTORY` als slug vervangen door `00_MODULE_INVENTORY`.
+- **Wat** — `content/docs` opnieuw gekopieerd uit `KRAKENBOTMAART/docs/*.md`; `lib/docs-catalog.ts` + `lib/i18n` (NL/EN/DE/FR) bijgewerkt. Broken links in gesynchroniseerde `DOCS_TARGET_STRUCTURE` / `FASE_0B_RUNTIME` gecorrigeerd in de engine-repo.
+- **Deploy server** — `cd /srv/KapitaalBot-Website && git pull --ff-only && npm ci && npm run build && systemctl restart kapitaalbot-web.service`.
+
 ## 2026-04-14 — Engine-docs: kernset 01–08 + sync-scripts + i18n
 
 - **Waarom** — De Krakenbot-`docs/` zijn herstructureerd (genummerde laaggidsen, index, module-inventaris, policy-docs). De site moest dezelfde markdown tonen en geen verouderde ENGINE_SSOT-/`*_CURRENT*`-bestanden meer uitshippen.

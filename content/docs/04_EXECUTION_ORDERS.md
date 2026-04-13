@@ -1,61 +1,108 @@
-# 04_EXECUTION_ORDERS.md - Order Lifecycle and Execution
+# 04 — Execution & Order Lifecycle
 
-This document details how Krakenbot executes trading decisions, manages the order lifecycle,
-and ensures reliable interaction with the Kraken exchange.
+[← 03 — Strategy Pipeline](./03_STRATEGY_PIPELINE.md) | **04 — Execution & Orders** | [05 — Protection & Exit](./05_PROTECTION_EXIT.md) →
 
-## Flow Poller and Flow Execution
+---
 
-The execution process is orchestrated by two main components:
+Dit document beschrijft de executielaag van Krakenbot: hoe intenties worden omgezet in orders, hoe de lifecycle wordt beheerd en hoe de integriteit met de exchange wordt gewaarborgd.
 
--   **Flow Poller**: Periodically polls for new trading decisions from the strategy pipeline (persisted in the DB). It identifies actionable signals and initiates the execution flow.
--   **Flow Execution**: Manages the step-by-step execution of a trading decision. This includes validating constraints, allocating capital, and interacting with the exchange to place and manage orders.
+## Navigatiemenu
 
-## Order Placement (WebSocket v2)
+- [Flow Poller & Execution](#flow-poller--execution)
+- [Order Placement (WS v2)](#order-placement-ws-v2)
+- [Order State Machine (SSOT)](#order-state-machine-ssot)
+- [Fill Handling & Ledger](#fill-handling--ledger)
+- [Dead-Man's Switch (Safety)](#dead-mans-switch-safety)
+- [Database Persistence](#database-persistence)
 
-Krakenbot uses Kraken's WebSocket v2 API for all trading actions to minimize latency and ensure real-time feedback.
+---
 
--   **`add_order`**: Used to place new orders (market, limit, etc.).
--   **`amend_order`**: Allows for in-place modification of existing orders (e.g., updating price or quantity) while attempting to maintain queue priority.
--   **`cancel_order`**: Used to cancel individual open orders.
--   **`batch_add` / `batch_cancel`**: Support for processing multiple orders in a single request for improved efficiency.
+<a name="flow-poller--execution"></a>
+## Flow Poller & Execution
 
-All requests include a `req_id` for correlation and are routed through a request multiplexer.
+De `flow_poller` is de motor van de executielaag. Het ontkoppelt de "denk-cyclus" (pipeline) van de "doe-cyclus" (submit).
 
-## Order Lifecycle and Statuses
+- **Flow Heap**: De pipeline plaatst kandidaten in een geprioriteerde heap (`edge_heap`).
+- **Continuous Drain**: de `flow_poller` haalt continu de beste kandidaat uit de heap en probeert deze uit te voeren, mits de `choke` (safety check) groen licht geeft.
+- **Concurrency**: Het systeem ondersteunt parallelle executie voor verschillende symbolen, maar dwingt volgordelijkheid af per symbool.
 
-The `executions` WS channel is the **Single Source of Truth (SSOT)** for order status. Key statuses include:
+---
 
--   `pending_new`: Order submitted but not yet acknowledged by the exchange.
--   `new`: Order acknowledged and active on the book.
--   `partially_filled`: Order has been partially executed.
--   `filled`: Order has been completely executed.
--   `canceled`: Order has been successfully canceled.
--   `expired`: Order has expired (e.g., due to a deadline).
+<a name="order-placement-ws-v2"></a>
+## Order Placement (WS v2)
 
-Final order state is always derived from the `executions` channel, not just the WS method response.
+Alle trading acties verlopen via de Private WebSocket v2 (`ws-auth.kraken.com`).
 
-## Fill Handling
+- **`add_order`**: Primaire methode voor entry en exit.
+- **`amend_order`**: Gebruikt voor het verplaatsen van limit orders (bijv. bij trailing) zonder queue-prioriteit volledig te verliezen.
+- **`cancel_order`**: Voor het intrekken van open orders.
+- **`req_id` Muxing**: Elk verzoek krijgt een uniek ID zodat de asynchrone respons correct gekoppeld kan worden aan de interne state.
 
-Fill events (both full and partial) are processed in real-time:
+---
 
--   **Position Updates**: Fills trigger updates to the bot's internal view of its positions (in-memory and DB).
--   **Protection Triggering**: Fills on entry orders immediately trigger the creation of associated protection orders (e.g., stop-loss, trailing-stop).
--   **Fill Feedback**: Information about fills (price, quantity, timing) is recorded for performance analysis and model calibration (`observability::fill_feedback`).
+<a name="order-state-machine-ssot"></a>
+## Order State Machine (SSOT)
 
-## Dead-Man's-Switch (`cancel_all_orders_after`)
+Krakenbot hanteert een strikte 13-state machine (`execution::order_state`). De **`executions`** WebSocket feed is de Single Source of Truth.
 
-For safety, Krakenbot utilizes Kraken's `cancel_all_orders_after` request. This acts as a dead-man's-switch: if the bot loses connection to the exchange and fails to renew this switch within a specified timeout, all open orders are automatically canceled by the exchange. This prevents orders from remaining active in an unmonitored state.
+```mermaid
+stateDiagram-v2
+    [*] --> Submitted: Intent Created
+    Submitted --> PendingAck: add_order sent
+    PendingAck --> Open: Status 'new'
+    Open --> PartiallyFilled: Status 'partially_filled'
+    PartiallyFilled --> Filled: Status 'filled'
+    Open --> Filled: Status 'filled'
+    
+    Open --> Cancelled: Status 'canceled'
+    PendingAck --> Rejected: Status 'rejected'
+    Open --> Expired: Status 'expired' (Deadline)
+    
+    Filled --> [*]
+    Cancelled --> [*]
+    Rejected --> [*]
+    Expired --> [*]
 
-## `execution_orders` Table
+    Note right of PendingAck: De WS Method Response is slechts een ACK.<br/>De echte status komt uit de 'executions' feed.
+```
 
-All order-related data is persisted in the `execution_orders` table in the `DECISION_DATABASE_URL`. This includes:
+---
 
--   `exchange_order_id`: The unique ID assigned by the exchange.
--   `cl_ord_id`: The client-side order ID used for correlation.
--   `symbol`, `side`, `order_type`, `quantity_base`, `limit_price_quote`.
--   `status`, `reason_code`, `strategy_context`.
--   Timestamps for creation and updates.
+<a name="fill-handling--ledger"></a>
+## Fill Handling & Ledger
 
-This table provides a complete audit trail of all trading activity and is critical for reconciliation and reporting.
+Wanneer een order (gedeeltelijk) gevuld wordt, treedt het `fills_ledger` in werking. Dit proces is **idempotent** om dubbele verwerking van WS-berichten te voorkomen.
 
-The execution layer is designed for robustness and reliability, with extensive error handling and reconciliation mechanisms to ensure consistent operation even in the face of network issues or exchange anomalies.
+1. **Fill Registratie**: De fill wordt opgeslagen in de `fills` tabel.
+2. **Position Update**: De netto exposure in `krakenbot.positions` wordt bijgewerkt.
+3. **Protection Trigger**: Voor entry-fills wordt direct de protectie-logica geactiveerd (zie [05 — Protection & Exit](./05_PROTECTION_EXIT.md)).
+4. **PnL Calculatie**: Bij een sluitende fill wordt de realized PnL berekend en opgeslagen.
+
+---
+
+<a name="dead-mans-switch-safety"></a>
+## Dead-Man's Switch (Safety)
+
+Om te voorkomen dat orders "wees" achterblijven bij een crash of netwerkstoring, gebruikt de bot `cancel_all_orders_after`.
+
+- **Werking**: De bot stuurt elke 15-30 seconden een verzoek om alle orders na 60 seconden te annuleren.
+- **Fail-Safe**: Als de bot stopt met pingen, annuleert de exchange automatisch alle open orders na het verstrijken van de timer.
+
+---
+
+<a name="database-persistence"></a>
+## Database Persistence
+
+Alle order-activiteit wordt gelogd in de `DECISION` database:
+
+- **`execution_orders`**: De hoofdtabel voor alle orders, inclusief `cl_ord_id` en `exchange_order_id`.
+- **`order_events`**: Een audit-log van elke statusovergang.
+- **`order_latency`**: Meet de tijd tussen T0 (beslissing), T1 (submit), T2 (ack) en T3 (fill).
+
+---
+
+[← 03 — Strategy Pipeline](./03_STRATEGY_PIPELINE.md) | **04 — Execution & Orders** | [05 — Protection & Exit](./05_PROTECTION_EXIT.md) →
+
+---
+
+*Document gegenereerd voor technische documentatie. Laatst bijgewerkt: 2026-04-13.*

@@ -1,56 +1,201 @@
-# 01_ARCHITECTURE.md - System Architecture
+# 01 — Systeemarchitectuur
 
-This document provides a high-level overview of the Krakenbot trading engine architecture,
-its core components, data flow, database topology, and communication models.
+[← 00 — Module-inventaris](./00_MODULE_INVENTORY.md) | **01 — Architectuur** | [02 — Data-ingest](./02_DATA_INGEST.md) →
 
-## Module Map (High-Level)
+---
 
-The Krakenbot codebase is organized into several key modules, each with a distinct responsibility:
+Dit document beschrijft de architectuur van de Krakenbot trading engine: componenten, datastromen, database-topologie en procesmodellen.
 
-- `src/main.rs`: Entry point and main orchestration logic.
-- `src/config`: Manages application configuration from environment variables.
-- `src/db`: Database interaction layer (Postgres), including schema definitions, migrations, and data access.
-- `src/exchange`: Handles all external exchange communication (Kraken), including WebSocket (WS) feeds and REST API calls (for authentication).
-- `src/pipeline`: The core strategy pipeline, responsible for signal generation, route evaluation, and decision-making.
-- `src/execution`: Manages order placement, position monitoring, and exit logic.
-- `src/state`: State management and projection, including Redis interaction for MSP (Managed State Projection).
-- `src/universe`: Manages the set of tradable symbols and instrument constraints.
-- `src/observability`: Contains logging, metrics, and forward-return observability components.
+## Navigatiemenu
 
-## Data Flow (Ingest -> Pipeline -> Execution)
+- [Systeemoverzicht](#systeemoverzicht)
+- [Runtime Topologie](#runtime-topologie)
+- [Datastromen (Live Pad)](#datastromen-live-pad)
+- [Strategy Pipeline Flow](#strategy-pipeline-flow)
+- [Execution Lifecycle](#execution-lifecycle)
+- [Database Topologie (SSOT)](#database-topologie-ssot)
+- [Procesmodel & Services](#procesmodel-services)
 
-Krakenbot operates on a data-driven loop:
+---
 
-1.  **Ingest (Exchange Data)**: Market data (tickers, trades, L2/L3 order book) is ingested from Kraken via WebSocket v2 connections (`exchange::auth_ws`). Private user data (executions, balances) is also ingested via authenticated WS.
-2.  **Preprocessing & Persistence**: Raw market data is preprocessed and persisted into the `INGEST_DATABASE_URL` for historical analysis and feature generation.
-3.  **Strategy Pipeline (Decision)**: The `pipeline` module consumes processed market data and internal state to generate trading signals and evaluate potential routes. This involves complex algorithms for edge calculation, confidence scoring, and route selection. Decisions are often persisted into the `DECISION_DATABASE_URL` (e.g., `candidate_decision_vectors`).
-4.  **Execution**: Based on the pipeline's decisions, the `execution` module interacts with the exchange to place orders, monitor open positions, and manage protection/exit strategies. This includes handling fills, amendments, and cancellations.
-5.  **State Management & Observability**: Throughout the process, the `state` and `observability` modules maintain a consistent view of the bot's internal state (in-memory, Redis, DB) and emit logs and metrics for monitoring and diagnostics.
+<a name="systeemoverzicht"></a>
+## Systeemoverzicht
 
-## Database Topology (INGEST, DECISION, RESEARCH)
+De Krakenbot is opgebouwd uit modulaire lagen met strikte verantwoordelijkheden:
 
-Krakenbot uses a partitioned PostgreSQL database model to separate concerns and optimize performance:
+- **Ingest Laag**: Verwerkt publieke en private WebSocket feeds, valideert checksums (L2) en persisteert ruwe marktdata.
+- **State & Projection**: Onderhoudt de in-memory en Redis-backed toestand van de markt (MSP), orderboeken en balansen.
+- **Strategy Pipeline**: Analyseert regimes, berekent edge/confidence en genereert execution mandates.
+- **Execution Engine**: Beheert de order lifecycle, positie-monitoring, trailing stops en risk guards.
+- **Observability**: Verzamelt metrics, logt funnel-events en faciliteert forward-return analyse.
 
--   **INGEST_DATABASE_URL**: Primarily used for storing raw and lightly processed market data. This is a high-throughput write-heavy database. Examples: `l2_snap_metrics`, `l3_queue_metrics`, ingest-side `observation_runs`.
--   **DECISION_DATABASE_URL**: Stores operational data related to trading decisions, orders, fills, and safety state. This database is critical for live execution and reconciliation. Examples: `symbol_safety_state`, `execution_orders`, `fills`.
--   **RESEARCH_DATABASE_URL**: Used for storing forward-return observability data and microstructure snapshots for post-hoc analysis and model calibration. This database is write-only for app data, read-heavy for research. Example: `krakenbot.directional_forward_observations`, `krakenbot.market_microstructure_snapshots`.
+---
 
-Separation ensures that ingest load does not impact execution latency and allows for independent scaling and data retention policies.
+<a name="runtime-topologie"></a>
+## Runtime Topologie
 
-## WebSocket Connections
+Krakenbot gebruikt een **dual-pool architectuur** om ingest-load te scheiden van execution-latency.
 
--   **Public Market Data (`wss://ws.kraken.com/v2`)**: Used for `ticker`, `book` (L2), `trade`, `ohlc`, `instrument` channels. Read-only, unauthenticated.
--   **Private Trading & User Data (`wss://ws-auth.kraken.com/v2`)**: Authenticated connection for `executions` and `balances` channels, and for sending trading requests (`add_order`, `amend_order`, `cancel_order`, etc.). Requires a token obtained via REST `GetWebSocketsToken`.
--   **Authenticated L3 (`wss://ws-l3.kraken.com/v2`)**: Dedicated authenticated connection for `level3` order book data. Requires the same token as private trading WS.
+```mermaid
+flowchart TB
+  subgraph Ingest_Process [Persistent Ingest]
+    direction TB
+    WS_Pub["Public WS (v2)"]
+    WS_L3["L3 WS (v2 Auth)"]
+    Writer["Async Batch Writer"]
+    
+    WS_Pub --> Writer
+    WS_L3 --> Writer
+    Writer --> DB_Ingest[("DB INGEST (Postgres)")]
+  end
 
-WebSocket connections are long-lived and reused to minimize overhead. Token rotation is handled automatically on reconnect for authenticated endpoints.
+  subgraph Execution_Process [Execution Engine]
+    direction TB
+    EvalLoop["Evaluation Loop"]
+    Refresh["State Refresh (run_symbol_state)"]
+    Pipeline["Strategy Pipeline"]
+    Risk["Risk & Safety Guards"]
+    Adapter["Kraken WS Adapter"]
+    
+    EvalLoop --> Refresh
+    Refresh -- "Read Raw" --> DB_Ingest
+    Refresh -- "Write Refreshed" --> DB_Ingest
+    
+    Refresh --> Pipeline
+    Pipeline --> Risk
+    Risk --> Adapter
+  end
 
-## Process Model
+  subgraph Decision_Storage [Decision & Truth]
+    DB_Decision[("DB DECISION (Postgres)")]
+    Redis_MSP[("Redis (MSP Projection)")]
+  end
 
-Krakenbot runs as a set of `systemd` services on the server, orchestrating various components:
+  Adapter <--> WS_Priv["Private WS (v2 Auth)"]
+  WS_Priv <--> DB_Decision
+  Risk <--> Redis_MSP
+  EvalLoop <--> DB_Decision
+```
 
--   `krakenbot-ingest.service`: Handles market data ingestion and writes to `INGEST_DATABASE_URL`.
--   `krakenbot-execution.service`: Contains the core trading logic, pipeline, position monitoring, and interacts with `DECISION_DATABASE_URL`.
--   `krakenbot-research.service`: (If separate) Handles specific research/observability writes to `RESEARCH_DATABASE_URL`.
+---
 
-Each service is designed to be fault-tolerant with restart policies. Communication between services and external components (like Redis for MSP) ensures a coherent view of the system state.
+<a name="datastromen-live-pad"></a>
+## Datastromen (Live Pad)
+
+Het systeem is **state-first** en **route-centric**. De hot-path scant geen ruwe tabellen per tick, maar gebruikt een ververste `run_symbol_state`.
+
+```mermaid
+sequenceDiagram
+    participant WS as Kraken WS
+    participant Ingest as Ingest Service
+    participant DBI as DB Ingest
+    participant Exec as Execution Service
+    participant DBD as DB Decision
+
+    WS->>Ingest: Market Data (Ticker/L2/L3)
+    Ingest->>DBI: Batch Write (Raw Samples)
+    
+    Note over Exec: Start Eval Cycle
+    Exec->>DBI: refresh_run_symbol_state
+    DBI-->>Exec: Refreshed State Rows
+    
+    Exec->>Exec: Run Readiness & Pipeline
+    Exec->>Exec: Edge/Confidence Scoring
+    
+    rect rgb(200, 220, 240)
+        Note over Exec: Execution Decision
+        Exec->>DBD: Create Order (Pending)
+        Exec->>WS: add_order (Private WS)
+        WS-->>Exec: Order Ack / Fill
+        Exec->>DBD: Update Order / Fill / Position
+    end
+```
+
+---
+
+<a name="strategy-pipeline-flow"></a>
+## Strategy Pipeline Flow
+
+De pipeline transformeert marktdata naar uitvoerbare plannen via een hiërarchie van filters en scorers.
+
+```mermaid
+graph TD
+    A["Market Features (Spread, Vol, Drift, OFI)"] --> B["Regime Detection (Trend/Range/Chaos)"]
+    B --> C["Strategy Selection (Liquidity/Momentum/Expansion)"]
+    C --> D["Readiness Gate (Blocker Audit)"]
+    D --> E["Route Engine (V1/V2 Adaptive)"]
+    E --> F["Edge & Confidence Scoring"]
+    F --> G["Ranking & Selection"]
+    G --> H["Risk Gate (Capital/Exposure/Safety)"]
+    H --> I["Execution Mandate (Intent)"]
+```
+
+---
+
+<a name="execution-lifecycle"></a>
+## Execution Lifecycle
+
+Orders doorlopen een strikte state-machine om consistentie tussen de database en de exchange te garanderen.
+
+```mermaid
+stateDiagram-v2
+    [*] --> Submitted: Pipeline Execute
+    Submitted --> PendingAck: add_order sent
+    PendingAck --> Open: Order Ack (New)
+    Open --> PartiallyFilled: Partial Fill
+    PartiallyFilled --> Filled: Full Fill
+    Open --> Filled: Full Fill
+    
+    Open --> Cancelled: User/Bot Cancel
+    PendingAck --> Rejected: Exchange Reject
+    
+    Filled --> [*]
+    Cancelled --> [*]
+    Rejected --> [*]
+
+    Note right of Submitted: DB-First: Order staat in DB<br/>vóór verzending naar Kraken.
+```
+
+---
+
+<a name="database-topologie-ssot"></a>
+## Database Topologie (SSOT)
+
+Het systeem onderscheidt drie logische rollen voor data-opslag:
+
+| Pool | Omgevingsvariabele | Primaire Inhoud (SSOT) |
+| :--- | :--- | :--- |
+| **INGEST** | `INGEST_DATABASE_URL` | Ruwe marktdata, L2/L3 metrics, `run_symbol_state` (refreshed). |
+| **DECISION** | `DECISION_DATABASE_URL` | Orders, Fills, Posities, Safety State, Watchdog logs. |
+| **RESEARCH** | `RESEARCH_DATABASE_URL` | Forward-return observations, Microstructure snapshots. |
+
+> **Harde Regel**: Geen cross-pool joins in de applicatie. Gebruik `db_target_precheck.sh` voor diagnose.
+
+---
+
+<a name="procesmodel-services"></a>
+## Procesmodel & Services
+
+Krakenbot draait als een set van **systemd** services op de productie-server (`/srv/krakenbot`):
+
+1. **`krakenbot-ingest.service`**:
+   - Taak: Continue dataverzameling.
+   - Mode: `run-ingest`.
+   - Schrijft naar: INGEST pool.
+
+2. **`krakenbot-execution.service`**:
+   - Taak: Strategie-evaluatie en trading.
+   - Mode: `run-execution-live`.
+   - Schrijft naar: DECISION pool.
+
+3. **Maintenance**:
+   - `retention`: Periodieke opschoning van oude samples.
+   - `watchdog`: Bewaakt consistentie en herstelt stale states.
+
+---
+
+[← 00 — Module-inventaris](./00_MODULE_INVENTORY.md) | **01 — Architectuur** | [02 — Data-ingest](./02_DATA_INGEST.md) →
+
+---
+
+*Document gegenereerd voor technische documentatie. Laatst bijgewerkt: 2026-04-13.*

@@ -69,4 +69,4 @@ Dit document beschrijft **hoe het in de code zit**: wiring, defaults, en wat je 
 ## Zie ook
 
 - [`01_ARCHITECTURE.md`](./01_ARCHITECTURE.md) — proces- en pool-overzicht.
-- [`MODULE_INVENTORY.md`](./MODULE_INVENTORY.md) — modules `vwap_buffer`, `vwap_window`, `route_state/*`, `tod_multiplier`.
+- [`00_MODULE_INVENTORY.md`](./00_MODULE_INVENTORY.md) — modules `vwap_buffer`, `vwap_window`, `route_state/*`, `tod_multiplier`.

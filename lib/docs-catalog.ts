@@ -35,9 +35,9 @@ export const DOCS_META: Record<string, { labelKey: string; descKey: string }> = 
     labelKey: "docs.meta.08_OPERATIONS.label",
     descKey: "docs.meta.08_OPERATIONS.desc",
   },
-  MODULE_INVENTORY: {
-    labelKey: "docs.meta.MODULE_INVENTORY.label",
-    descKey: "docs.meta.MODULE_INVENTORY.desc",
+  "00_MODULE_INVENTORY": {
+    labelKey: "docs.meta.00_MODULE_INVENTORY.label",
+    descKey: "docs.meta.00_MODULE_INVENTORY.desc",
   },
   FASE_0B_RUNTIME: {
     labelKey: "docs.meta.FASE_0B_RUNTIME.label",

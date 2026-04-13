@@ -1,63 +1,102 @@
-# 07_OBSERVABILITY.md - Monitoring and Diagnostics
+# 07 — Observability & Diagnostiek
 
-This document details the observability framework implemented in Krakenbot,
-providing insights into system health, trading performance, and data integrity.
+[← 06 — Risk & Safety](./06_RISK_SAFETY.md) | **07 — Observability** | [08 — Operations](./08_OPERATIONS.md) →
 
-## Logging Taxonomy
+---
 
-Krakenbot uses a structured logging approach to ensure that logs are informative and easy to analyze.
+Dit document beschrijft hoe Krakenbot inzicht geeft in zijn eigen werking, van real-time logging tot lange-termijn performance analyse (Forward-Returns).
 
--   **`info!`**: Used for significant system events (startup, shutdown, order placement, fills, position updates). These are essential for normal monitoring.
--   **`warn!`**: Indicates potential issues or unexpected conditions that require attention but don't necessarily halt operation (e.g., API errors, minor data delays).
--   **`error!`**: Critical failures that impact the bot's ability to trade or maintain state.
--   **`debug!`**: Detailed diagnostic information, primarily used for troubleshooting and during development. Many high-volume diagnostic logs are demoted to this level to reduce noise.
+## Navigatiemenu
 
-Logs are emitted using the `tracing` crate and can be directed to various outputs (stdout, files, journald).
+- [Logging Taxonomie](#logging-taxonomie)
+- [Trading Funnel & Events](#trading-funnel--events)
+- [Forward-Return Observability](#forward-return-observability)
+- [Edgeboard & CDV Snapshots](#edgeboard--cdv-snapshots)
+- [Resource Telemetry](#resource-telemetry)
+- [Fill Feedback & Slippage](#fill-feedback--slippage)
 
-## STANDARD_FUNNEL_COUNTERS
+---
 
-The bot maintains a set of standardized counters to track the flow of signals through the strategy pipeline and execution layer.
+<a name="logging-taxonomie"></a>
+## Logging Taxonomie
 
--   **Signals Generated**: Total number of potential trading signals produced.
--   **Signals Filtered**: Signals rejected due to risk limits, confidence thresholds, or other constraints.
--   **Orders Submitted**: Number of orders successfully sent to the exchange.
--   **Orders Filled**: Number of orders that resulted in a fill.
+Krakenbot gebruikt gestructureerde logging via het `tracing` crate. Om ruis te minimaliseren, zijn logs strikt ingedeeld:
 
-These counters provide a high-level view of the bot's "funnel" and help identify bottlenecks or inefficiencies.
+- **`ERROR`**: Kritieke fouten die actie vereisen (bijv. DB verbinding verloren, API keys ongeldig).
+- **`WARN`**: Onverwachte situaties (bijv. L2 checksum mismatch, order rejected).
+- **`INFO`**: Belangrijke lifecycle events (bijv. order geplaatst, fill ontvangen, positie gesloten).
+- **`DEBUG`**: Hoog-volume diagnostiek (bijv. elke evaluatie-tick, heartbeat, interne state-updates).
 
+> **Opmerking**: Tijdens de cleanup-ronde zijn veel repetitieve `INFO` logs gedegradeerd naar `DEBUG` om de live-observatie werkbaar te houden.
+
+---
+
+<a name="trading-funnel--events"></a>
+## Trading Funnel & Events
+
+De bot houdt een "funnel" bij om te zien waar signalen afvallen. Dit wordt opgeslagen in de `trading_funnel_events` tabel.
+
+```mermaid
+graph TD
+    A[Signals Generated] --> B{Readiness Gate}
+    B -- "Block" --> C[Blocker: Spread/Vol/L3]
+    B -- "Pass" --> D{Route Engine}
+    D -- "No Edge" --> E[Skip: Low Expectancy]
+    D -- "Edge" --> F{Risk Gate}
+    F -- "Block" --> G[Blocker: Exposure/Slots]
+    F -- "Pass" --> H[EXECUTE]
+```
+
+---
+
+<a name="forward-return-observability"></a>
 ## Forward-Return Observability
 
-This component tracks the performance of trading signals over time, even if they weren't executed.
+Dit is het hart van de leer-lus van de bot. Het meet de kwaliteit van signalen, ook als ze **niet** zijn uitgevoerd.
 
--   **`directional_forward_observations`**: Records the initial signal and its predicted direction.
--   **Finalization**: The system periodically "finalizes" these observations by comparing the predicted price move against the actual market movement over various time horizons.
--   **Calibration**: The resulting data is used to calibrate strategy models and improve the accuracy of future signals.
+- **`directional_forward_observations`**: Elke keer dat de pipeline een signaal ziet, wordt dit gelogd in de `RESEARCH` database.
+- **Sweeper**: Een achtergrondtaak controleert na 5, 10 en 15 minuten wat de prijs heeft gedaan t.o.v. het signaal.
+- **Markout**: Dit levert de "markout curve" op, die laat zien of onze entry-timing statistisch voordeel (edge) heeft.
 
-This data is stored in the `RESEARCH_DATABASE_URL`.
+---
 
-## Edgeboard Snapshots
+<a name="edgeboard--cdv-snapshots"></a>
+## Edgeboard & CDV Snapshots
 
-The **Edgeboard** provides a real-time view of the strategy pipeline's internal state, including evaluated routes, edges, and confidence scores.
+- **CDV (Candidate Decision Vector)**: Een rijke JSON-dump van alle features en scores op het moment van een beslissing.
+- **Edgeboard**: Een real-time overzicht van de top-kandidaten per symbool, horizon en strategie. Dit wordt gebruikt voor de UI en voor handmatige inspectie van de "markt-kansen".
 
--   **Snapshots**: Periodic snapshots of the Edgeboard state are captured and persisted for analysis.
--   **Visualization**: (If applicable) Tools are available to visualize these snapshots, helping operators understand the bot's current decision-making process.
+---
 
+<a name="resource-telemetry"></a>
 ## Resource Telemetry
 
-The bot monitors its own resource usage to ensure stable operation.
+De bot bewaakt zijn eigen "footprint" om degradatie op de server te voorkomen.
 
--   **CPU and Memory**: Tracks usage to identify potential performance issues or memory leaks.
--   **Database Latency**: Monitors the time taken for DB operations to identify bottlenecks.
--   **WebSocket Latency**: Tracks the round-trip time for WS messages to ensure data freshness.
+- **CPU/RAM**: Gelogd via `observability::resource_telemetry`.
+- **DB Latency**: Meet de tijd van SQL-queries om trage indexen of locks te detecteren.
+- **Event Loop Lag**: Meet of de Tokio runtime de ticks op tijd kan verwerken.
 
-## Fill Feedback
+---
 
-The `observability::fill_feedback` module records detailed information about every fill event.
+<a name="fill-feedback--slippage"></a>
+## Fill Feedback & Slippage
 
--   **Execution Price**: The actual price at which the order was filled.
--   **Slippage**: The difference between the intended price and the actual execution price.
--   **Timing**: The time taken from order submission to fill.
+Na elke fill berekent de bot de **slippage**: het verschil tussen de prijs waarop we *wilden* traden en de prijs die we *kregen*.
 
-This feedback is crucial for refining execution strategies and transaction cost models.
+```mermaid
+flowchart LR
+    Intent[Intended Price] --> Fill[Actual Fill Price]
+    Fill --> Diff[Slippage / Friction]
+    Diff --> Model[Update Cost Model]
+```
 
-The observability framework is designed to provide a comprehensive and actionable view of Krakenbot's operation, enabling proactive monitoring, efficient troubleshooting, and continuous performance improvement.
+- **`fill_feedback`**: Deze data wordt gebruikt om de `cost_model` in de pipeline te verfijnen, zodat de bot in de toekomst realistischer rekent.
+
+---
+
+[← 06 — Risk & Safety](./06_RISK_SAFETY.md) | **07 — Observability** | [08 — Operations](./08_OPERATIONS.md) →
+
+---
+
+*Document gegenereerd voor technische documentatie. Laatst bijgewerkt: 2026-04-13.*

@@ -10,7 +10,7 @@ Build history has no place unless it explains a current design choice.
 
 | Document | Inhoud |
 |----------|--------|
-| **[`MODULE_INVENTORY.md`](./MODULE_INVENTORY.md)** | Volledige `src/**` module-lijst: primair / secundair / runtime per bestand |
+| **[`00_MODULE_INVENTORY.md`](./00_MODULE_INVENTORY.md)** | Volledige `src/**` module-lijst: primair / secundair / runtime per bestand |
 | [`01_ARCHITECTURE.md`](./01_ARCHITECTURE.md) | Systeemoverzicht |
 | [`02_DATA_INGEST.md`](./02_DATA_INGEST.md) … [`08_OPERATIONS.md`](./08_OPERATIONS.md) | Laaggidsen |
 | [`FASE_0B_RUNTIME.md`](./FASE_0B_RUNTIME.md) | VWAP, RouteStateStore, ranking TOD |
@@ -21,7 +21,7 @@ Build history has no place unless it explains a current design choice.
 
 | Item | Status |
 |------|--------|
-| Exhaustive per-module list (primary/secondary function, runtime gates) | **Done** — [`MODULE_INVENTORY.md`](./MODULE_INVENTORY.md) |
+| Exhaustive per-module list (primary/secondary function, runtime gates) | **Done** — [`00_MODULE_INVENTORY.md`](./00_MODULE_INVENTORY.md) |
 | Doc 01 — system overview | **Done** — [`01_ARCHITECTURE.md`](./01_ARCHITECTURE.md) |
 | Docs 02–08 — layer guides | **Done** — see table below (ingest → operations) |
 | Fase 0B flags (VWAP, RouteStateStore, ranking TOD) | **Done** — [`FASE_0B_RUNTIME.md`](./FASE_0B_RUNTIME.md) |
@@ -30,8 +30,8 @@ Build history has no place unless it explains a current design choice.
 
 | # | Document | Scope | Key topics |
 |---|----------|-------|------------|
-| **0** | **[`MODULE_INVENTORY.md`](./MODULE_INVENTORY.md)** | **Module map (exhaustief)** | **Alle Rust-modules onder `src/`: primaire/secundaire functie, runtime gates, CLI vs live** |
-| 1 | [`01_ARCHITECTURE.md`](./01_ARCHITECTURE.md) | System overview | Module map → **`MODULE_INVENTORY.md`**; data flow (ingest → pipeline → execution); DB topology (ingest/decision/research); WS connections; process model |
+| **0** | **[`00_MODULE_INVENTORY.md`](./00_MODULE_INVENTORY.md)** | **Module map (exhaustief)** | **Alle Rust-modules onder `src/`: primaire/secundaire functie, runtime gates, CLI vs live** |
+| 1 | [`01_ARCHITECTURE.md`](./01_ARCHITECTURE.md) | System overview | Module map → **`00_MODULE_INVENTORY.md`**; data flow (ingest → pipeline → execution); DB topology (ingest/decision/research); WS connections; process model |
 | 2 | [`02_DATA_INGEST.md`](./02_DATA_INGEST.md) | Market data layer | Ticker/trade/L2/L3 WS feeds, trade_samples, l2_snap_metrics, l3_queue_metrics, run lifecycle, epoch generation, refresh |
 | 3 | [`03_STRATEGY_PIPELINE.md`](./03_STRATEGY_PIPELINE.md) | Signal generation | Route engine, move thesis dispatch, market features, strategy families, edge computation, route expectancy, confidence |
 | 4 | [`04_EXECUTION_ORDERS.md`](./04_EXECUTION_ORDERS.md) | Order lifecycle | Flow poller, flow_execution, order placement (WS v2), amend/cancel, fill handling, dead-man's-switch, execution_orders table |
@@ -44,7 +44,7 @@ Build history has no place unless it explains a current design choice.
 
 - `01_ARCHITECTURE.md` — system overview (dual-DB, WS, process modes); entry point for technical docs
 - `02_DATA_INGEST.md` … `08_OPERATIONS.md` — layer guides (this table)
-- `MODULE_INVENTORY.md` — full `src/**` module list with primary/secondary function and runtime status
+- `00_MODULE_INVENTORY.md` — full `src/**` module list with primary/secondary function and runtime status
 - `FASE_0B_RUNTIME.md` — VWAP feed, RouteStateStore, ranking TOD: env flags, defaults, wiring
 - `DECIMAL_F64_POLICY_AND_INVENTORY.md` — financial numeric invariants (referenced from AGENTS.md, .cursor/rules)
 - `FORWARD_RETURNS_OBSERVABILITY.md` — directional forward-return observability (referenced from AGENTS.md)

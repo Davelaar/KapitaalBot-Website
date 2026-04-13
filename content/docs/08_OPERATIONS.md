@@ -1,65 +1,114 @@
-# 08_OPERATIONS.md - Deployment and Operations
+# 08 — Operations & Runbook
 
-This document provides practical information for deploying, managing, and troubleshooting
-the Krakenbot trading engine in a production environment.
+[← 07 — Observability](./07_OBSERVABILITY.md) | **08 — Operations** | [Index](./DOC_INDEX.md) →
 
+---
+
+Dit document bevat de praktische instructies voor het beheren, deployen en troubleshootbaar houden van Krakenbot op de productie-server (`root@snapdiscounts.nl`).
+
+## Navigatiemenu
+
+- [Deployment Workflow (Git-only)](#deployment-workflow-git-only)
+- [Systemd Services](#systemd-services)
+- [Server Validatie & Checks](#server-validatie--checks)
+- [Configuratie (.env)](#configuratie-env)
+- [Incident Response & Noodstop](#incident-response--noodstop)
+
+---
+
+<a name="deployment-workflow-git-only"></a>
+## Deployment Workflow (Git-only)
+
+Krakenbot hanteert een strikte **Git-only codeflow**. Er worden nooit losse bestanden naar de server gekopieerd via SCP of FTP.
+
+```mermaid
+graph LR
+    Dev[Local Dev] --> Commit[Git Commit & Push]
+    Commit --> Pull[SSH: git pull op server]
+    Pull --> Build[SSH: cargo build --release]
+    Build --> Restart[SSH: systemctl restart]
+```
+
+1. **Lokaal**: Wijzig code, run `cargo check`, commit en push.
+2. **Server**: Ga naar `/srv/krakenbot`.
+3. **Update**: `git pull --ff-only`.
+4. **Build**: `./scripts/deploy.sh` (voert build uit en herstart services).
+
+---
+
+<a name="systemd-services"></a>
 ## Systemd Services
 
-Krakenbot is managed as a set of `systemd` services on the server, ensuring reliable operation and automatic restarts.
+De bot draait als twee hoofddiensten.
 
--   `krakenbot-ingest.service`: Manages the market data ingestion process.
--   `krakenbot-execution.service`: Manages the core trading and execution logic.
--   `krakenbot-research.service`: (Optional) Manages research and observability data processing.
+- **`krakenbot-ingest.service`**: Verzamelt marktdata.
+- **`krakenbot-execution.service`**: Voert de trading strategie uit.
 
-Common commands:
-- `systemctl start <service>`: Start a service.
-- `systemctl stop <service>`: Stop a service.
-- `systemctl restart <service>`: Restart a service.
-- `systemctl status <service>`: Check the current status of a service.
-- `journalctl -u <service> -f`: Monitor live logs for a service.
+### Handige Commando's
+```bash
+# Status bekijken
+systemctl status krakenbot-execution
 
-## Deployment (`deploy.sh`)
+# Logs live volgen
+journalctl -u krakenbot-execution -f
 
-Deployment is handled via the `scripts/deploy.sh` script, which follows a **Git-only codeflow**.
+# Herstarten na config wijziging
+systemctl restart krakenbot-execution
+```
 
-1.  **Local Commit**: All changes must be committed and pushed to the Git repository.
-2.  **Server Pull**: The `deploy.sh` script (or manual command) performs a `git pull` on the server (`/srv/krakenbot`).
-3.  **Build**: The bot is built from the fresh Git state using `cargo build --release`.
-4.  **Restart**: The relevant `systemd` services are restarted to apply the changes.
+---
 
-This process ensures that the code running on the server is always traceable to a specific Git commit.
+<a name="server-validatie--checks"></a>
+## Server Validatie & Checks
 
-## Server Validation Scripts
+Na een deploy of bij twijfel over de status, gebruik deze scripts:
 
-Several scripts are available to validate the system state after deployment or restart:
+- **`./scripts/db_target_precheck.sh`**: **Verplicht** vóór elk handmatig DB-onderzoek. Bewijst dat je op de juiste pool (Ingest/Decision) kijkt.
+- **`./scripts/validate_live_engine_server.sh`**: Controleert of de binary correct is gebouwd, de DB bereikbaar is en de API keys werken.
+- **`./scripts/ws_safety_report.sh`**: Geeft een overzicht van de WebSocket gezondheid en latency.
 
--   `scripts/validate_live_engine_server.sh`: Performs a comprehensive check of the live engine's health and connectivity.
--   `scripts/check_execution_runtime_truth.sh`: Verifies the consistency of the execution runtime state.
--   `scripts/db_target_precheck.sh`: Mandatory script to verify database connectivity and identity before performing any DB-related tasks.
+---
 
-## Environment Configuration (`.env`)
+<a name="config-env"></a>
+## Configuratie (.env)
 
-The bot's behavior is configured via environment variables, typically stored in a `.env` file in the repository root. Key variables include:
+De `.env` file in `/srv/krakenbot` is de Single Source of Truth voor configuratie.
 
--   `INGEST_DATABASE_URL`, `DECISION_DATABASE_URL`, `RESEARCH_DATABASE_URL`: Database connection strings.
--   `KRAKEN_API_KEY`, `KRAKEN_API_SECRET`: Exchange credentials.
--   `EXECUTION_ENABLE`: Global flag to enable or disable live trading.
--   `LOG_LEVEL`: Controls the verbosity of logging.
+| Variabele | Doel |
+| :--- | :--- |
+| `INGEST_DATABASE_URL` | Connectie naar de Ingest pool. |
+| `DECISION_DATABASE_URL` | Connectie naar de Decision pool. |
+| `EXECUTION_ENABLE` | `true` voor live trading, `false` voor alleen observeren. |
+| `KRAKEN_API_KEY` | API sleutel van Kraken. |
+| `EDGE_ENGINE_V2` | Schakelt de adaptieve V2 route-engine in. |
 
-## Restart Doctrine
+---
 
--   **Scheduled Restarts**: Periodic restarts (e.g., daily) are recommended to clear any transient state and ensure long-term stability.
--   **Emergency Restarts**: If critical errors or inconsistencies are detected, services should be restarted immediately.
--   **Reconciliation on Startup**: The bot automatically performs exposure and position reconciliation upon startup to ensure a consistent state.
+<a name="incident-response--noodstop"></a>
+## Incident Response & Noodstop
 
-## Incident Response
+In geval van nood (bijv. onverklaarbaar verlies of exchange errors):
 
-In the event of an incident (e.g., unexpected losses, exchange downtime, software crashes):
+1. **Noodstop**:
+   ```bash
+   systemctl stop krakenbot-execution
+   ```
+   *De Dead-Man's Switch op Kraken zal alle open orders binnen 60s annuleren.*
 
-1.  **Halt Trading**: Use `EXECUTION_ENABLE=false` or stop the `krakenbot-execution` service.
-2.  **Assess State**: Use the validation scripts and logs to understand the current situation.
-3.  **Manual Intervention**: If necessary, manually manage positions or orders on the exchange.
-4.  **Root Cause Analysis**: Identify the cause of the incident and implement necessary fixes.
-5.  **Recovery**: Once the issue is resolved and validated, resume trading in a controlled manner.
+2. **Analyse**:
+   - Check `journalctl -u krakenbot-execution -n 100`.
+   - Run `./scripts/ws_safety_report.sh`.
+   - Controleer open posities op de Kraken UI.
 
-This operational framework ensures that Krakenbot can be managed effectively and safely in a dynamic production environment.
+3. **Herstel**:
+   - Los de bug op lokaal, commit en push.
+   - Deploy opnieuw naar de server.
+   - Start de service en monitor de `Startup Reconcile` logs nauwgezet.
+
+---
+
+[← 07 — Observability](./07_OBSERVABILITY.md) | **08 — Operations** | [Index](./DOC_INDEX.md) →
+
+---
+
+*Document gegenereerd voor technische documentatie. Laatst bijgewerkt: 2026-04-13.*

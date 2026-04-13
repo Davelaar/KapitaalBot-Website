@@ -1,53 +1,113 @@
-# 03_STRATEGY_PIPELINE.md - Signal Generation and Strategy Pipeline
+# 03 — Strategy Pipeline & Signaalgeneratie
 
-This document describes the core of Krakenbot's decision-making logic: the strategy pipeline.
-It details how raw market data is transformed into actionable trading signals and routes.
+[← 02 — Data-ingest](./02_DATA_INGEST.md) | **03 — Strategy Pipeline** | [04 — Execution & Orders](./04_EXECUTION_ORDERS.md) →
 
-## Route Engine and Move Thesis Dispatch
+---
 
-The **Route Engine** is responsible for evaluating potential trading opportunities across various symbols and time horizons. It acts as a central orchestrator for the strategy pipeline.
+Dit document beschrijft de "denklaag" van Krakenbot: hoe ruwe marktdata wordt getransformeerd in handelsbeslissingen via de strategy pipeline en de route engine.
 
--   **Move Thesis Dispatch**: The engine dispatches "move theses" which are specific hypotheses about future price movements based on current market conditions. Each thesis is evaluated by one or more strategy families.
--   **Route Evaluation**: A "route" represents a specific execution path for a thesis (e.g., a specific symbol, entry side, and target horizon). The engine evaluates multiple routes in parallel to find the most promising opportunities.
+## Navigatiemenu
 
-## Market Features
+- [Pipeline Architectuur](#pipeline-architectuur)
+- [Market Features & Extractie](#market-features-extractie)
+- [Regime Detection](#regime-detection)
+- [Route Engine (V1 & V2)](#route-engine-v1-v2)
+- [Edge & Confidence Math](#edge-confidence-math)
+- [Decision Persistence (CDV)](#decision-persistence-cdv)
 
-Signals are generated based on a rich set of **Market Features**, which are derived from ingested market data:
+---
 
--   **L2/L3 Metrics**: Imbalance, depth, and queue pressure metrics from the order book.
--   **Trade Dynamics**: Volume-weighted price movements, trade frequency, and liquidity flow.
--   **Price History**: Short-term and long-term price trends, volatility, and mean reversion indicators.
--   **Microstructure Snapshots**: Granular snapshots of market state at specific points in time, captured for research and calibration.
+<a name="pipeline-architectuur"></a>
+## Pipeline Architectuur
 
-Features are normalized and combined to form the input for strategy models.
+De pipeline is een lineair proces dat elke evaluatie-tick (getriggerd door `mid_price` wijzigingen of timers) wordt doorlopen.
 
-## Strategy Families
+```mermaid
+flowchart LR
+    State[Refreshed State] --> Features[Feature Extraction]
+    Features --> Regime[Regime Classifier]
+    Regime --> Selector[Strategy Selector]
+    Selector --> Routes[Route Engine]
+    Routes --> Scoring[Edge/Confidence Scoring]
+    Scoring --> Mandate[Execution Mandate]
+```
 
-Trading logic is organized into **Strategy Families**, each with a specific focus or methodology:
+---
 
--   **Momentum/Expansion**: Identifies and capitalizes on strong price trends and volatility expansions.
--   **Mean Reversion**: Targets price corrections after significant deviations from average values.
--   **Liquidity Flow**: Analyzes shifts in buying and selling pressure to anticipate price moves.
--   **Custom Families**: The system is designed to be extensible, allowing for the addition of new strategy families as needed.
+<a name="market-features-extractie"></a>
+## Market Features & Extractie
 
-Each family produces signals and associated metrics (edge, confidence) for its evaluated routes.
+Features zijn de numerieke bouwstenen voor alle beslissingen. Ze worden berekend in `route_engine::market_features`.
 
-## Edge Computation and Route Expectancy
+- **Microstructure**: Spread, book-imbalance (L2), queue-pressure (L3).
+- **Momentum**: Getekende drift en versnelling over meerdere horizons (5s tot 15m).
+- **Volume**: Buy/sell imbalance uit de `trade_flow_window`.
+- **Volatility**: ATR (Average True Range) en realized volatility.
 
--   **Edge Computation**: An "edge" is a measure of the expected profit (in basis points, bps) for a given route, relative to the risk. It's calculated by comparing the predicted price move against transaction costs (fees, spread, slippage).
--   **Route Expectancy**: This is a broader measure that combines the edge with the probability of success. It represents the long-term expected value of taking a particular route.
+---
 
-The pipeline prioritizes routes with the highest positive expectancy and edge.
+<a name="regime-detection"></a>
+## Regime Detection
 
-## Confidence Scoring
+Voordat strategieën worden geëvalueerd, bepaalt de `regime_detection` de huidige marktomstandigheden:
 
-Each signal is assigned a **Confidence Score**, reflecting the model's certainty about its prediction.
+- **TREND**: Duidelijke directionele beweging met volume-ondersteuning.
+- **RANGE**: Consolidatie tussen bekende L2-levels.
+- **EXPANSION**: Plotselinge toename in volatiliteit en spread (Phase 1).
+- **CHAOS**: Onvoorspelbare microstructure (vaak een block-conditie).
 
--   **Confidence Calculation**: Confidence is derived from various factors, including the strength of the underlying features, the consistency of signals across different strategy families, and historical performance metrics for similar market conditions.
--   **Impact on Execution**: Confidence scores are used to filter signals and adjust position sizing. Higher confidence signals may lead to larger positions or more aggressive execution.
+---
 
-## Decision Persistence
+<a name="route-engine-v1-v2"></a>
+## Route Engine (V1 & V2)
 
-Final trading decisions, including the selected routes and their associated metrics, are persisted into the `DECISION_DATABASE_URL` (e.g., `candidate_decision_vectors`). This allows for detailed post-hoc analysis and performance monitoring.
+De Route Engine (`route_engine::route_selector`) evalueert specifieke "Move Theses".
 
-The strategy pipeline is a continuous process, constantly evaluating the market and updating its decisions as new data arrives. It's designed for high performance and low latency to ensure that the bot can react quickly to changing market conditions.
+- **V1 (Deterministisch)**: Gebruikt vaste drempels en lineaire scoring.
+- **V2 (Adaptief)**: Gebruikt historische uitkomsten uit de RESEARCH pool om scores aan te passen aan recente marktprestaties (`edge_engine`).
+
+### Move Theses
+Een thesis is een hypothese over de prijsbeweging, bijv:
+- `AtrBreakout`: Prijs breekt door een ATR-band.
+- `MeanReversion`: Prijs keert terug naar de VWAP.
+- `LiquiditySweep`: Absorptie van een groot L2-level.
+
+---
+
+<a name="edge-confidence-math"></a>
+## Edge & Confidence Math
+
+Elke route krijgt een **Edge** (verwachte winst in bps) en een **Confidence** (betrouwbaarheid).
+
+```mermaid
+graph TD
+    Move[Verwachte Move] --> GrossEdge[Gross Edge]
+    Costs[Fees + Spread + Slippage] --> GrossEdge
+    GrossEdge --> NetEdge[Net Edge]
+    
+    Features[Feature Strength] --> Confidence
+    History[Historical Winrate] --> Confidence
+    NetEdge --> FinalScore[Final Ranking Score]
+    Confidence --> FinalScore
+```
+
+- **Edge**: `(Expected Move - Transaction Costs)`.
+- **Confidence**: Een genormaliseerde waarde (0.0 - 1.0) gebaseerd op signaalsterkte en historische marktoutcomes.
+
+---
+
+<a name="decision-persistence-cdv"></a>
+## Decision Persistence (CDV)
+
+Elke serieuze kandidaat wordt opgeslagen als een **Candidate Decision Vector (CDV)** in de `DECISION` database.
+
+- **Traceerbaarheid**: De CDV bevat alle inputs (features) en outputs (edge, confidence, reason codes).
+- **Shadow Markouts**: Ook niet-gekozen routes worden gelogd om "counterfactual" analyses mogelijk te maken (wat als we wél hadden getrade?).
+
+---
+
+[← 02 — Data-ingest](./02_DATA_INGEST.md) | **03 — Strategy Pipeline** | [04 — Execution & Orders](./04_EXECUTION_ORDERS.md) →
+
+---
+
+*Document gegenereerd voor technische documentatie. Laatst bijgewerkt: 2026-04-13.*
