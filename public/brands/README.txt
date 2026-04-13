@@ -1,1 +1,1 @@
-Kraken® wordmarks are official assets from Kraken (Payward Ltd.), used only to identify the spot venue. Source: assets-cms.kraken.com (horizontal wordmark SVG + PNG). Trademarks belong to their respective owners.
+Kraken® marks: operator-supplied cockpit assets (desktop/mobile × light/dark), JPEG in repo. Trademarks belong to Payward Ltd. Link target: https://www.kraken.com

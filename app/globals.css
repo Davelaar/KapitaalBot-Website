@@ -1326,6 +1326,13 @@ textarea {
   object-position: right bottom;
 }
 
+/* Stacked mark (mobiel): hoger kader, minder breed */
+.cockpit-kraken-img--mobile {
+  height: clamp(38px, 11vw, 52px);
+  max-width: min(36vw, 112px);
+  object-position: right center;
+}
+
 [data-theme="light"] .cockpit-hero {
   background: linear-gradient(180deg, rgba(10, 143, 154, 0.1) 0%, rgba(10, 143, 154, 0.03) 40%, transparent 78%);
   box-shadow: 0 1px 0 rgba(10, 143, 154, 0.08);
