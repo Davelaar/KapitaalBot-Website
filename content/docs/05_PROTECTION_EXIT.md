@@ -66,16 +66,16 @@ Naast de exchange-side orders, bewaakt de bot posities via de `position_monitor`
 De `position_monitor` draait elke 30 seconden en evalueert elke positie tegen de `ManagementAdvice` uit de route-engine.
 
 ```mermaid
-decision_tree [Exit Beslisboom]
-    A[Positie Open] --> B{Loss > 1%?}
-    B -- "Ja" --> C[Market Exit (Safety)]
-    B -- "No" --> D{Leeftijd > 15m?}
-    D -- "Ja" --> E{Winstgevend?}
-    E -- "Nee" --> F[Market Exit (Time)]
-    E -- "Ja" --> G[Tighten TSL (Harvest)]
-    D -- "No" --> H{Stale / No Edge?}
-    H -- "Ja" --> I[Market Exit (Advisory)]
-    H -- "No" --> J[Continue Monitoring]
+flowchart TD
+    A[Positie open] --> B{Verlies groter dan 1 pct?}
+    B -- Ja --> C[Market exit veiligheid]
+    B -- Nee --> D{Positie ouder dan 15 min?}
+    D -- Ja --> E{Winstgevend?}
+    E -- Nee --> F[Market exit tijd]
+    E -- Ja --> G[TSL aanscherpen oogst]
+    D -- Nee --> H{Stale of geen edge?}
+    H -- Ja --> I[Market exit advisory]
+    H -- Nee --> J[Blijven monitoren]
 ```
 
 ---
