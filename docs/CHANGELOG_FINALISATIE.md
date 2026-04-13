@@ -5,6 +5,7 @@
 - **Waarom** — De Krakenbot-`docs/` zijn herstructureerd (genummerde laaggidsen, index, module-inventaris, policy-docs). De site moest dezelfde markdown tonen en geen verouderde ENGINE_SSOT-/`*_CURRENT*`-bestanden meer uitshippen.
 - **Wat** — `content/docs`: volledige sync vanuit `KRAKENBOTMAART/docs/*.md`, plus `SYSTEMD_README.md` uit `systemd/README.md`; `OBSERVABILITY_SNAPSHOT_CONTRACT.md` blijft staan als die (nog) niet in de bot-repo zit. Verwijderd: oude `ENGINE_SSOT`, `ARCHITECTURE_ENGINE_CURRENT`, `LIVE_RUNBOOK_CURRENT`, enz. Scripts: `scripts/sync-docs-from-bot.cjs` kopieert nu alle bot-`docs/*.md` deterministisch; `scripts/sync-docs.cjs` delegeert daarnaartoe. UI: `lib/docs-catalog.ts`, `/docs` en `/docs/[slug]` (alle `.md` zijn leesbaar; sidebar toont vertaalde titels). **i18n** (NL/EN/DE/FR): `docs.intro`, FAQ validatie-antwoord, `docs.meta.*` voor de nieuwe documenten.
 - **Engine (gerelateerd)** — `systemd/README.md`: links naar `01_ARCHITECTURE` / `08_OPERATIONS` i.p.v. verwijderde SSOT/runbook-bestandsnamen.
+- **Website commit** — `0edbc0e` (*docs: sync engine doc set 01-08, catalog + i18n, refresh sync scripts*).
 - **Deploy server** — `cd /srv/KapitaalBot-Website && git pull --ff-only && npm ci && npm run build && systemctl restart kapitaalbot-web.service`.
 
 ## 2026-04-10 — Dashboard cockpit: lege strip vullen + tabel volle breedte
