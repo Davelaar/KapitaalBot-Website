@@ -320,6 +320,15 @@ footer a[href]:hover {
   color: var(--text-link-hover);
 }
 
+/* Logo link: geen underline onder het Kraken-wordmark */
+main a.cockpit-kraken-link {
+  text-decoration: none !important;
+}
+
+main a.cockpit-kraken-link:hover {
+  text-decoration: none !important;
+}
+
 /* Explicit link utility (overrides inline no-underline from legacy components) */
 .kb-text-link {
   color: var(--text-link) !important;
@@ -1274,6 +1283,47 @@ textarea {
   border-bottom: 1px solid var(--border-strong);
   background: linear-gradient(180deg, rgba(89, 248, 252, 0.07) 0%, rgba(89, 248, 252, 0.02) 38%, transparent 78%);
   box-shadow: 0 1px 0 rgba(89, 248, 252, 0.05);
+}
+
+.cockpit-hero__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.65rem 1.25rem;
+}
+
+.cockpit-hero__titles {
+  min-width: 0;
+  flex: 1 1 10rem;
+}
+
+.cockpit-kraken-link {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: flex-end;
+  line-height: 0;
+  opacity: 0.9;
+  transition: opacity 0.15s ease;
+}
+
+.cockpit-kraken-link:hover {
+  opacity: 1;
+}
+
+.cockpit-kraken-link:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+.cockpit-kraken-img {
+  display: block;
+  height: clamp(20px, 4.2vw, 30px);
+  width: auto;
+  max-width: min(52vw, 220px);
+  object-fit: contain;
+  object-position: right bottom;
 }
 
 [data-theme="light"] .cockpit-hero {

@@ -15,6 +15,7 @@ import { formatDelaySeconds } from "@/lib/snapshot-freshness";
 import { InstrumentGauge } from "@/components/InstrumentGauge";
 import type { PieSegment } from "@/components/SimplePieChart";
 import { SimplePieChart } from "@/components/SimplePieChart";
+import { CockpitKrakenMark } from "@/components/CockpitKrakenMark";
 
 function formatFreshnessMs(ms: number | null | undefined): string {
   if (ms == null) return "—";
@@ -139,13 +140,18 @@ export function DashboardCockpit({
   return (
     <div className="cockpit-root">
       <header className="cockpit-hero">
-        <h1 className="cockpit-brand">KapitaalBot</h1>
-        <p className="cockpit-tagline">{cockpitT(locale, "tagline")}</p>
-        {delaySecs != null && (
-          <p className="cockpit-delay">
-            {cockpitT(locale, "delay")}: <span className="cockpit-delay__mono">~{formatDelaySeconds(delaySecs)}</span>
-          </p>
-        )}
+        <div className="cockpit-hero__row">
+          <div className="cockpit-hero__titles">
+            <h1 className="cockpit-brand">KapitaalBot</h1>
+            <p className="cockpit-tagline">{cockpitT(locale, "tagline")}</p>
+            {delaySecs != null && (
+              <p className="cockpit-delay">
+                {cockpitT(locale, "delay")}: <span className="cockpit-delay__mono">~{formatDelaySeconds(delaySecs)}</span>
+              </p>
+            )}
+          </div>
+          <CockpitKrakenMark ariaLabel={cockpitT(locale, "krakenMarkAria")} />
+        </div>
       </header>
 
       <div className="cockpit-col-left">

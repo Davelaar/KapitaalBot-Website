@@ -45,7 +45,8 @@ type CockpitKey =
   | "cardIntentBlocked"
   | "cardConf"
   | "noRows"
-  | "delay";
+  | "delay"
+  | "krakenMarkAria";
 
 const cockpit: Record<Locale, Record<CockpitKey, string>> = {
   nl: {
@@ -95,6 +96,7 @@ const cockpit: Record<Locale, Record<CockpitKey, string>> = {
     cardConf: "Confidence",
     noRows: "Geen rijen in snapshot.",
     delay: "Snapshot-vertraging",
+    krakenMarkAria: "Kraken — spotbeurs (website opent in een nieuw tabblad)",
   },
   en: {
     tagline: "A precision trading system",
@@ -143,6 +145,7 @@ const cockpit: Record<Locale, Record<CockpitKey, string>> = {
     cardConf: "CONF",
     noRows: "No rows in snapshot.",
     delay: "Snapshot lag",
+    krakenMarkAria: "Kraken — spot exchange (opens in a new tab)",
   },
   de: {
     tagline: "Präzisions-Handelssystem",
@@ -191,6 +194,7 @@ const cockpit: Record<Locale, Record<CockpitKey, string>> = {
     cardConf: "Confidence",
     noRows: "Keine Zeilen im Snapshot.",
     delay: "Snapshot-Latenz",
+    krakenMarkAria: "Kraken — Spot-Börse (Website öffnet in neuem Tab)",
   },
   fr: {
     tagline: "Système de trading de précision",
@@ -239,6 +243,7 @@ const cockpit: Record<Locale, Record<CockpitKey, string>> = {
     cardConf: "Confiance",
     noRows: "Aucune ligne dans le snapshot.",
     delay: "Latence snapshot",
+    krakenMarkAria: "Kraken — plateforme spot (site dans un nouvel onglet)",
   },
 };
 
