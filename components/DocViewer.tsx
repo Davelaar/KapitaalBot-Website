@@ -1,8 +1,12 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import type { Locale } from "@/lib/i18n";
+import { slugifyHeadingPlainText } from "@/lib/doc-heading-slug";
+import { isExternalDocHref, resolveDocMarkdownHref } from "@/lib/resolve-doc-markdown-href";
 import { MermaidLiveDiagram } from "@/components/MermaidLiveDiagram";
 
 const docViewerStyles = {
@@ -58,23 +62,62 @@ const docViewerStyles = {
 
 interface DocViewerProps {
   content: string;
+  locale: Locale;
+  docSlug: string;
 }
 
-/** react-markdown does not render raw HTML; engine docs use `<a name="...">` for anchors — strip so they are not shown as literal text. */
+/** react-markdown does not render raw HTML; engine docs used `<a name="...">` for anchors — strip so they are not shown as literal text. */
 function stripInvisibleAnchors(markdown: string): string {
   return markdown.replace(/<a\s+name="[^"]*"\s*>\s*<\/a>\s*\n?/gi, "");
 }
 
-export default function DocViewer({ content }: DocViewerProps) {
+function reactNodeToPlainText(node: React.ReactNode): string {
+  if (node == null || typeof node === "boolean") return "";
+  if (typeof node === "string" || typeof node === "number") return String(node);
+  if (Array.isArray(node)) return node.map(reactNodeToPlainText).join("");
+  if (React.isValidElement(node)) {
+    const props = node.props as { children?: React.ReactNode };
+    return reactNodeToPlainText(props.children);
+  }
+  return "";
+}
+
+export default function DocViewer({ content, locale, docSlug }: DocViewerProps) {
   const md = stripInvisibleAnchors(content);
+
+  const nextHeadingId = React.useMemo(() => {
+    const counts = new Map<string, number>();
+    return (plain: string) => {
+      const base = slugifyHeadingPlainText(plain);
+      const k = counts.get(base) ?? 0;
+      counts.set(base, k + 1);
+      return k === 0 ? base : `${base}-${k}`;
+    };
+  }, [md]);
+
+  const mkHeading =
+    (Tag: "h1" | "h2" | "h3" | "h4" | "h5" | "h6", style: React.CSSProperties) =>
+    ({ children }: { children?: React.ReactNode }) => {
+      const text = reactNodeToPlainText(children);
+      const id = nextHeadingId(text);
+      return (
+        <Tag id={id} style={style}>
+          {children}
+        </Tag>
+      );
+    };
+
   return (
     <article style={docViewerStyles.doc} className="doc-viewer markdown-body">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
-          h1: ({ children }) => <h1 style={docViewerStyles.heading1}>{children}</h1>,
-          h2: ({ children }) => <h2 style={docViewerStyles.heading2}>{children}</h2>,
-          h3: ({ children }) => <h3 style={docViewerStyles.heading3}>{children}</h3>,
+          h1: mkHeading("h1", docViewerStyles.heading1),
+          h2: mkHeading("h2", docViewerStyles.heading2),
+          h3: mkHeading("h3", docViewerStyles.heading3),
+          h4: mkHeading("h4", docViewerStyles.heading3),
+          h5: mkHeading("h5", docViewerStyles.heading3),
+          h6: mkHeading("h6", docViewerStyles.heading3),
           p: ({ children }) => <p style={docViewerStyles.paragraph}>{children}</p>,
           ul: ({ children }) => <ul style={docViewerStyles.list}>{children}</ul>,
           ol: ({ children }) => <ol style={docViewerStyles.list}>{children}</ol>,
@@ -98,7 +141,10 @@ export default function DocViewer({ content }: DocViewerProps) {
             );
           },
           pre: ({ children }) => {
-            const child = React.Children.only(children) as React.ReactElement<{ children?: React.ReactNode; className?: string }> | null;
+            const child = React.Children.only(children) as React.ReactElement<{
+              children?: React.ReactNode;
+              className?: string;
+            }> | null;
             const className = child?.props?.className ?? "";
             const isMermaid = typeof className === "string" && /language-mermaid/.test(className);
             const codeStr = (child?.props?.children != null ? String(child.props.children) : "").replace(/\n$/, "");
@@ -108,6 +154,26 @@ export default function DocViewer({ content }: DocViewerProps) {
             return <pre style={docViewerStyles.pre}>{children}</pre>;
           },
           blockquote: ({ children }) => <blockquote style={docViewerStyles.blockquote}>{children}</blockquote>,
+          a: ({ href, children }) => {
+            if (isExternalDocHref(href)) {
+              return (
+                <a
+                  href={href}
+                  className="kb-text-link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {children}
+                </a>
+              );
+            }
+            const resolved = resolveDocMarkdownHref(href, locale, docSlug);
+            return (
+              <Link href={resolved} className="kb-text-link">
+                {children}
+              </Link>
+            );
+          },
         }}
       >
         {md}

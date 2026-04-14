@@ -94,7 +94,7 @@ export default async function DocSlugPage({ params }: { params: { locale: string
             ? "Publieke docs zijn functioneel volledig en canoniek, maar bevatten geen broncode, geen private accountdetails en geen reproduceerbare tuning."
             : "Public docs are functionally complete and canonical, but contain no source code, no private account details, and no reproducible tuning."}
         </p>
-        <DocViewer content={content} />
+        <DocViewer content={content} locale={locale} docSlug={slug} />
       </article>
     </main>
   );
