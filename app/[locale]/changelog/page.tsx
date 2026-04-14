@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Locale } from "@/lib/i18n";
+import { t } from "@/lib/i18n";
 import { readBotChangelog, type BotChangelogEntry } from "@/lib/read-bot-changelog";
 import { parseLocaleParam, withLocale } from "@/lib/locale-path";
 import { buildPageMetadata } from "@/lib/page-metadata";
@@ -36,29 +37,25 @@ export async function generateMetadata({
   params: { locale: string };
 }) {
   const locale = parseLocaleParam(params.locale);
-  const isNl = locale === "nl";
   return buildPageMetadata({
     locale,
-    title: isNl ? "Changelog — canonieke wijzigingen" : "Changelog — canonical changes",
-    description: isNl
-      ? "Wijzigingslog van publieke semantiek, observability-contract en enginehistorie."
-      : "Change log for public semantics, observability contract, and engine history.",
+    title: t(locale, "changelog.meta.title"),
+    description: t(locale, "changelog.meta.desc"),
     path: "/changelog",
   });
 }
 
 export default async function ChangelogPage({ params }: { params: { locale: string } }) {
   const locale = parseLocaleParam(params.locale) as Locale;
-  const isNl = locale === "nl";
   const bot = readBotChangelog();
   const entriesNewestFirst = bot ? [...bot.entries].reverse() : [];
 
   const ui = {
     nl: {
       sectionWebsite: "Website canon-line updates",
-      navBack: "Home",
-      title: "Changelog",
-      intro: "Canonieke website-updates en volledige bot-historie (Git).",
+      navBack: t(locale, "nav.home"),
+      title: t(locale, "nav.changelog"),
+      intro: t(locale, "changelog.meta.desc"),
       bulletsWebsite: [
         "Route-/decision-centric dashboardsemantiek als hoofdmodel.",
         "SPEC-pagina toegevoegd als canonieke technische specificatie.",
@@ -70,9 +67,9 @@ export default async function ChangelogPage({ params }: { params: { locale: stri
     },
     en: {
       sectionWebsite: "Website canon-line updates",
-      navBack: "Home",
-      title: "Changelog",
-      intro: "Canonical website updates and full bot history (Git).",
+      navBack: t(locale, "nav.home"),
+      title: t(locale, "nav.changelog"),
+      intro: t(locale, "changelog.meta.desc"),
       bulletsWebsite: [
         "Route/decision-centric dashboard semantics as primary model.",
         "SPEC page added as canonical technical specification.",
@@ -84,9 +81,9 @@ export default async function ChangelogPage({ params }: { params: { locale: stri
     },
     de: {
       sectionWebsite: "Website canon-line updates",
-      navBack: "Start",
-      title: "Changelog",
-      intro: "Kanonische Website-Updates und vollständige Bot-Historie (Git).",
+      navBack: t(locale, "nav.home"),
+      title: t(locale, "nav.changelog"),
+      intro: t(locale, "changelog.meta.desc"),
       bulletsWebsite: [
         "Route-/Decision-zentrierte Dashboard-Semantik als Hauptmodell.",
         "SPEC-Seite als kanonische technische Spezifikation hinzugefügt.",
@@ -98,9 +95,9 @@ export default async function ChangelogPage({ params }: { params: { locale: stri
     },
     fr: {
       sectionWebsite: "Website canon-line updates",
-      navBack: "Accueil",
-      title: "Changelog",
-      intro: "Mises à jour canoniques du site et historique complet du bot (Git).",
+      navBack: t(locale, "nav.home"),
+      title: t(locale, "nav.changelog"),
+      intro: t(locale, "changelog.meta.desc"),
       bulletsWebsite: [
         "Sémantique dashboard orientée route/décision comme modèle principal.",
         "Page SPEC ajoutée comme spécification technique canonique.",
@@ -113,7 +110,7 @@ export default async function ChangelogPage({ params }: { params: { locale: stri
   }[locale];
 
   const generatedLabel = bot
-    ? `${isNl ? "Gegenereerd" : "Generated"}: ${formatCommittedAt(bot.generated_at, locale)}`
+    ? `${t(locale, "changelog.engine.generated")}: ${formatCommittedAt(bot.generated_at, locale)}`
     : null;
 
   return (
@@ -136,17 +133,15 @@ export default async function ChangelogPage({ params }: { params: { locale: stri
       </section>
 
       <section className="card" style={{ marginBottom: "1.5rem" }}>
-        <h2 style={{ fontSize: "1.25rem", marginBottom: "0.75rem" }}>{isNl ? "Engine commit-historie" : "Engine commit history"}</h2>
+        <h2 style={{ fontSize: "1.25rem", marginBottom: "0.75rem" }}>{t(locale, "changelog.h2.engine")}</h2>
         <p style={{ color: "var(--muted)", fontSize: "0.9375rem", marginBottom: "0.75rem", lineHeight: 1.6 }}>
-          {isNl
-            ? "Bronhistorie van de engine-repository. Deze lijst is informatief en verwijst naar commitdoelen, niet naar broncode-uitleg op deze pagina."
-            : "Source history from the engine repository. This list is informational and points to commit intent, not source code explanation on this page."}
+          {t(locale, "changelog.engine.body")}
         </p>
         {bot ? (
           <p style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1rem" }}>
             {generatedLabel}
             <br />
-            {bot.commit_count} {isNl ? "commits" : "commits"}
+            {bot.commit_count} {t(locale, "changelog.engine.commits")}
             {bot.source_repo ? (
               <>
                 <br />
@@ -156,7 +151,7 @@ export default async function ChangelogPage({ params }: { params: { locale: stri
           </p>
         ) : (
           <p style={{ color: "var(--warn, #c9a227)", fontSize: "0.9375rem" }}>
-            {isNl ? "Geen bot changelog beschikbaar." : "No bot changelog available."}
+            {t(locale, "changelog.engine.empty")}
           </p>
         )}
 
@@ -182,7 +177,7 @@ export default async function ChangelogPage({ params }: { params: { locale: stri
                 {e.body && e.body.replace(/\s+/g, " ").trim().length > 0 ? (
                   <details style={{ marginTop: "0.35rem" }}>
                     <summary className="kb-summary-trigger">
-                      {isNl ? "Toon commit body" : "Show commit body"}
+                      {t(locale, "changelog.commit.show")}
                     </summary>
                     <pre
                       style={{

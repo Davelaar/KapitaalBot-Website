@@ -2,6 +2,7 @@
 
 import type { CSSProperties } from "react";
 import { useLocale } from "@/lib/locale";
+import { t } from "@/lib/i18n";
 import type { PublicTradingSnapshot } from "@/lib/snapshots";
 
 export interface RecentExecutionSectionProps {
@@ -39,7 +40,6 @@ export default function RecentExecutionSection({
   maxFills = 10,
 }: RecentExecutionSectionProps) {
   const locale = useLocale();
-  const isNl = locale === "nl";
   if (!trading) return null;
 
   const orders = (trading.recent_orders ?? []).slice(0, maxOrders);
@@ -62,18 +62,18 @@ export default function RecentExecutionSection({
     <section style={{ marginTop: "1.5rem", display: "grid", gap: "1rem", minWidth: 0 }}>
       <div className="card" style={{ padding: "1rem 1.25rem", minWidth: 0 }}>
         <h2 style={{ fontSize: "1rem", marginBottom: "0.5rem" }}>
-          {isNl ? "Why-No-Trade en route-uitkomst (1h)" : "Why-No-Trade and route outcome (1h)"}
+          {t(locale, "dashboard.exec.wntTitle")}
         </h2>
         <p className="kb-dash-prose" style={{ margin: 0, color: "var(--muted)", fontSize: "0.875rem", lineHeight: 1.6 }}>
-          <strong>{isNl ? "Reject reasons: " : "Reject reasons: "}</strong>
+          <strong>{t(locale, "dashboard.exec.rejectReasons")}</strong>
           {rejectReasons.length ? rejectReasons.map((r) => `${r.label} (${r.count})`).join(" · ") : "—"}
         </p>
         <p className="kb-dash-prose" style={{ margin: "0.4rem 0 0", color: "var(--muted)", fontSize: "0.875rem", lineHeight: 1.6 }}>
-          <strong>{isNl ? "Why-No-Trade: " : "Why-No-Trade: "}</strong>
+          <strong>Why-No-Trade: </strong>
           {whyNoTrade.length ? whyNoTrade.map((r) => `${r.label} (${r.count})`).join(" · ") : "—"}
         </p>
         <p className="kb-dash-prose" style={{ margin: "0.4rem 0 0", color: "var(--muted)", fontSize: "0.875rem", lineHeight: 1.6 }}>
-          <strong>{isNl ? "Route wins: " : "Route wins: "}</strong>
+          <strong>{t(locale, "dashboard.exec.routeWins")}</strong>
           {routeWins.length ? routeWins.map((r) => `${r.label} (${r.count})`).join(" · ") : "—"}
         </p>
       </div>
@@ -81,22 +81,22 @@ export default function RecentExecutionSection({
       {orders.length > 0 && (
         <div className="card" style={{ padding: "1rem 1.25rem", minWidth: 0 }}>
           <h2 style={{ fontSize: "1.05rem", marginBottom: "0.5rem" }}>
-            {isNl ? "Recente execution context" : "Recent execution context"}
+            {t(locale, "dashboard.exec.recentContext")}
           </h2>
           <div className="kb-table-scroll" style={tableWrap}>
             <table className="kb-table">
               <thead>
                 <tr>
                   {[
-                    isNl ? "Tijd" : "Time",
+                    t(locale, "dashboard.execution.col.time"),
                     "Ref",
-                    isNl ? "Symbool" : "Symbol",
+                    t(locale, "dashboard.execution.col.symbol"),
                     "Side",
-                    isNl ? "Type" : "Type",
-                    isNl ? "Status" : "Status",
-                    isNl ? "Route" : "Route",
-                    isNl ? "Regime" : "Regime",
-                    isNl ? "Strategie" : "Strategy",
+                    t(locale, "dashboard.execution.col.type"),
+                    t(locale, "dashboard.execution.col.status"),
+                    "Route",
+                    t(locale, "dashboard.execution.col.regime"),
+                    t(locale, "dashboard.execution.col.strategy"),
                   ].map((h) => (
                     <th key={h} style={th}>{h}</th>
                   ))}
@@ -125,19 +125,19 @@ export default function RecentExecutionSection({
       {fills.length > 0 && (
         <div className="card" style={{ padding: "1rem 1.25rem", minWidth: 0 }}>
           <h2 style={{ fontSize: "1.05rem", marginBottom: "0.5rem" }}>
-            {isNl ? "Recente fill outcomes" : "Recent fill outcomes"}
+            {t(locale, "dashboard.exec.recentFills")}
           </h2>
           <div className="kb-table-scroll" style={tableWrap}>
             <table className="kb-table">
               <thead>
                 <tr>
                   {[
-                    isNl ? "Tijd" : "Time",
-                    isNl ? "Symbool" : "Symbol",
+                    t(locale, "dashboard.execution.col.time"),
+                    t(locale, "dashboard.execution.col.symbol"),
                     "Side",
-                    isNl ? "Qty" : "Qty",
-                    isNl ? "Prijs" : "Price",
-                    isNl ? "Fee" : "Fee",
+                    t(locale, "dashboard.execution.col.qty"),
+                    t(locale, "dashboard.execution.col.price"),
+                    t(locale, "dashboard.execution.col.fee"),
                   ].map((h) => (
                     <th key={h} style={th}>{h}</th>
                   ))}

@@ -6,13 +6,13 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { withLocale } from "@/lib/locale-path";
 import type {
-  LabelCount,
   PublicRegimeSnapshot,
   PublicStatusSnapshot,
   PublicStrategySnapshot,
   PublicTradingSnapshot,
   Tier2DataBundle,
 } from "@/lib/snapshots";
+import { LabelCountBarTable } from "@/components/LabelCountBarTable";
 import { labelCountsToPieSegments, pieSegmentsTotal, SimplePieChart } from "@/components/SimplePieChart";
 import { ExecutionEconomicsStrip } from "@/components/ExecutionEconomicsStrip";
 
@@ -24,11 +24,6 @@ type Props = {
   trading: PublicTradingSnapshot | null;
   dataBundle: Tier2DataBundle | null;
 };
-
-function top(rows: LabelCount[] | null | undefined, n = 6): LabelCount[] {
-  if (!rows || rows.length === 0) return [];
-  return [...rows].sort((a, b) => b.count - a.count).slice(0, n);
-}
 
 function formatHorizonSec(sec: number | null | undefined): string {
   if (sec == null || sec <= 0) return "—";
@@ -62,13 +57,10 @@ function card(title: string, body: ReactNode) {
 }
 
 export function RouteCentricDashboard({ locale, status, regime, strategy, trading, dataBundle }: Props) {
-  const isNl = locale === "nl";
   const pieOther = t(locale, "dashboard.pieOther");
 
-  const rejectTop = top(trading?.top_reject_reasons_last_hour, 8);
-  const stageTop = top(dataBundle?.route_no_trade?.funnel_stage_counts_24h, 8);
-  const decisionTop = top(dataBundle?.route_no_trade?.funnel_decision_code_counts_24h, 10);
-  const pathTapeTop = top(dataBundle?.path_doctrine?.orders_by_path_tape_24h, 8);
+  const rejectReasons1h = trading?.top_reject_reasons_last_hour ?? [];
+  const pathTapeRows = dataBundle?.path_doctrine?.orders_by_path_tape_24h ?? [];
   const edgeSignals = dataBundle?.edgeboard?.top_signals ?? [];
   const edgeboardSourceDb = dataBundle?.edgeboard?.source_db ?? null;
   const edgeboardSnapshotAgeMs = dataBundle?.edgeboard?.snapshot_age_ms ?? null;
@@ -108,7 +100,7 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
   return (
     <div className="route-centric-dashboard" style={{ display: "grid", gap: "1rem", minWidth: 0 }}>
       {card(
-        isNl ? "Live Route Board" : "Live Route Board",
+        t(locale, "dashboard.rcd.liveRouteBoard"),
         <>
           <p className="kb-dash-prose" style={{ marginTop: 0, color: "var(--muted)", fontSize: "0.9rem" }}>
             {t(locale, "dashboard.routeBoardIntro")}
@@ -116,15 +108,13 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
           <p className="kb-refresh-note kb-dash-prose">{t(locale, "dashboard.refreshNote")}</p>
           {isDecisionFallback && (
             <p className="kb-callout-warn">
-              {isNl
-                ? "Bron: decision fallback — research snapshot is verlopen. Edge/confidence semantiek verschilt van research."
-                : "Source: decision fallback — research snapshot expired. Edge/confidence semantics differ from research."}
+              {t(locale, "dashboard.edgeboard.decisionFallbackWarn")}
             </p>
           )}
           {edgeboardSnapshotAgeMs != null && (
             <p style={{ margin: "0 0 0.25rem", fontSize: "0.75rem", color: "var(--muted)" }}>
-              {isNl ? "Snapshot leeftijd: " : "Snapshot age: "}{formatFreshnessMs(edgeboardSnapshotAgeMs)}
-              {edgeboardSourceDb ? ` · ${isNl ? "bron" : "source"}: ${edgeboardSourceDb}` : ""}
+              {t(locale, "dashboard.rcd.snapshotAge")}{formatFreshnessMs(edgeboardSnapshotAgeMs)}
+              {edgeboardSourceDb ? ` · ${t(locale, "dashboard.rcd.source")}: ${edgeboardSourceDb}` : ""}
             </p>
           )}
           {edgeSignals.length > 0 ? (
@@ -165,7 +155,7 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
             </div>
           ) : (
             <p style={{ margin: 0, color: "var(--muted)" }}>
-              {isNl ? "Nog geen publieke edgeboard-signalen beschikbaar." : "No public edgeboard signals available yet."}
+              {t(locale, "dashboard.rcd.noSignals")}
             </p>
           )}
           <p className="kb-dash-prose" style={{ margin: "0.5rem 0 0", fontSize: "0.75rem", color: "var(--muted)" }}>
@@ -269,7 +259,7 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
         }}
       >
         <section className="card" style={{ padding: "1rem 1.25rem" }}>
-          <h2 style={{ fontSize: "1.05rem", marginBottom: "0.5rem" }}>{isNl ? "Verdeling (funnel)" : "Distribution (funnel)"}</h2>
+          <h2 style={{ fontSize: "1.05rem", marginBottom: "0.5rem" }}>{t(locale, "dashboard.rcd.funnelTitle")}</h2>
           <div
             style={{
               display: "flex",
@@ -280,7 +270,7 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
             }}
           >
             <SimplePieChart
-              title={isNl ? "Funnel-fase (24h)" : "Funnel stage (24h)"}
+              title={t(locale, "dashboard.rcd.funnelStage24h")}
               segments={funnelStagePie}
               size={158}
               variant="donut"
@@ -288,7 +278,7 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
               centerValue={pieSegmentsTotal(funnelStagePie) > 0 ? pieSegmentsTotal(funnelStagePie) : undefined}
             />
             <SimplePieChart
-              title={isNl ? "Decision codes (24h)" : "Decision codes (24h)"}
+              title={t(locale, "dashboard.rcd.decisionCodes24h")}
               segments={decisionPie}
               size={158}
               variant="donut"
@@ -298,10 +288,10 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
           </div>
         </section>
         <section className="card" style={{ padding: "1rem 1.25rem" }}>
-          <h2 style={{ fontSize: "1.05rem", marginBottom: "0.5rem" }}>{isNl ? "Regime & strategie" : "Regime & strategy"}</h2>
+          <h2 style={{ fontSize: "1.05rem", marginBottom: "0.5rem" }}>{t(locale, "dashboard.rcd.regimeStrategy")}</h2>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "1.25rem", justifyContent: "flex-start" }}>
             <SimplePieChart
-              title={isNl ? "Actieve regimes" : "Active regimes"}
+              title={t(locale, "dashboard.rcd.activeRegimes")}
               segments={regimePie}
               size={158}
               variant="donut"
@@ -309,7 +299,7 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
               centerValue={pieSegmentsTotal(regimePie) > 0 ? pieSegmentsTotal(regimePie) : undefined}
             />
             <SimplePieChart
-              title={isNl ? "Actieve strategieën" : "Active strategies"}
+              title={t(locale, "dashboard.rcd.activeStrategies")}
               segments={strategyPie}
               size={158}
               variant="donut"
@@ -329,36 +319,47 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
         }}
       >
         {card(
-          isNl ? "Why-No-Trade / Rejections" : "Why-No-Trade / Rejections",
+          t(locale, "dashboard.rcd.wntTitle"),
           <>
             <p style={{ marginTop: 0, color: "var(--muted)", fontSize: "0.85rem" }}>
-              {isNl ? "Top afwijsredenen en funnel-stadia (geaggregeerd)." : "Top rejection reasons and funnel stages (aggregated)."}
+              {t(locale, "dashboard.rcd.wntIntro")}
             </p>
-            <p style={{ margin: 0, fontSize: "0.85rem" }}>
-              <strong>{isNl ? "Reject reasons (1h): " : "Reject reasons (1h): "}</strong>
-              {rejectTop.length ? rejectTop.map((r) => `${r.label} (${r.count})`).join(" · ") : "—"}
-            </p>
-            <p style={{ margin: "0.45rem 0 0", fontSize: "0.85rem" }}>
-              <strong>{isNl ? "Funnel stage (24h): " : "Funnel stage (24h): "}</strong>
-              {stageTop.length ? stageTop.map((r) => `${r.label} (${r.count})`).join(" · ") : "—"}
-            </p>
-            <p style={{ margin: "0.45rem 0 0", fontSize: "0.85rem" }}>
-              <strong>{isNl ? "Decision codes (24h): " : "Decision codes (24h): "}</strong>
-              {decisionTop.length ? decisionTop.map((r) => `${r.label} (${r.count})`).join(" · ") : "—"}
-            </p>
+            <div className="kb-tier2-wnt-grids" style={{ marginTop: "0.5rem" }}>
+              <div style={{ minWidth: 0 }}>
+                <p style={{ margin: 0, fontSize: "0.82rem", fontWeight: 600, color: "var(--text)" }}>
+                  {t(locale, "dashboard.rcd.rejectReasons1h")}
+                </p>
+                <LabelCountBarTable
+                  rows={rejectReasons1h}
+                  emptyLabel="—"
+                  maxRows={10}
+                  accentColor="var(--pie-5)"
+                />
+              </div>
+              <div style={{ minWidth: 0 }}>
+                <p style={{ margin: 0, fontSize: "0.82rem", fontWeight: 600, color: "var(--text)" }}>
+                  {t(locale, "dashboard.rcd.funnelStageLabel")}
+                </p>
+                <LabelCountBarTable rows={dataBundle?.route_no_trade?.funnel_stage_counts_24h} emptyLabel="—" />
+              </div>
+              <div style={{ minWidth: 0 }}>
+                <p style={{ margin: 0, fontSize: "0.82rem", fontWeight: 600, color: "var(--text)" }}>
+                  {t(locale, "dashboard.rcd.decisionCodesLabel")}
+                </p>
+                <LabelCountBarTable rows={dataBundle?.route_no_trade?.funnel_decision_code_counts_24h} emptyLabel="—" maxRows={12} />
+              </div>
+            </div>
           </>,
         )}
 
         {card(
-          isNl ? "Position Context Board" : "Position Context Board",
+          t(locale, "dashboard.rcd.positionContext"),
           <>
             <p style={{ marginTop: 0, color: "var(--muted)", fontSize: "0.85rem" }}>
-              {isNl
-                ? "Publieke positiecontext zonder accountgevoelige waarden: safety-modes en route-pad distributie."
-                : "Public position context without account-sensitive values: safety modes and route-path distribution."}
+              {t(locale, "dashboard.posContext.intro")}
             </p>
             <SimplePieChart
-              title={isNl ? "Orders per route-pad (24h)" : "Orders by route path (24h)"}
+              title={t(locale, "dashboard.rcd.ordersByPath")}
               segments={pathTapePie}
               size={152}
               variant="donut"
@@ -367,20 +368,20 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
             />
             <p style={{ margin: "0.45rem 0 0", fontSize: "0.85rem", display: "flex", flexWrap: "wrap", gap: "0.35rem", alignItems: "center" }}>
               <strong style={{ marginRight: "0.25rem" }}>Safety:</strong>
-              <span className="kb-state-allow" title={isNl ? "Normal (N)" : "Normal (N)"}>
+              <span className="kb-state-allow" title={t(locale, "dashboard.rcd.safetyNormal")}>
                 N={status?.safety_normal_count ?? "—"}
               </span>
-              <span className="kb-state-skip" title={isNl ? "Exit-only (E)" : "Exit-only (E)"}>
+              <span className="kb-state-skip" title={t(locale, "dashboard.rcd.safetyExit")}>
                 E={status?.safety_exit_only_count ?? "—"}
               </span>
-              <span className="kb-state-halt" title={isNl ? "Hard block (B)" : "Hard block (B)"}>
+              <span className="kb-state-halt" title={t(locale, "dashboard.rcd.safetyBlock")}>
                 B={status?.safety_hard_blocked_count ?? "—"}
               </span>
             </p>
-            <p style={{ margin: "0.45rem 0 0", fontSize: "0.85rem" }}>
-              <strong>{isNl ? "Orders per route-pad (tekst): " : "Orders by route path (text): "}</strong>
-              {pathTapeTop.length ? pathTapeTop.map((r) => `${r.label} (${r.count})`).join(" · ") : "—"}
+            <p style={{ margin: "0.45rem 0 0", fontSize: "0.82rem", fontWeight: 600, color: "var(--text)" }}>
+              {t(locale, "dashboard.rcd.pathTapeLabel")}
             </p>
+            <LabelCountBarTable rows={pathTapeRows} emptyLabel="—" maxRows={12} />
           </>,
         )}
       </div>
@@ -394,51 +395,73 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
         }}
       >
         {card(
-          isNl ? "Timing & Execution Viability" : "Timing & Execution Viability",
+          t(locale, "dashboard.rcd.timingTitle"),
           <>
             <p style={{ marginTop: 0, color: "var(--muted)", fontSize: "0.85rem" }}>
-              {isNl
-                ? "Timing-relevante signalen voor route-keuze en uitvoerbaarheid."
-                : "Timing-relevant signals for route selection and execution viability."}
+              {t(locale, "dashboard.timingIntro")}
             </p>
-            <p style={{ margin: 0, fontSize: "0.85rem" }}>
-              <strong>{isNl ? "Feed freshness (ticker/trade): " : "Feed freshness (ticker/trade): "}</strong>
-              <span className={feedStale ? "kb-feed-stale" : "kb-feed-ok"}>
-                {feedFreshnessSecs != null ? `${feedFreshnessSecs}s` : "—"}
-                {feedStale ? (isNl ? " — STALE" : " — STALE") : ""}
-              </span>
-            </p>
-            <p style={{ margin: "0.15rem 0 0", fontSize: "0.75rem", color: "var(--muted)" }}>
-              {isNl
-                ? "= leeftijd van het recentste ticker/trade-bericht van de exchange (INGEST pool). Threshold: 60s."
-                : "= age of the most recent ticker/trade message from the exchange (INGEST pool). Threshold: 60s."}
-            </p>
-            <p style={{ margin: "0.45rem 0 0", fontSize: "0.85rem" }}>
-              <strong>{isNl ? "Orders 24h: " : "Orders 24h: "}</strong>{trading?.orders_24h_count ?? "—"} ·{" "}
-              <strong>{isNl ? "Fills 24h: " : "Fills 24h: "}</strong>{trading?.trades_24h_count ?? "—"}
-            </p>
+            <table className="kb-table kb-kv-mini" style={{ fontSize: "0.85rem", width: "100%", marginTop: "0.35rem" }}>
+              <tbody>
+                <tr>
+                  <td style={{ color: "var(--muted)", width: "42%", verticalAlign: "top" }}>
+                    {t(locale, "dashboard.rcd.feedFreshness")}
+                  </td>
+                  <td>
+                    <span className={feedStale ? "kb-feed-stale" : "kb-feed-ok"}>
+                      {feedFreshnessSecs != null ? `${feedFreshnessSecs}s` : "—"}
+                      {feedStale ? t(locale, "dashboard.rcd.stale") : ""}
+                    </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td style={{ color: "var(--muted)", fontSize: "0.75rem", paddingTop: "0.15rem" }} colSpan={2}>
+                    {t(locale, "dashboard.rcd.feedFreshnessHint")}
+                  </td>
+                </tr>
+                <tr>
+                  <td style={{ color: "var(--muted)", paddingTop: "0.45rem" }}>{t(locale, "dashboard.rcd.orders24h")}</td>
+                  <td style={{ paddingTop: "0.45rem" }}>{trading?.orders_24h_count ?? "—"}</td>
+                </tr>
+                <tr>
+                  <td style={{ color: "var(--muted)" }}>{t(locale, "dashboard.rcd.fills24h")}</td>
+                  <td>{trading?.trades_24h_count ?? "—"}</td>
+                </tr>
+              </tbody>
+            </table>
             <p style={{ margin: "0.45rem 0 0", fontSize: "0.85rem", color: "var(--muted)" }}>
-              {isNl
-                ? "Maker-window expiry en taker fallback worden publiek geaggregeerd getoond zodra dedicated snapshotvelden beschikbaar zijn."
-                : "Maker-window expiry and taker fallback are shown publicly in aggregated form once dedicated snapshot fields are available."}
+              {t(locale, "dashboard.rcd.makerWindow")}
             </p>
           </>,
         )}
 
         {card(
-          isNl ? "Strategy / Regime Matrix" : "Strategy / Regime Matrix",
+          t(locale, "dashboard.rcd.strategyMatrix"),
           <>
             <p style={{ marginTop: 0, color: "var(--muted)", fontSize: "0.85rem" }}>
-              {isNl ? "Verdeling van actieve regimes en strategieën." : "Distribution of active regimes and strategies."}
+              {t(locale, "dashboard.rcd.strategyMatrixIntro")}
             </p>
-            <p style={{ margin: 0, fontSize: "0.85rem" }}>
-              <strong>{isNl ? "Regimes: " : "Regimes: "}</strong>
-              {activeRegimes.length ? activeRegimes.map((r) => `${r.regime} (${r.count})`).join(" · ") : "—"}
-            </p>
-            <p style={{ margin: "0.45rem 0 0", fontSize: "0.85rem" }}>
-              <strong>{isNl ? "Strategieën: " : "Strategies: "}</strong>
-              {activeStrategies.length ? activeStrategies.map((s) => `${s.strategy} (${s.count})`).join(" · ") : "—"}
-            </p>
+            <div className="kb-tier2-wnt-grids" style={{ marginTop: "0.45rem" }}>
+              <div style={{ minWidth: 0 }}>
+                <p style={{ margin: 0, fontSize: "0.82rem", fontWeight: 600, color: "var(--text)" }}>
+                  {t(locale, "dashboard.rcd.regimesLabel")}
+                </p>
+                <LabelCountBarTable
+                  rows={activeRegimes.map((r) => ({ label: r.regime, count: r.count }))}
+                  emptyLabel="—"
+                  accentColor="var(--pie-3)"
+                />
+              </div>
+              <div style={{ minWidth: 0 }}>
+                <p style={{ margin: 0, fontSize: "0.82rem", fontWeight: 600, color: "var(--text)" }}>
+                  {t(locale, "dashboard.rcd.strategiesLabel")}
+                </p>
+                <LabelCountBarTable
+                  rows={activeStrategies.map((s) => ({ label: s.strategy, count: s.count }))}
+                  emptyLabel="—"
+                  accentColor="var(--pie-2)"
+                />
+              </div>
+            </div>
           </>,
         )}
       </div>
@@ -452,57 +475,51 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
         }}
       >
         {card(
-          isNl ? "Execution / Fill Quality" : "Execution / Fill Quality",
+          t(locale, "dashboard.rcd.execQuality"),
           <>
             <p style={{ marginTop: 0, color: "var(--muted)", fontSize: "0.85rem" }}>
-              {isNl
-                ? "Operationele uitkomsten zonder private account/PnL-details."
-                : "Operational outcomes without private account/PnL details."}
+              {t(locale, "dashboard.rcd.execQualityIntro")}
             </p>
             <p style={{ margin: 0, fontSize: "0.85rem" }}>
-              <strong>{isNl ? "Recente uitvoering: " : "Recent execution: "}</strong>
-              {trading?.recent_orders?.length ?? 0} {isNl ? "orders in snapshot" : "orders in snapshot"} ·{" "}
-              {trading?.recent_fills?.length ?? 0} {isNl ? "fills in snapshot" : "fills in snapshot"}
+              <strong>{t(locale, "dashboard.rcd.recentExec")}</strong>
+              {trading?.recent_orders?.length ?? 0} {t(locale, "dashboard.rcd.ordersInSnapshot")} ·{" "}
+              {trading?.recent_fills?.length ?? 0} {t(locale, "dashboard.rcd.fillsInSnapshot")}
             </p>
             <p style={{ margin: "0.45rem 0 0", fontSize: "0.85rem", color: "var(--muted)" }}>
-              {isNl
-                ? "Publiek tonen we verklaarbare uitvoeringstrends; accountniveau fill-details blijven admin-only."
-                : "Publicly we show explainable execution trends; account-level fill details stay admin-only."}
+              {t(locale, "dashboard.rcd.execPublicNote")}
             </p>
           </>,
         )}
 
         {card(
-          isNl ? "Runtime Health" : "Runtime Health",
+          t(locale, "dashboard.rcd.runtimeHealth"),
           <>
             <p style={{ marginTop: 0, color: "var(--muted)", fontSize: "0.85rem" }}>
-              {isNl ? "Gezondheid van ingest/execution-routes op geaggregeerd niveau." : "Health of ingest/execution routes on an aggregated level."}
+              {t(locale, "dashboard.rcd.runtimeHealthIntro")}
             </p>
             <p style={{ margin: 0, fontSize: "0.85rem" }}>
               <strong>Run:</strong> #{status?.run_id ?? "—"} · <strong>Epoch:</strong> {status?.epoch_status ?? "—"} · <strong>Symbols:</strong> {status?.epoch_symbol_count ?? "—"}
             </p>
             <p style={{ margin: "0.45rem 0 0", fontSize: "0.85rem" }}>
-              <strong>{isNl ? "Feed rows:" : "Feed rows:"}</strong> t={status?.ticker_count ?? "—"} · tr={status?.trade_count ?? "—"} · L2={status?.l2_count ?? "—"} · L3={status?.l3_count ?? "—"}
+              <strong>{t(locale, "dashboard.rcd.feedRows")}</strong> t={status?.ticker_count ?? "—"} · tr={status?.trade_count ?? "—"} · L2={status?.l2_count ?? "—"} · L3={status?.l3_count ?? "—"}
             </p>
           </>,
         )}
       </div>
 
       {card(
-        isNl ? "Route Drilldown / Lineage" : "Route Drilldown / Lineage",
+        t(locale, "dashboard.rcd.routeDrilldown"),
         <>
           <p style={{ marginTop: 0, color: "var(--muted)", fontSize: "0.85rem" }}>
-            {isNl
-              ? "Publieke drilldown naar route lineage en besliscontext (zonder reproduceerbare tuningwaarden)."
-              : "Public drilldown to route lineage and decision context (without reproducible tuning values)."}
+            {t(locale, "dashboard.rcd.routeDrilldownIntro")}
           </p>
           <p style={{ margin: 0, fontSize: "0.9rem" }}>
             <Link href={withLocale(locale, "/spec")} className="kb-text-link">
-              {isNl ? "Open de SPEC-pagina voor canonieke runtime-specificatie" : "Open the SPEC page for canonical runtime specification"}
+              {t(locale, "dashboard.rcd.openSpec")}
             </Link>
             {" · "}
             <Link href={withLocale(locale, "/docs")} className="kb-text-link">
-              {isNl ? "Bekijk de publieke architectuurdocumentatie" : "Read the public architecture documentation"}
+              {t(locale, "dashboard.rcd.viewDocs")}
             </Link>
           </p>
         </>,

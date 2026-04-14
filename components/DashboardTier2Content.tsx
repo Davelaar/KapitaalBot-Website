@@ -5,9 +5,10 @@ import { useLocale } from "@/lib/locale";
 import { withLocale } from "@/lib/locale-path";
 import { t } from "@/lib/i18n";
 import { labelCountsToPieSegments, SimplePieChart } from "@/components/SimplePieChart";
+import { LabelCountBarTable } from "@/components/LabelCountBarTable";
+import { LabelCountTable } from "@/components/LabelCountTable";
 import type {
   EquityPoint,
-  LabelCount,
   LatencyBucketPoint,
   MissedMoveBucket,
   RunHealthPoint,
@@ -24,42 +25,6 @@ interface DashboardTier2ContentProps {
   latency: Tier2LatencySnapshot | null;
   pnl: Tier2PnlSnapshot | null;
   safety: Tier2SafetySnapshot | null;
-}
-
-function sortedLabelCounts(items: LabelCount[] | null | undefined): LabelCount[] {
-  if (!items?.length) return [];
-  return [...items].sort((a, b) => b.count - a.count);
-}
-
-function LabelCountTable({
-  rows,
-  emptyLabel,
-  maxRows = 12,
-}: {
-  rows: LabelCount[] | null | undefined;
-  emptyLabel: string;
-  maxRows?: number;
-}) {
-  const sorted = sortedLabelCounts(rows).slice(0, maxRows);
-  if (sorted.length === 0) {
-    return <p style={{ margin: 0, fontSize: "0.82rem", color: "var(--text-muted)" }}>{emptyLabel}</p>;
-  }
-  return (
-    <table className="kb-table" style={{ fontSize: "0.8rem", width: "100%", marginTop: "0.35rem" }}>
-      <tbody>
-        {sorted.map((r, i) => (
-          <tr key={`${r.label}-${i}`}>
-            <td style={{ padding: "0.2rem 0.35rem 0.2rem 0", borderBottom: "1px solid var(--border)", wordBreak: "break-word" }}>
-              {r.label}
-            </td>
-            <td style={{ padding: "0.2rem 0", borderBottom: "1px solid var(--border)", textAlign: "right", whiteSpace: "nowrap" }}>
-              {r.count.toLocaleString()}
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  );
 }
 
 function LatencyHistogramBars({ points, ariaLabel }: { points: LatencyBucketPoint[]; ariaLabel: string }) {
@@ -144,11 +109,11 @@ function PnlEquityMiniBars({ equity, ariaLabel }: { equity: EquityPoint[] | null
 
 function RunHealthTable({
   points,
-  isNl,
+  modeLabel,
   emptyLabel,
 }: {
   points: RunHealthPoint[] | null | undefined;
-  isNl: boolean;
+  modeLabel: string;
   emptyLabel: string;
 }) {
   const rows = points?.length ? [...points].slice(-8).reverse() : [];
@@ -161,7 +126,7 @@ function RunHealthTable({
         <thead>
           <tr>
             <th style={{ textAlign: "left", padding: "0.25rem" }}>run</th>
-            <th style={{ textAlign: "left", padding: "0.25rem" }}>{isNl ? "modus" : "mode"}</th>
+            <th style={{ textAlign: "left", padding: "0.25rem" }}>{modeLabel}</th>
             <th style={{ textAlign: "right", padding: "0.25rem" }}>fresh s</th>
             <th style={{ textAlign: "right", padding: "0.25rem" }}>L2</th>
             <th style={{ textAlign: "right", padding: "0.25rem" }}>L3</th>
@@ -187,7 +152,6 @@ function RunHealthTable({
 
 export function DashboardTier2Content({ dataBundle, execution, latency, pnl, safety }: DashboardTier2ContentProps) {
   const locale = useLocale();
-  const isNl = locale === "nl";
   const pieOther = t(locale, "dashboard.pieOther");
   const emptyCounts = t(locale, "dashboard.tier2.noCountsInSnapshot");
   const showLatencyHistNote =
@@ -202,17 +166,15 @@ export function DashboardTier2Content({ dataBundle, execution, latency, pnl, saf
       <main>
         <nav style={{ marginBottom: "1.25rem" }}>
           <Link href={withLocale(locale, "/dashboard")} className="kb-text-link">
-            ← {isNl ? "Dashboard" : "Dashboard"}
+            ← {t(locale, "nav.dashboard")}
           </Link>
         </nav>
         <section className="card" style={{ borderLeft: "4px solid var(--brand)" }}>
           <h1 style={{ fontSize: "1.35rem", marginBottom: "0.5rem" }}>
-            {isNl ? "Tier 2 route-observability" : "Tier 2 route observability"}
+            {t(locale, "dashboard.tier2.emptyTitle")}
           </h1>
           <p style={{ margin: 0, color: "var(--muted)" }}>
-            {isNl
-              ? "Nog geen Tier 2 snapshots beschikbaar. Exporteer observability-snapshots op de bot en probeer opnieuw."
-              : "No Tier 2 snapshots available yet. Export observability snapshots on the bot and try again."}
+            {t(locale, "dashboard.tier2.emptyBody")}
           </p>
         </section>
       </main>
@@ -223,17 +185,15 @@ export function DashboardTier2Content({ dataBundle, execution, latency, pnl, saf
     <main>
       <nav style={{ marginBottom: "1.25rem" }}>
         <Link href={withLocale(locale, "/dashboard")} className="kb-text-link">
-          ← {isNl ? "Dashboard" : "Dashboard"}
+          ← {t(locale, "nav.dashboard")}
         </Link>
       </nav>
 
       <h1 style={{ fontSize: "1.7rem", marginBottom: "0.5rem" }}>
-        {isNl ? "Tier 2: route-/decision-centric observability" : "Tier 2: route/decision-centric observability"}
+        {t(locale, "dashboard.tier2.h1")}
       </h1>
       <p style={{ color: "var(--muted)", marginBottom: "0.5rem", maxWidth: "78ch", lineHeight: 1.65 }}>
-        {isNl
-          ? "Verdiepte operationele diagnose op basis van geaggregeerde snapshots. Deze pagina toont uitkomst- en oorzaakinformatie zonder broncode, zonder private accountdetails en zonder reproduceerbare tuning."
-          : "Deep operational diagnostics from aggregated snapshots. This page shows outcomes and causes without source code, without private account details, and without reproducible tuning."}
+        {t(locale, "dashboard.tier2.intro")}
       </p>
       <p className="kb-refresh-note" style={{ marginBottom: "1rem", fontSize: "0.88rem" }}>
         {t(locale, "dashboard.refreshNote")}
@@ -242,7 +202,7 @@ export function DashboardTier2Content({ dataBundle, execution, latency, pnl, saf
       {dataBundle && (
         <section className="card" style={{ marginBottom: "1rem", borderLeft: "4px solid var(--brand)" }}>
           <h2 style={{ fontSize: "1.1rem", marginBottom: "0.5rem" }}>
-            {isNl ? "Data contract en bronnen" : "Data contract and sources"}
+            {t(locale, "dashboard.tier2.dataContract")}
           </h2>
           <p style={{ margin: 0, fontSize: "0.85rem", color: "var(--muted)" }}>
             contract {dataBundle.contract_version} · exported {dataBundle.exported_at} · source roles:{" "}
@@ -253,50 +213,42 @@ export function DashboardTier2Content({ dataBundle, execution, latency, pnl, saf
       )}
 
       <section className="card" style={{ marginBottom: "1rem" }}>
-        <h2 style={{ fontSize: "1.05rem", marginBottom: "0.65rem" }}>{isNl ? "Verdelingen (pie)" : "Distributions (pie)"}</h2>
+        <h2 style={{ fontSize: "1.05rem", marginBottom: "0.65rem" }}>{t(locale, "dashboard.tier2.distributionsTitle")}</h2>
         <div style={{ display: "flex", flexWrap: "wrap", gap: "1.25rem", alignItems: "flex-start" }}>
           <SimplePieChart
-            title={isNl ? "Funnel-fase (24h)" : "Funnel stage (24h)"}
+            title={t(locale, "dashboard.rcd.funnelStage24h")}
             segments={labelCountsToPieSegments(dataBundle?.route_no_trade?.funnel_stage_counts_24h, 8, pieOther)}
             size={148}
           />
           <SimplePieChart
-            title={isNl ? "Decision codes (24h)" : "Decision codes (24h)"}
+            title={t(locale, "dashboard.rcd.decisionCodes24h")}
             segments={labelCountsToPieSegments(dataBundle?.route_no_trade?.funnel_decision_code_counts_24h, 8, pieOther)}
             size={148}
           />
           <SimplePieChart
-            title={isNl ? "Order status (24h)" : "Order status (24h)"}
+            title={t(locale, "dashboard.tier2.orderStatus24h")}
             segments={labelCountsToPieSegments(execution?.orders_status_counts_24h, 8, pieOther)}
             size={148}
           />
           <SimplePieChart
-            title={isNl ? "Fill side (24h)" : "Fill side (24h)"}
+            title={t(locale, "dashboard.tier2.fillSide24h")}
             segments={labelCountsToPieSegments(execution?.fills_side_counts_24h, 8, pieOther)}
             size={148}
           />
           <SimplePieChart
-            title={isNl ? "Safety per mode" : "Safety by mode"}
+            title={t(locale, "dashboard.tier2.safetyByMode")}
             segments={labelCountsToPieSegments(dataBundle?.risk_capital?.symbol_safety_by_mode, 8, pieOther)}
             size={148}
           />
           <SimplePieChart
-            title={isNl ? "Path tape (orders 24h)" : "Path tape (orders 24h)"}
+            title={t(locale, "dashboard.tier2.pathTape24h")}
             segments={labelCountsToPieSegments(dataBundle?.path_doctrine?.orders_by_path_tape_24h, 8, pieOther)}
             size={148}
           />
         </div>
       </section>
 
-      <div
-        className="tier2-dashboard-grid"
-        style={{
-          display: "grid",
-          gap: "1rem",
-          gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,340px),1fr))",
-          minWidth: 0,
-        }}
-      >
+      <div className="tier2-dashboard-grid">
         <section className="card" style={{ margin: 0, minWidth: 0 }}>
           <h2 style={{ fontSize: "1.05rem", marginBottom: "0.45rem" }}>Live Route Board</h2>
           <p style={{ margin: 0, color: "var(--muted)", fontSize: "0.82rem", lineHeight: 1.55 }}>{t(locale, "dashboard.routeBoardMeta")}</p>
@@ -304,9 +256,7 @@ export function DashboardTier2Content({ dataBundle, execution, latency, pnl, saf
           <p style={{ margin: "0.45rem 0 0", color: "var(--muted)", fontSize: "0.85rem" }}>
             {dataBundle?.edgeboard?.available
               ? `Edgeboard: rows ${dataBundle.edgeboard.visible_rows ?? "—"} · symbols ${dataBundle.edgeboard.visible_symbols ?? "—"} · positive ${dataBundle.edgeboard.positive_edge_symbols ?? "—"} · source ${dataBundle.edgeboard.source_db ?? "—"}`
-              : isNl
-                ? "Nog geen zichtbare edgeboard snapshot."
-                : "No visible edgeboard snapshot yet."}
+              : t(locale, "dashboard.tier2.edgeboardNo")}
           </p>
           {dataBundle?.edgeboard?.available && !dataBundle.edgeboard.top_signals?.length ? (
             <p style={{ margin: "0.45rem 0 0", fontSize: "0.82rem", color: "var(--text-muted)" }}>{t(locale, "dashboard.tier2.edgeboardNoRows")}</p>
@@ -325,10 +275,7 @@ export function DashboardTier2Content({ dataBundle, execution, latency, pnl, saf
               <table className="kb-table" style={{ fontSize: "0.82rem" }}>
                 <thead style={{ position: "sticky", top: 0, background: "var(--card-bg)", zIndex: 1 }}>
                   <tr>
-                    {(isNl
-                      ? ["#", "Symbool", "Route", "Horizon (s)", "Fresh (ms)", "Edge", "Conf", "Reden"]
-                      : ["#", "Symbol", "Route", "Horizon (s)", "Fresh (ms)", "Edge", "Conf", "Reason"]
-                    ).map((h) => (
+                    {["#", t(locale, "dashboard.tier2.colSymbol"), "Route", "Horizon (s)", "Fresh (ms)", "Edge", "Conf", t(locale, "dashboard.tier2.colReason")].map((h) => (
                       <th key={h} style={{ textAlign: "left", padding: "0.3rem", borderBottom: "1px solid var(--border)" }}>
                         {h}
                       </th>
@@ -356,41 +303,45 @@ export function DashboardTier2Content({ dataBundle, execution, latency, pnl, saf
           ) : null}
         </section>
 
-        <section className="card" style={{ margin: 0, minWidth: 0 }}>
+        <section className="card kb-tier2-wnt-card" style={{ margin: 0, minWidth: 0 }}>
           <h2 style={{ fontSize: "1.05rem", marginBottom: "0.45rem" }}>Why-No-Trade / Rejections</h2>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem", alignItems: "flex-start" }}>
-            <SimplePieChart
-              title={isNl ? "Top redenen (24h)" : "Top reasons (24h)"}
-              segments={labelCountsToPieSegments(dataBundle?.route_no_trade?.funnel_reason_top_24h, 8, pieOther)}
-              size={120}
-              showLegend
-            />
-            <div style={{ flex: "1 1 200px", minWidth: 0 }}>
-              <p style={{ margin: 0, fontSize: "0.8rem", fontWeight: 600, color: "var(--text)" }}>
-                {isNl ? "Funnel-fase" : "Funnel stage"}
-              </p>
-              <LabelCountTable rows={dataBundle?.route_no_trade?.funnel_stage_counts_24h} emptyLabel={emptyCounts} />
+          <div className="kb-tier2-wnt-inner">
+            <div className="kb-tier2-wnt-pie" style={{ minWidth: 0 }}>
+              <SimplePieChart
+                title={t(locale, "dashboard.tier2.topReasons24h")}
+                segments={labelCountsToPieSegments(dataBundle?.route_no_trade?.funnel_reason_top_24h, 8, pieOther)}
+                size={120}
+                showLegend
+              />
             </div>
-            <div style={{ flex: "1 1 200px", minWidth: 0 }}>
-              <p style={{ margin: 0, fontSize: "0.8rem", fontWeight: 600, color: "var(--text)" }}>
-                {isNl ? "Decision codes" : "Decision codes"}
-              </p>
-              <LabelCountTable rows={dataBundle?.route_no_trade?.funnel_decision_code_counts_24h} emptyLabel={emptyCounts} />
-            </div>
-            <div style={{ flex: "1 1 200px", minWidth: 0 }}>
-              <p style={{ margin: 0, fontSize: "0.8rem", fontWeight: 600, color: "var(--text)" }}>
-                {isNl ? "Redenen (top)" : "Reasons (top)"}
-              </p>
-              <LabelCountTable rows={dataBundle?.route_no_trade?.funnel_reason_top_24h} emptyLabel={emptyCounts} />
-            </div>
-            {dataBundle?.route_no_trade?.shadow_blocker_counts?.length ? (
-              <div style={{ flex: "1 1 200px", minWidth: 0 }}>
+            <div className="kb-tier2-wnt-grids">
+              <div style={{ minWidth: 0 }}>
                 <p style={{ margin: 0, fontSize: "0.8rem", fontWeight: 600, color: "var(--text)" }}>
-                  {isNl ? "Shadow blockers" : "Shadow blockers"}
+                  {t(locale, "dashboard.tier2.funnelStageLabel")}
                 </p>
-                <LabelCountTable rows={dataBundle?.route_no_trade?.shadow_blocker_counts} emptyLabel={emptyCounts} />
+                <LabelCountBarTable rows={dataBundle?.route_no_trade?.funnel_stage_counts_24h} emptyLabel={emptyCounts} />
               </div>
-            ) : null}
+              <div style={{ minWidth: 0 }}>
+                <p style={{ margin: 0, fontSize: "0.8rem", fontWeight: 600, color: "var(--text)" }}>
+                  {t(locale, "dashboard.tier2.decisionCodesLabel")}
+                </p>
+                <LabelCountBarTable rows={dataBundle?.route_no_trade?.funnel_decision_code_counts_24h} emptyLabel={emptyCounts} />
+              </div>
+              <div style={{ minWidth: 0 }}>
+                <p style={{ margin: 0, fontSize: "0.8rem", fontWeight: 600, color: "var(--text)" }}>
+                  {t(locale, "dashboard.tier2.reasonsTopLabel")}
+                </p>
+                <LabelCountBarTable rows={dataBundle?.route_no_trade?.funnel_reason_top_24h} emptyLabel={emptyCounts} />
+              </div>
+              {dataBundle?.route_no_trade?.shadow_blocker_counts?.length ? (
+                <div style={{ minWidth: 0 }}>
+                  <p style={{ margin: 0, fontSize: "0.8rem", fontWeight: 600, color: "var(--text)" }}>
+                    {t(locale, "dashboard.tier2.shadowBlockers")}
+                  </p>
+                  <LabelCountBarTable rows={dataBundle?.route_no_trade?.shadow_blocker_counts} emptyLabel={emptyCounts} />
+                </div>
+              ) : null}
+            </div>
           </div>
         </section>
 
@@ -401,15 +352,15 @@ export function DashboardTier2Content({ dataBundle, execution, latency, pnl, saf
           </p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem", marginTop: "0.45rem", alignItems: "flex-start" }}>
             <SimplePieChart
-              title={isNl ? "Safety per mode" : "Safety by mode"}
+              title={t(locale, "dashboard.tier2.safetyByMode")}
               segments={labelCountsToPieSegments(dataBundle?.risk_capital?.symbol_safety_by_mode, 8, pieOther)}
               size={120}
             />
-            <div style={{ flex: "1 1 180px", minWidth: 0 }}>
+            <div style={{ flex: "1 1 220px", minWidth: 0 }}>
               <p style={{ margin: 0, fontSize: "0.8rem", fontWeight: 600, color: "var(--text)" }}>
-                {isNl ? "Path tape (orders)" : "Path tape (orders)"}
+                {t(locale, "dashboard.tier2.pathTapeLabel")}
               </p>
-              <LabelCountTable rows={dataBundle?.path_doctrine?.orders_by_path_tape_24h} emptyLabel={emptyCounts} />
+              <LabelCountBarTable rows={dataBundle?.path_doctrine?.orders_by_path_tape_24h} emptyLabel={emptyCounts} maxRows={10} />
             </div>
           </div>
         </section>
@@ -428,17 +379,17 @@ export function DashboardTier2Content({ dataBundle, execution, latency, pnl, saf
           {latency?.submit_to_ack_histogram_ms_24h?.length ? (
             <LatencyHistogramBars
               points={latency.submit_to_ack_histogram_ms_24h}
-              ariaLabel={isNl ? "Histogram submit naar ack in milliseconden" : "Submit to ack latency histogram (ms)"}
+              ariaLabel={t(locale, "dashboard.tier2.latencySubmitAria")}
             />
           ) : null}
           {latency?.fill_to_exit_submit_histogram_ms_24h?.length ? (
             <>
               <p style={{ margin: "0.65rem 0 0", fontSize: "0.8rem", fontWeight: 600, color: "var(--text)" }}>
-                {isNl ? "Fill → exit submit (ms)" : "Fill → exit submit (ms)"}
+                {t(locale, "dashboard.tier2.fillExitLabel")}
               </p>
               <LatencyHistogramBars
                 points={latency.fill_to_exit_submit_histogram_ms_24h}
-                ariaLabel={isNl ? "Histogram fill naar exit submit in milliseconden" : "Fill to exit submit latency histogram (ms)"}
+                ariaLabel={t(locale, "dashboard.tier2.latencyFillAria")}
               />
             </>
           ) : null}
@@ -453,7 +404,7 @@ export function DashboardTier2Content({ dataBundle, execution, latency, pnl, saf
           <h2 style={{ fontSize: "1.05rem", marginBottom: "0.45rem" }}>Strategy / Regime Matrix</h2>
           <p style={{ margin: 0, color: "var(--muted)", fontSize: "0.85rem", lineHeight: 1.55 }}>{t(locale, "dashboard.tier2.marketForecastIntro")}</p>
           <p style={{ margin: "0.45rem 0 0", color: "var(--muted)", fontSize: "0.85rem" }}>
-            {isNl ? "Edgeboard model: " : "Edgeboard model: "}
+            {t(locale, "dashboard.tier2.edgeboardModel")}
             {dataBundle?.edgeboard?.model_version ?? "—"}
           </p>
           {dataBundle?.market_forecast_15m?.forecasts?.length ? (
@@ -461,11 +412,11 @@ export function DashboardTier2Content({ dataBundle, execution, latency, pnl, saf
               <table className="kb-table" style={{ fontSize: "0.78rem", width: "100%" }}>
                 <thead>
                   <tr>
-                    <th style={{ textAlign: "left", padding: "0.25rem" }}>{isNl ? "Symbool" : "Symbol"}</th>
-                    <th style={{ textAlign: "left", padding: "0.25rem" }}>{isNl ? "Richting 15m" : "Direction 15m"}</th>
-                    <th style={{ textAlign: "right", padding: "0.25rem" }}>{isNl ? "Move (bps)" : "Move (bps)"}</th>
-                    <th style={{ textAlign: "right", padding: "0.25rem" }}>{isNl ? "Conf." : "Conf."}</th>
-                    <th style={{ textAlign: "left", padding: "0.25rem" }}>{isNl ? "Reden" : "Reason"}</th>
+                    <th style={{ textAlign: "left", padding: "0.25rem" }}>{t(locale, "dashboard.tier2.colSymbol")}</th>
+                    <th style={{ textAlign: "left", padding: "0.25rem" }}>{t(locale, "dashboard.tier2.colDirection15m")}</th>
+                    <th style={{ textAlign: "right", padding: "0.25rem" }}>{t(locale, "dashboard.tier2.colMoveBps")}</th>
+                    <th style={{ textAlign: "right", padding: "0.25rem" }}>{t(locale, "dashboard.tier2.colConf")}</th>
+                    <th style={{ textAlign: "left", padding: "0.25rem" }}>{t(locale, "dashboard.tier2.colReason")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -492,20 +443,20 @@ export function DashboardTier2Content({ dataBundle, execution, latency, pnl, saf
           <h2 style={{ fontSize: "1.05rem", marginBottom: "0.45rem" }}>Execution / Fill Quality</h2>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem", alignItems: "flex-start" }}>
             <SimplePieChart
-              title={isNl ? "Order status (24h)" : "Order status (24h)"}
+              title={t(locale, "dashboard.tier2.orderStatus24h")}
               segments={labelCountsToPieSegments(execution?.orders_status_counts_24h, 8, pieOther)}
               size={112}
               showLegend
             />
             <SimplePieChart
-              title={isNl ? "Fill side (24h)" : "Fill side (24h)"}
+              title={t(locale, "dashboard.tier2.fillSide24h")}
               segments={labelCountsToPieSegments(execution?.fills_side_counts_24h, 8, pieOther)}
               size={112}
               showLegend
             />
             {execution?.shadow_outcome_counts?.length ? (
               <SimplePieChart
-                title={isNl ? "Shadow outcomes" : "Shadow outcomes"}
+                title={t(locale, "dashboard.tier2.shadowOutcomes")}
                 segments={labelCountsToPieSegments(execution.shadow_outcome_counts, 8, pieOther)}
                 size={112}
                 showLegend
@@ -515,18 +466,18 @@ export function DashboardTier2Content({ dataBundle, execution, latency, pnl, saf
           {execution?.shadow_missed_move_histogram?.length ? (
             <>
               <p style={{ margin: "0.55rem 0 0", fontSize: "0.8rem", fontWeight: 600, color: "var(--text)" }}>
-                {isNl ? "Shadow missed move (bps)" : "Shadow missed move (bps)"}
+                {t(locale, "dashboard.tier2.shadowMissed")}
               </p>
               <MissedMoveHistogramBars
                 points={execution.shadow_missed_move_histogram}
-                ariaLabel={isNl ? "Shadow missed move verdeling in basispunten" : "Shadow missed move distribution (bps)"}
+                ariaLabel={t(locale, "dashboard.tier2.shadowMissedAria")}
               />
             </>
           ) : null}
           {execution?.event_buffer_kpis ? (
             <div style={{ marginTop: "0.55rem" }}>
               <p style={{ margin: 0, fontSize: "0.8rem", fontWeight: 600, color: "var(--text)" }}>
-                {isNl ? "Event buffer" : "Event buffer"}
+                {t(locale, "dashboard.tier2.eventBuffer")}
               </p>
               <p style={{ margin: "0.25rem 0 0", fontSize: "0.78rem", color: "var(--text-muted)" }}>
                 active {execution.event_buffer_kpis.buffered_active_count ?? "—"} · total {execution.event_buffer_kpis.buffered_total_count ?? "—"} ·
@@ -543,16 +494,16 @@ export function DashboardTier2Content({ dataBundle, execution, latency, pnl, saf
         <section className="card" style={{ margin: 0, minWidth: 0 }}>
           <h2 style={{ fontSize: "1.05rem", marginBottom: "0.45rem" }}>Runtime Health</h2>
           <p style={{ margin: 0, color: "var(--muted)", fontSize: "0.85rem" }}>
-            {isNl ? "Run health samples: " : "Run health samples: "}
+            {t(locale, "dashboard.tier2.runHealthSamples")}
             {execution?.run_health_timeline?.length ?? 0}
             {" · "}
-            {isNl ? "Infra/watchdog: " : "Infra/watchdog: "}
+            {t(locale, "dashboard.tier2.infraWatchdog")}
             {dataBundle?.infra?.latest_watchdog_state ?? "—"}
             {dataBundle?.infra?.event_buffer_unknown_24h != null
               ? ` · event_buffer unknown 24h: ${dataBundle.infra.event_buffer_unknown_24h}`
               : ""}
           </p>
-          <RunHealthTable points={execution?.run_health_timeline} isNl={isNl} emptyLabel={t(locale, "dashboard.tier2.runHealthEmpty")} />
+          <RunHealthTable points={execution?.run_health_timeline} modeLabel={t(locale, "dashboard.tier2.runHealthMode")} emptyLabel={t(locale, "dashboard.tier2.runHealthEmpty")} />
         </section>
 
         <section className="card" style={{ margin: 0, minWidth: 0 }}>
@@ -562,7 +513,7 @@ export function DashboardTier2Content({ dataBundle, execution, latency, pnl, saf
             <Link href={withLocale(locale, "/spec")} className="kb-text-link">SPEC</Link>
             {" · "}
             <Link href={withLocale(locale, "/docs")} className="kb-text-link">
-              {isNl ? "Publieke docs" : "Public docs"}
+              {t(locale, "nav.docs")}
             </Link>
           </p>
         </section>
@@ -570,7 +521,7 @@ export function DashboardTier2Content({ dataBundle, execution, latency, pnl, saf
         {pnl ? (
           <section className="card" style={{ margin: 0, minWidth: 0 }}>
             <h2 style={{ fontSize: "1.05rem", marginBottom: "0.45rem" }}>
-              {isNl ? "Economische context (publiek geaggregeerd)" : "Economic context (public aggregated)"}
+              {t(locale, "dashboard.tier2.econContext")}
             </h2>
             <p style={{ margin: 0, color: "var(--muted)", fontSize: "0.85rem" }}>
               realized_pnl_quote_24h: {pnl.realized_pnl_quote_24h != null ? pnl.realized_pnl_quote_24h.toFixed(2) : "—"} · drawdown:{" "}
@@ -580,7 +531,7 @@ export function DashboardTier2Content({ dataBundle, execution, latency, pnl, saf
             </p>
             <PnlEquityMiniBars
               equity={pnl.equity_trend_delayed}
-              ariaLabel={isNl ? "Vertraagde equity trend" : "Delayed equity trend"}
+              ariaLabel={t(locale, "dashboard.tier2.equityTrendAria")}
             />
             {!equitySparklineOk ? (
               <p style={{ margin: "0.45rem 0 0", fontSize: "0.78rem", color: "var(--text-muted)", lineHeight: 1.5 }}>

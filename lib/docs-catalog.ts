@@ -36,6 +36,18 @@ export const DOCS_META: Record<string, { labelKey: string; descKey: string }> = 
     labelKey: "docs.meta.08_OPERATIONS.label",
     descKey: "docs.meta.08_OPERATIONS.desc",
   },
+  "09_STRATEGIES": {
+    labelKey: "docs.meta.09_STRATEGIES.label",
+    descKey: "docs.meta.09_STRATEGIES.desc",
+  },
+  "12_INVESTOR_OVERVIEW": {
+    labelKey: "docs.meta.12_INVESTOR_OVERVIEW.label",
+    descKey: "docs.meta.12_INVESTOR_OVERVIEW.desc",
+  },
+  "13_INVESTOR_RISK_REPORT": {
+    labelKey: "docs.meta.13_INVESTOR_RISK_REPORT.label",
+    descKey: "docs.meta.13_INVESTOR_RISK_REPORT.desc",
+  },
   "00_MODULE_INVENTORY": {
     labelKey: "docs.meta.00_MODULE_INVENTORY.label",
     descKey: "docs.meta.00_MODULE_INVENTORY.desc",

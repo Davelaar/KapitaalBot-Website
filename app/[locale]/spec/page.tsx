@@ -9,23 +9,17 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: { locale: string } }) {
   const locale = parseLocaleParam(params.locale);
-  const isNl = locale === "nl";
   return buildPageMetadata({
     locale,
-    title: isNl ? "SPEC — KapitaalBot Runtime Specificatie" : "SPEC — KapitaalBot Runtime Specification",
-    description: isNl
-      ? "Canonieke technische specificatie van stack, runtime-architectuur en latencyprofiel van KapitaalBot."
-      : "Canonical technical specification of KapitaalBot stack, runtime architecture, and latency profile.",
+    title: t(locale, "spec.meta.title"),
+    description: t(locale, "spec.meta.desc"),
     path: "/spec",
-    keywords: isNl
-      ? "KapitaalBot spec, Rust trading bot, runtime architecture, latency tiers, observability"
-      : "KapitaalBot spec, Rust trading bot, runtime architecture, latency tiers, observability",
+    keywords: t(locale, "spec.meta.keywords"),
   });
 }
 
 export default async function SpecPage({ params }: { params: { locale: string } }) {
   const locale = parseLocaleParam(params.locale) as Locale;
-  const isNl = locale === "nl";
 
   const runtimeDiagram = `flowchart LR
   Ingest["Ingest State"] --> Route["Route Ranking"]
@@ -39,22 +33,18 @@ export default async function SpecPage({ params }: { params: { locale: string } 
     <main>
       <nav style={{ marginBottom: "1.25rem" }}>
         <Link href={withLocale(locale, "/")} className="kb-text-link">
-          ← {isNl ? "Home" : "Home"}
+          ← {t(locale, "spec.nav.back")}
         </Link>
       </nav>
 
       <h1 style={{ fontSize: "1.9rem", marginBottom: "0.5rem" }}>
-        {isNl ? "SPEC: KapitaalBot Runtime" : "SPEC: KapitaalBot Runtime"}
+        {t(locale, "spec.h1")}
       </h1>
       <p style={{ color: "var(--muted)", maxWidth: "78ch", lineHeight: 1.65 }}>
-        {isNl
-          ? "Deze pagina is de canonieke publieke technische specificatie van KapitaalBot. De focus ligt op systeemgedrag, operationele architectuur en latency-eisen. Broncode, gevoelige tuningwaarden en private accountdetails blijven bewust buiten scope."
-          : "This page is the canonical public technical specification of KapitaalBot. It focuses on system behavior, operational architecture, and latency requirements. Source code, sensitive tuning values, and private account details remain intentionally out of scope."}
+        {t(locale, "spec.intro")}
       </p>
       <p style={{ color: "var(--muted)", maxWidth: "78ch", lineHeight: 1.65, marginTop: "0.75rem" }}>
-        {isNl
-          ? "Diepgaande, bij de engine-bron synchrone documentatie (o.a. dual-pool DB, processen, datastromen):"
-          : "Deeper documentation synced from the engine (including dual-pool DB, processes, data flows):"}{" "}
+        {t(locale, "spec.deeper.intro")}{" "}
         <Link href={withLocale(locale, "/docs/DOC_INDEX")} className="kb-text-link">
           {t(locale, "docs.meta.DOC_INDEX.label")}
         </Link>
@@ -66,7 +56,7 @@ export default async function SpecPage({ params }: { params: { locale: string } 
 
       <section className="card" style={{ marginTop: "1rem", padding: "1rem 1.25rem" }}>
         <h2 style={{ fontSize: "1.2rem", marginBottom: "0.6rem" }}>
-          {isNl ? "1) Gebruikte techniek / stack" : "1) Technology stack"}
+          {t(locale, "spec.h2.stack")}
         </h2>
         <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.9rem" }}>
@@ -99,17 +89,13 @@ export default async function SpecPage({ params }: { params: { locale: string } 
 
       <section className="card" style={{ marginTop: "1rem", padding: "1rem 1.25rem" }}>
         <h2 style={{ fontSize: "1.2rem", marginBottom: "0.6rem" }}>
-          {isNl ? "2) Runtime / architecture specs" : "2) Runtime / architecture specs"}
+          {t(locale, "spec.h2.runtime")}
         </h2>
         <p style={{ color: "var(--muted)", lineHeight: 1.65 }}>
-          {isNl
-            ? "KapitaalBot werkt als timing-aware, multistrategy route-selection engine met live route-state, regime-routering, position-context, execution choke en feedbackgedreven explainability."
-            : "KapitaalBot operates as a timing-aware multistrategy route-selection engine with live route-state, regime routing, position context, execution choke, and feedback-driven explainability."}
+          {t(locale, "spec.runtime.body")}
         </p>
         <p style={{ color: "var(--muted)", lineHeight: 1.65, marginTop: "0.65rem" }}>
-          {isNl
-            ? "Het diagram hieronder is bewust compact. In productie scheiden aparte Postgres-pools ingest (marktruwdata) en decision (orders, fills, execution truth); details staan in Architectuur (01)."
-            : "The diagram below is intentionally compact. In production, separate Postgres pools isolate ingest (raw market data) from decision (orders, fills, execution truth); see Architecture (01) for detail."}
+          {t(locale, "spec.runtime.pools")}
         </p>
         <div className="markdown-body" style={{ marginTop: "0.75rem" }}>
           <MermaidLiveDiagram chart={runtimeDiagram} seoKeyPrefix="spec.runtime.diagram" />
@@ -118,12 +104,10 @@ export default async function SpecPage({ params }: { params: { locale: string } 
 
       <section className="card" style={{ marginTop: "1rem", padding: "1rem 1.25rem" }}>
         <h2 style={{ fontSize: "1.2rem", marginBottom: "0.6rem" }}>
-          {isNl ? "3) Latency specification" : "3) Latency specification"}
+          {t(locale, "spec.h2.latency")}
         </h2>
         <p style={{ color: "var(--muted)", marginTop: 0 }}>
-          {isNl
-            ? "Onderstaand overzicht maakt expliciet onderscheid tussen latency-targets, geobserveerde ranges en vertraagde/background-paden."
-            : "The table below explicitly distinguishes latency targets, observed ranges, and delayed/background paths."}
+          {t(locale, "spec.latency.intro")}
         </p>
         <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.88rem" }}>
@@ -156,11 +140,11 @@ export default async function SpecPage({ params }: { params: { locale: string } 
 
       <section className="card" style={{ marginTop: "1rem", padding: "1rem 1.25rem" }}>
         <h2 style={{ fontSize: "1.2rem", marginBottom: "0.6rem" }}>
-          {isNl ? "4) Public safety boundary" : "4) Public safety boundary"}
+          {t(locale, "spec.h2.boundary")}
         </h2>
         <ul style={{ margin: 0, paddingLeft: "1.2rem", color: "var(--muted)", lineHeight: 1.7 }}>
-          <li>{isNl ? "WEL: functionele werking, architectuur, beslislogica op hoog niveau, outcomes, explainability." : "YES: functional behavior, architecture, high-level decision logic, outcomes, explainability."}</li>
-          <li>{isNl ? "NIET: broncode, exacte private thresholds, gevoelige allocator/sizing details, accountspecifieke data." : "NO: source code, exact private thresholds, sensitive allocator/sizing details, account-specific data."}</li>
+          <li>{t(locale, "spec.boundary.yes")}</li>
+          <li>{t(locale, "spec.boundary.no")}</li>
         </ul>
       </section>
     </main>
