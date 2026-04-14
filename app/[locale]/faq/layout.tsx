@@ -17,6 +17,7 @@ export async function generateMetadata({
     title,
     description,
     path: "/faq",
+    keywords: t(locale, "faq.seo.keywords"),
   });
 }
 

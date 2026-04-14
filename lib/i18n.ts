@@ -55,6 +55,8 @@ const strings: Record<Locale, Record<string, string>> = {
     "donate.ariaLabel": "Doneer aan KapitaalBot via bunq (opent in een nieuw venster)",
     "faq.title": "FAQ",
     "faq.intro": "Veelgestelde vragen over de KapitaalBot-engine, observability en tiers. De chatbot hieronder kan aanvullende uitleg geven in meerdere talen (NL/EN/DE/FR), zonder strategiecode prijs te geven.",
+    "faq.seo.keywords":
+      "KapitaalBot, FAQ, trading engine, crypto, Kraken, observability, veiligheid, Tier 2, regime, strategie, WebSocket, execution",
     "faq.chat.title": "FAQ-chatbot",
     "faq.chat.intro": "Stel een vraag over KapitaalBot, de engine of de observability-website. Deze chatbot gebruikt een kennisbasis op basis van de documentatie.",
     "faq.chat.placeholder": "Stel een vraag over KapitaalBot...",
@@ -516,6 +518,8 @@ const strings: Record<Locale, Record<string, string>> = {
     "donate.ariaLabel": "Donate to KapitaalBot via bunq (opens in a new window)",
     "faq.title": "FAQ",
     "faq.intro": "Frequently asked questions about the KapitaalBot engine, observability and tiers. The chatbot below can provide further explanation in multiple languages (NL/EN/DE/FR), without disclosing strategy code.",
+    "faq.seo.keywords":
+      "KapitaalBot, FAQ, trading engine, crypto, Kraken, observability, safety, Tier 2, regime, strategy, WebSocket, execution",
     "faq.chat.title": "FAQ chatbot",
     "faq.chat.intro": "Ask a question about KapitaalBot, the engine or the observability website. This chatbot uses a knowledge base based on the documentation.",
     "faq.chat.placeholder": "Ask a question about KapitaalBot...",
@@ -976,6 +980,8 @@ const strings: Record<Locale, Record<string, string>> = {
     "donate.ariaLabel": "KapitaalBot über bunq unterstützen (öffnet in neuem Fenster)",
     "faq.title": "FAQ",
     "faq.intro": "Häufig gestellte Fragen zur KapitaalBot-Engine, Observability und Tiers. Der Chatbot unten kann weitere Erklärungen in mehreren Sprachen (NL/EN/DE/FR) geben, ohne Strategiecode preiszugeben.",
+    "faq.seo.keywords":
+      "KapitaalBot, FAQ, Trading-Engine, Krypto, Kraken, Observability, Sicherheit, Tier 2, Regime, Strategie, WebSocket, Execution",
     "faq.chat.title": "FAQ-Chatbot",
     "faq.chat.intro": "Stellen Sie eine Frage zu KapitaalBot, der Engine oder der Observability-Website. Dieser Chatbot nutzt eine Wissensbasis auf Basis der Dokumentation.",
     "faq.chat.placeholder": "Frage zu KapitaalBot stellen...",
@@ -1436,6 +1442,8 @@ const strings: Record<Locale, Record<string, string>> = {
     "donate.ariaLabel": "Soutenir KapitaalBot via bunq (s’ouvre dans une nouvelle fenêtre)",
     "faq.title": "FAQ",
     "faq.intro": "Questions fréquentes sur le moteur KapitaalBot, l'observability et les tiers. Le chatbot ci-dessous peut fournir des explications supplémentaires en plusieurs langues (NL/EN/DE/FR), sans divulguer de code de stratégie.",
+    "faq.seo.keywords":
+      "KapitaalBot, FAQ, moteur de trading, crypto, Kraken, observability, sécurité, Tier 2, régime, stratégie, WebSocket, exécution",
     "faq.chat.title": "Chatbot FAQ",
     "faq.chat.intro": "Posez une question sur KapitaalBot, le moteur ou le site d'observability. Ce chatbot s'appuie sur une base de connaissances issue de la documentation.",
     "faq.chat.placeholder": "Posez une question sur KapitaalBot...",
