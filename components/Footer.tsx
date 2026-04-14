@@ -41,6 +41,7 @@ export function Footer() {
       <Link href={withLocale(locale, "/tier2-request")} style={linkStyle}>
         {t(locale, "nav.access")}
       </Link>
+      <span style={{ ...linkStyle, opacity: 0.9 }}>{t(locale, "site.credit")}</span>
     </footer>
   );
 }
