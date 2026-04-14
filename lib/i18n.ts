@@ -54,9 +54,14 @@ const strings: Record<Locale, Record<string, string>> = {
     "donate.cta": "Doneer…",
     "donate.ariaLabel": "Doneer aan KapitaalBot via bunq (opent in een nieuw venster)",
     "faq.title": "FAQ",
-    "faq.intro": "Veelgestelde vragen over de KapitaalBot-engine, observability en tiers. De chatbot hieronder kan aanvullende uitleg geven in meerdere talen (NL/EN/DE/FR), zonder strategiecode prijs te geven.",
+    "faq.intro":
+      "Veelgestelde vragen over de KapitaalBot-engine, observability en tiers. Gebruik het zoekveld hierboven voor FAQ + documentatie + assistent (meertalig), zonder strategiecode.",
     "faq.seo.keywords":
       "KapitaalBot, FAQ, trading engine, crypto, Kraken, observability, veiligheid, Tier 2, regime, strategie, WebSocket, execution",
+    "faq.search.title": "Zoeken: FAQ, documentatie, assistent",
+    "faq.search.lead":
+      "We matchen eerst met onderstaande FAQ, daarna met technische documenten, daarna met de uitgebreide kennisbron. Herkent je sessie een vergelijkbare vraag, dan hergebruiken we dat antwoord. Geen antwoord? Dan zeggen we dat eerlijk — zonder aannames.",
+    "faq.listHeading": "Alle veelgestelde vragen (per categorie)",
     "faq.chat.title": "FAQ-chatbot",
     "faq.chat.intro": "Stel een vraag over KapitaalBot, de engine of de observability-website. Deze chatbot gebruikt een kennisbasis op basis van de documentatie.",
     "faq.chat.placeholder": "Stel een vraag over KapitaalBot...",
@@ -68,6 +73,12 @@ const strings: Record<Locale, Record<string, string>> = {
     "faq.chat.questionRequired": "Stel eerst een vraag.",
     "faq.chat.fallbackNoMatch":
       "Ik vind geen duidelijke match in de FAQ of een sterk genoeg fragment in de technische documentatie. Probeer kernwoorden (bijv. ingest, safety, Tier 2), scroll naar de secties hierboven, bekijk `/docs`, of gebruik het contactformulier.",
+    "faq.chat.duplicateHint": "Dit lijkt sterk op je eerdere vraag in dit gesprek:",
+    "faq.chat.unknownHonest":
+      "Op basis van de beschikbare FAQ, documentatie en kennisbron kan ik dit niet met zekerheid beantwoorden — ik wil geen aannames doen. Tip: kernwoorden (bijv. ingest, safety, Tier 2), de categorieën hieronder, `/docs`, of contact.",
+    "faq.chat.ragUnavailable":
+      "De uitgebreide antwoorddienst is tijdelijk niet bereikbaar. Probeer zo opnieuw of gebruik de FAQ-secties en `/docs` hieronder.",
+    "faq.chat.followUpHint": "Vervolgvraag? Gebruik hetzelfde zoekveld — eerdere vragen in dit gesprek worden herkend.",
     "faq.chat.sourcesLabel": "Bronnen",
     "faq.chat.docExtractPrefix": "Volgens de engine-documentatie (fragment):",
     "faq.chat.docRetrievalNoMatch":
@@ -517,9 +528,14 @@ const strings: Record<Locale, Record<string, string>> = {
     "donate.cta": "Donate…",
     "donate.ariaLabel": "Donate to KapitaalBot via bunq (opens in a new window)",
     "faq.title": "FAQ",
-    "faq.intro": "Frequently asked questions about the KapitaalBot engine, observability and tiers. The chatbot below can provide further explanation in multiple languages (NL/EN/DE/FR), without disclosing strategy code.",
+    "faq.intro":
+      "Frequently asked questions about the KapitaalBot engine, observability and tiers. Use the search box above for FAQ + documentation + assistant (multiple languages), without strategy source code.",
     "faq.seo.keywords":
       "KapitaalBot, FAQ, trading engine, crypto, Kraken, observability, safety, Tier 2, regime, strategy, WebSocket, execution",
+    "faq.search.title": "Search: FAQ, documentation, assistant",
+    "faq.search.lead":
+      "We match the on-page FAQ first, then technical docs, then the extended knowledge backend. If your question closely matches one you already asked this session, we reuse that answer. If we still cannot answer, we say so honestly — no guessing.",
+    "faq.listHeading": "All frequently asked questions (by category)",
     "faq.chat.title": "FAQ chatbot",
     "faq.chat.intro": "Ask a question about KapitaalBot, the engine or the observability website. This chatbot uses a knowledge base based on the documentation.",
     "faq.chat.placeholder": "Ask a question about KapitaalBot...",
@@ -531,6 +547,12 @@ const strings: Record<Locale, Record<string, string>> = {
     "faq.chat.questionRequired": "Please enter a question first.",
     "faq.chat.fallbackNoMatch":
       "I can’t find a clear FAQ match or a strong enough excerpt in the technical documentation. Try keywords (e.g. ingest, safety, Tier 2), scroll the sections above, open `/docs`, or use the contact form.",
+    "faq.chat.duplicateHint": "This is very similar to a question you already asked in this session:",
+    "faq.chat.unknownHonest":
+      "From the FAQ, documentation and knowledge sources available here, I can’t answer that with confidence — I won’t guess. Tip: try keywords (e.g. ingest, safety, Tier 2), the categories below, `/docs`, or contact.",
+    "faq.chat.ragUnavailable":
+      "The extended answer service is temporarily unavailable. Try again shortly or use the FAQ sections and `/docs` below.",
+    "faq.chat.followUpHint": "Follow-up? Use the same search box — earlier questions in this session are recognised.",
     "faq.chat.sourcesLabel": "Sources",
     "faq.chat.docExtractPrefix": "From the engine documentation (excerpt):",
     "faq.chat.docRetrievalNoMatch":
@@ -979,9 +1001,14 @@ const strings: Record<Locale, Record<string, string>> = {
     "donate.cta": "Spenden…",
     "donate.ariaLabel": "KapitaalBot über bunq unterstützen (öffnet in neuem Fenster)",
     "faq.title": "FAQ",
-    "faq.intro": "Häufig gestellte Fragen zur KapitaalBot-Engine, Observability und Tiers. Der Chatbot unten kann weitere Erklärungen in mehreren Sprachen (NL/EN/DE/FR) geben, ohne Strategiecode preiszugeben.",
+    "faq.intro":
+      "Häufig gestellte Fragen zur KapitaalBot-Engine, Observability und Tiers. Nutzen Sie das Suchfeld oben für FAQ, Dokumentation und Assistent (mehrsprachig), ohne Strategie-Quellcode.",
     "faq.seo.keywords":
       "KapitaalBot, FAQ, Trading-Engine, Krypto, Kraken, Observability, Sicherheit, Tier 2, Regime, Strategie, WebSocket, Execution",
+    "faq.search.title": "Suche: FAQ, Dokumentation, Assistent",
+    "faq.search.lead":
+      "Zuerst Abgleich mit der FAQ auf dieser Seite, dann technische Dokumente, dann die erweiterte Wissensquelle. Sehr ähnliche Fragen in dieser Sitzung werden erkannt. Keine Antwort? Dann sagen wir das ehrlich — ohne Spekulation.",
+    "faq.listHeading": "Alle häufig gestellten Fragen (nach Kategorie)",
     "faq.chat.title": "FAQ-Chatbot",
     "faq.chat.intro": "Stellen Sie eine Frage zu KapitaalBot, der Engine oder der Observability-Website. Dieser Chatbot nutzt eine Wissensbasis auf Basis der Dokumentation.",
     "faq.chat.placeholder": "Frage zu KapitaalBot stellen...",
@@ -993,6 +1020,12 @@ const strings: Record<Locale, Record<string, string>> = {
     "faq.chat.questionRequired": "Bitte zuerst eine Frage eingeben.",
     "faq.chat.fallbackNoMatch":
       "Kein klarer Treffer in der FAQ und kein ausreichend passendes Zitat in der technischen Dokumentation. Versuchen Sie Stichwörter (z. B. Ingest, Safety, Tier 2), scrollen Sie zu den Abschnitten oben, öffnen Sie `/docs`, oder nutzen Sie das Kontaktformular.",
+    "faq.chat.duplicateHint": "Das ähnelt stark einer früheren Frage in dieser Sitzung:",
+    "faq.chat.unknownHonest":
+      "Auf Basis der verfügbaren FAQ, Dokumentation und Wissensquelle kann ich das nicht sicher beantworten — ich möchte nichts erfinden. Tipp: Stichwörter (z. B. Ingest, Safety, Tier 2), die Kategorien unten, `/docs` oder Kontakt.",
+    "faq.chat.ragUnavailable":
+      "Der erweiterte Antwortdienst ist vorübergehend nicht erreichbar. Bitte später erneut versuchen oder FAQ und `/docs` unten nutzen.",
+    "faq.chat.followUpHint": "Rückfrage? Dasselbe Suchfeld — frühere Fragen in dieser Sitzung werden erkannt.",
     "faq.chat.sourcesLabel": "Quellen",
     "faq.chat.docExtractPrefix": "Aus der Engine-Dokumentation (Auszug):",
     "faq.chat.docRetrievalNoMatch":
@@ -1441,9 +1474,14 @@ const strings: Record<Locale, Record<string, string>> = {
     "donate.cta": "Faire un don…",
     "donate.ariaLabel": "Soutenir KapitaalBot via bunq (s’ouvre dans une nouvelle fenêtre)",
     "faq.title": "FAQ",
-    "faq.intro": "Questions fréquentes sur le moteur KapitaalBot, l'observability et les tiers. Le chatbot ci-dessous peut fournir des explications supplémentaires en plusieurs langues (NL/EN/DE/FR), sans divulguer de code de stratégie.",
+    "faq.intro":
+      "Questions fréquentes sur le moteur KapitaalBot, l'observability et les tiers. Utilisez le champ de recherche ci-dessus pour la FAQ, la documentation et l'assistant (plusieurs langues), sans code source de stratégie.",
     "faq.seo.keywords":
       "KapitaalBot, FAQ, moteur de trading, crypto, Kraken, observability, sécurité, Tier 2, régime, stratégie, WebSocket, exécution",
+    "faq.search.title": "Recherche : FAQ, documentation, assistant",
+    "faq.search.lead":
+      "Nous comparons d'abord à la FAQ ci-dessous, puis à la documentation technique, puis à la base étendue. Une question très proche déjà posée dans cette session est reconnue. Pas de réponse ? Nous le disons clairement — sans suppositions.",
+    "faq.listHeading": "Toutes les questions fréquentes (par catégorie)",
     "faq.chat.title": "Chatbot FAQ",
     "faq.chat.intro": "Posez une question sur KapitaalBot, le moteur ou le site d'observability. Ce chatbot s'appuie sur une base de connaissances issue de la documentation.",
     "faq.chat.placeholder": "Posez une question sur KapitaalBot...",
@@ -1455,6 +1493,12 @@ const strings: Record<Locale, Record<string, string>> = {
     "faq.chat.questionRequired": "Saisissez d’abord une question.",
     "faq.chat.fallbackNoMatch":
       "Aucune correspondance nette dans la FAQ ni extrait assez pertinent dans la documentation technique. Essayez des mots-clés (ex. ingest, safety, Tier 2), remontez aux sections ci-dessus, ouvrez `/docs`, ou utilisez le formulaire de contact.",
+    "faq.chat.duplicateHint": "C'est très proche d'une question déjà posée dans cette session :",
+    "faq.chat.unknownHonest":
+      "D'après la FAQ, la documentation et les sources disponibles ici, je ne peux pas répondre avec certitude — je ne veux pas inventer. Astuce : mots-clés (ex. ingest, safety, Tier 2), les catégories ci-dessous, `/docs`, ou contact.",
+    "faq.chat.ragUnavailable":
+      "Le service de réponses étendues est temporairement indisponible. Réessayez bientôt ou utilisez la FAQ et `/docs` ci-dessous.",
+    "faq.chat.followUpHint": "Suite de question ? Même champ de recherche — les questions précédentes de cette session sont reconnues.",
     "faq.chat.sourcesLabel": "Sources",
     "faq.chat.docExtractPrefix": "D’après la documentation moteur (extrait) :",
     "faq.chat.docRetrievalNoMatch":

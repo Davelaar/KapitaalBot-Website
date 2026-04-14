@@ -14,9 +14,11 @@ function parseLocale(raw: string): Locale {
 }
 
 /**
- * FAQ endpoint (website) -> externe RAG backend.
- * Primair contract: POST FAQ_CHAT_BACKEND_URL (/rag/faq).
- * Zonder backend: lokale FAQ-match → fragment uit engine-docs → i18n-fallback (taal = UI-locale).
+ * FAQ-antwoordketen (één contract voor zoekbalk + chat):
+ * 1) Lokale FAQ (zelfde Q/A als /faq)
+ * 2) Fragment uit gesyncte engine-docs
+ * 3) RAG-backend (als FAQ_CHAT_BACKEND_URL gezet is)
+ * 4) Eerlijk “weet ik niet” / geen match
  */
 
 async function logFaq(question: string, answer: string, sources: string[]) {
@@ -52,73 +54,91 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: t(locale, "faq.chat.questionRequired") }, { status: 400 });
   }
 
-  const backendUrl = process.env.FAQ_CHAT_BACKEND_URL?.trim();
-  if (!backendUrl) {
-    const local = matchLocalFaq(question, locale);
-    if (local?.answer) {
-      await logFaq(question, local.answer, local.sources);
-      return NextResponse.json({
-        answer: local.answer,
-        sources: local.sources,
-        mode: "local_faq" as const,
-      });
-    }
-
-    const docHit = await retrieveFaqFromDocs(question, locale);
-    if (docHit.bestScore >= 4 && docHit.sources.length > 0 && docHit.candidate.length > 40) {
-      await logFaq(question, docHit.candidate, docHit.sources);
-      return NextResponse.json({
-        answer: docHit.candidate,
-        sources: docHit.sources,
-        mode: "doc_snippet" as const,
-      });
-    }
-
-    const fallbackMsg = t(locale, "faq.chat.fallbackNoMatch");
-    await logFaq(question, fallbackMsg, []);
+  const local = matchLocalFaq(question, locale);
+  if (local?.answer) {
+    await logFaq(question, local.answer, local.sources);
     return NextResponse.json({
-      answer: fallbackMsg,
-      sources: [],
-      mode: "fallback" as const,
+      answer: local.answer,
+      sources: local.sources,
+      mode: "local_faq" as const,
     });
   }
 
-  const tierNum = await getSessionTier();
-  const tier = tierNum >= 3 ? "admin" : tierNum >= 2 ? "tier2" : "tier1";
-
-  let finalAnswer = "";
-  let sources: string[] = [];
-  try {
-    const resp = await fetch(backendUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ question, locale, tier }),
+  const docHit = await retrieveFaqFromDocs(question, locale);
+  if (docHit.bestScore >= 4 && docHit.sources.length > 0 && docHit.candidate.length > 40) {
+    await logFaq(question, docHit.candidate, docHit.sources);
+    return NextResponse.json({
+      answer: docHit.candidate,
+      sources: docHit.sources,
+      mode: "doc_snippet" as const,
     });
-    if (!resp.ok) {
-      const raw = await resp.text();
-      throw new Error(`RAG backend error (${resp.status}): ${raw.slice(0, 240)}`);
+  }
+
+  const backendUrl = process.env.FAQ_CHAT_BACKEND_URL?.trim();
+  if (backendUrl) {
+    const tierNum = await getSessionTier();
+    const tier = tierNum >= 3 ? "admin" : tierNum >= 2 ? "tier2" : "tier1";
+
+    try {
+      const resp = await fetch(backendUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question, locale, tier }),
+      });
+
+      if (resp.ok) {
+        const json = (await resp.json()) as { answer?: string; sources?: unknown[] };
+        const finalAnswer = String(json?.answer || "").trim();
+        const rawSources = Array.isArray(json?.sources) ? json.sources : [];
+        const sources = rawSources
+          .map((s: unknown) => {
+            if (typeof s === "object" && s !== null && "doc_path" in s && typeof (s as { doc_path: string }).doc_path === "string") {
+              return (s as { doc_path: string }).doc_path;
+            }
+            return "";
+          })
+          .filter((s: string) => s.length > 0);
+        await logFaq(question, finalAnswer, sources);
+        return NextResponse.json({
+          answer: finalAnswer || t(locale, "faq.chat.unknownHonest"),
+          sources,
+          mode: "rag" as const,
+        });
+      }
+
+      if (resp.status === 404) {
+        const honest = t(locale, "faq.chat.unknownHonest");
+        await logFaq(question, honest, []);
+        return NextResponse.json({
+          answer: honest,
+          sources: [],
+          mode: "rag_no_chunks" as const,
+        });
+      }
+
+      const unavailable = t(locale, "faq.chat.ragUnavailable");
+      await logFaq(question, unavailable, []);
+      return NextResponse.json({
+        answer: unavailable,
+        sources: [],
+        mode: "rag_unavailable" as const,
+      });
+    } catch {
+      const unavailable = t(locale, "faq.chat.ragUnavailable");
+      await logFaq(question, unavailable, []);
+      return NextResponse.json({
+        answer: unavailable,
+        sources: [],
+        mode: "rag_unavailable" as const,
+      });
     }
-    const json = (await resp.json()) as { answer?: string; sources?: unknown[] };
-    finalAnswer = String(json?.answer || "").trim();
-    const rawSources = Array.isArray(json?.sources) ? json.sources : [];
-    sources = rawSources
-      .map((s: unknown) => {
-        if (typeof s === "object" && s !== null && "doc_path" in s && typeof (s as { doc_path: string }).doc_path === "string") {
-          return (s as { doc_path: string }).doc_path;
-        }
-        return "";
-      })
-      .filter((s: string) => s.length > 0);
-  } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : "RAG backend niet bereikbaar.";
-    return NextResponse.json({ error: msg }, { status: 503 });
   }
 
-  await logFaq(question, finalAnswer, sources);
-
+  const fallbackMsg = t(locale, "faq.chat.unknownHonest");
+  await logFaq(question, fallbackMsg, []);
   return NextResponse.json({
-    answer: finalAnswer,
-    sources,
-    mode: "rag" as const,
+    answer: fallbackMsg,
+    sources: [],
+    mode: "unknown" as const,
   });
 }

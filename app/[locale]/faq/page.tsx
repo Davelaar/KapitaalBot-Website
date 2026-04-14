@@ -26,6 +26,10 @@ export default async function FAQPage({ params }: { params: { locale: string } }
         <p style={{ color: "var(--muted)", marginBottom: "1rem", maxWidth: "78ch", lineHeight: 1.65 }}>
           {t(locale, "faq.intro")}
         </p>
+        <FaqChatbot />
+        <h2 className="kb-faq-list-heading" style={{ fontSize: "1.1rem", marginBottom: "0.65rem", color: "var(--text-secondary)" }}>
+          {t(locale, "faq.listHeading")}
+        </h2>
         <div className="kb-faq-root" style={{ display: "grid", gap: "1rem", marginBottom: "1.5rem" }}>
           {FAQ_SECTIONS.map((section, sectionIdx) => (
             <details
@@ -50,7 +54,6 @@ export default async function FAQPage({ params }: { params: { locale: string } }
             </details>
           ))}
         </div>
-        <FaqChatbot />
       </main>
     </>
   );
