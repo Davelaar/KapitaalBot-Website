@@ -92,6 +92,10 @@
     0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 10px 36px rgba(0, 0, 0, 0.28), 0 0 52px -18px rgba(89, 248, 252, 0.16);
   --card-shadow-hover:
     0 1px 0 rgba(255, 255, 255, 0.055) inset, 0 14px 42px rgba(0, 0, 0, 0.34), 0 0 60px -14px rgba(89, 248, 252, 0.24);
+
+  /* Laptop/desktop: main column ≈ 80% viewport; cap width on ultrawide */
+  --layout-inner-pct: 80%;
+  --layout-inner-max: 1920px;
 }
 
 [data-theme="light"] {
@@ -226,6 +230,15 @@ body {
   background: var(--bg);
   overflow-x: hidden;
   overflow-y: visible;
+}
+
+/* Breadcrumb strip aligns with main/header column (width set at ≥961px in main block) */
+.kb-breadcrumbs {
+  width: 100%;
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
 }
 
 /* Globale donatie-CTA (bunq.me) — buiten flex-kolommen, vast t.o.v. viewport */
@@ -523,11 +536,25 @@ main a.cockpit-kraken-link:hover {
 
 main {
   width: 100%;
-  max-width: 1440px;
+  max-width: 100%;
   min-width: 0;
   margin: 0 auto;
   padding: 1rem 1.5rem;
   padding-bottom: calc(2.5rem + env(safe-area-inset-bottom, 0px));
+  box-sizing: border-box;
+}
+
+@media (min-width: 961px) {
+  main,
+  .site-header {
+    width: var(--layout-inner-pct);
+    max-width: var(--layout-inner-max);
+  }
+
+  .kb-breadcrumbs {
+    width: var(--layout-inner-pct);
+    max-width: var(--layout-inner-max);
+  }
 }
 
 /* —— Top bar —— */
@@ -538,12 +565,13 @@ main {
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  max-width: 1440px;
+  max-width: 100%;
   margin: 0 auto;
   padding: 0.75rem 1.5rem;
   background: var(--bg-elevated);
   border-bottom: 1px solid var(--border);
   box-shadow: var(--shadow-soft);
+  box-sizing: border-box;
 }
 
 .nav-link {
@@ -1111,7 +1139,7 @@ textarea {
 /* /docs/[slug]: one column + horizontal strip (no narrow sidebar stealing width) */
 .docs-article-page {
   width: 100%;
-  max-width: min(56rem, 100%);
+  max-width: 100%;
   margin: 0 auto;
   box-sizing: border-box;
 }

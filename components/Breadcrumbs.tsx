@@ -41,8 +41,6 @@ export function Breadcrumbs() {
         className="kb-breadcrumbs"
         aria-label={t(locale, "breadcrumb.ariaLabel")}
         style={{
-          width: "100%",
-          maxWidth: 1440,
           margin: "0 auto",
           padding: "0.5rem 1.5rem 0.65rem",
           fontSize: "0.8125rem",
