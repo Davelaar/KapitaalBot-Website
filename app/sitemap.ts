@@ -18,6 +18,7 @@ const PATHS = [
   "/docs",
   "/spec",
   "/contact",
+  "/honeypot",
 ] as const;
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -51,7 +52,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
                     ? 0.55
                     : p === "/tier2-request"
                       ? 0.5
-                      : 0.45;
+                      : p === "/honeypot"
+                        ? 0.8
+                        : 0.45;
       entries.push({
         url,
         lastModified: now,
