@@ -1,4 +1,7 @@
-/** Gedeelde FAQ-structuur: zelfde bron als `app/faq/page.tsx` (accordion-secties). */
+/**
+ * Enige bron voor FAQ-secties: zelfde structuur als `/faq` en `matchLocalFaq`.
+ * Geen losse `faq.seo.*` (bestonden niet in i18n); `legal_data` staat in hoofd-i18n.
+ */
 
 export type FaqSectionItem = { qKey: string; aKey: string };
 
@@ -9,17 +12,6 @@ export type FaqSection = {
 };
 
 export const FAQ_SECTIONS: FaqSection[] = [
-  {
-    id: "seo",
-    titleKey: "faq.section.seo.title",
-    items: [
-      { qKey: "faq.seo.q1", aKey: "faq.seo.a1" },
-      { qKey: "faq.seo.q2", aKey: "faq.seo.a2" },
-      { qKey: "faq.seo.q3", aKey: "faq.seo.a3" },
-      { qKey: "faq.seo.q4", aKey: "faq.seo.a4" },
-      { qKey: "faq.seo.q5", aKey: "faq.seo.a5" },
-    ],
-  },
   {
     id: "overview",
     titleKey: "faq.section.overview.title",
@@ -119,6 +111,18 @@ export const FAQ_SECTIONS: FaqSection[] = [
     ],
   },
   {
+    id: "legal_data",
+    titleKey: "faq.section.legal_data.title",
+    items: [
+      { qKey: "faq.legal_data.q1", aKey: "faq.legal_data.a1" },
+      { qKey: "faq.legal_data.q2", aKey: "faq.legal_data.a2" },
+      { qKey: "faq.legal_data.q3", aKey: "faq.legal_data.a3" },
+      { qKey: "faq.legal_data.q4", aKey: "faq.legal_data.a4" },
+      { qKey: "faq.legal_data.q5", aKey: "faq.legal_data.a5" },
+      { qKey: "faq.legal_data.q6", aKey: "faq.legal_data.a6" },
+    ],
+  },
+  {
     id: "funding",
     titleKey: "faq.section.funding.title",
     items: [
@@ -130,3 +134,15 @@ export const FAQ_SECTIONS: FaqSection[] = [
     ],
   },
 ];
+
+/** Primaire doc-slug voor bronverwijzing in de chat (engine-docs). */
+export const FAQ_SECTION_PRIMARY_DOC: Record<string, string> = {
+  overview: "DOC_INDEX",
+  architecture: "01_ARCHITECTURE",
+  regimes_strategies: "03_STRATEGY_PIPELINE",
+  risk_safety: "06_RISK_SAFETY",
+  observability: "07_OBSERVABILITY",
+  validation: "08_OPERATIONS",
+  legal_data: "DOC_INDEX",
+  funding: "DOC_INDEX",
+};

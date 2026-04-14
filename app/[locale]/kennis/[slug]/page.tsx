@@ -64,102 +64,160 @@ function buildArticle(slug: string, locale: Locale): CanonicalArticle | null {
     },
   ];
 
+  const ingestDecisionNote = txt(
+    "Let op: ruwe markt-ingest en metrics leven primair op de ingest-pool; execution, safety en order-‘truth’ op de decision-pool. Koppel observability nooit aan de verkeerde database — zie docs 01 (architectuur) en 02 (ingest).",
+    "Note: raw market ingest and metrics live primarily on the ingest pool; execution, safety, and order truth live on the decision pool. Never attribute observability to the wrong database — see docs 01 (architecture) and 02 (ingest).",
+  );
+
   const map: Record<string, CanonicalArticle> = {
     "kraken-l3-orderbook-bot": {
       h1: txt("Route-state en marktcontext", "Route-state and market context"),
       lead: txt(
-        "Deze pagina definieert hoe marktdatacontext in KapitaalBot functioneel landt als route-state.",
-        "This page defines how market context in KapitaalBot functionally lands as route-state.",
+        "Deze pagina definieert hoe marktdatacontext in KapitaalBot functioneel landt als route-state. L2/L3-feeds voeden integriteitscontroles (o.a. checksums) voordat state de strategie-pipeline ingaat.",
+        "This page defines how market context lands as route-state. L2/L3 feeds feed integrity checks (including checksums) before state enters the strategy pipeline.",
       ),
-      definitions: baseDefs,
+      definitions: [
+        ...baseDefs.slice(0, 2),
+        {
+          term: txt("Orderbook-integriteit", "Order book integrity"),
+          definition: txt(
+            "L2-updates moeten in volgorde verwerkt worden; checksum-mismatch ⇒ resync. Kritieke numerieke paden vermijden float-ronding — zie ook `DECIMAL_F64_POLICY` in de engine-docs.",
+            "L2 updates must be processed in order; checksum mismatch ⇒ resync. Critical numeric paths avoid float rounding — see `DECIMAL_F64_POLICY` in the engine docs.",
+          ),
+        },
+        baseDefs[2],
+      ],
       interpretation: [
+        ingestDecisionNote,
         txt(
-          "Gebruik dashboard + Tier2 om te zien hoe context leidt tot routekeuzes zonder private implementatiedetails.",
-          "Use dashboard + Tier2 to see how context leads to route choices without private implementation details.",
+          "Gebruik Tier 1 routeboard + Tier 2 ‘Live Route Board’ om zichtbaarheid per symbool × route × horizon te volgen; dat is geen live orderfeed maar geëxporteerde read-models.",
+          "Use the Tier 1 route board + Tier 2 ‘Live Route Board’ for visibility per symbol × route × horizon; that is not a live order feed but exported read models.",
+        ),
+        txt(
+          "Diepere technische laag: `02_DATA_INGEST`, `03_STRATEGY_PIPELINE` en `07_OBSERVABILITY` in `/docs`.",
+          "Deeper technical layer: `02_DATA_INGEST`, `03_STRATEGY_PIPELINE`, and `07_OBSERVABILITY` under `/docs`.",
         ),
       ],
     },
     "kraken-websocket-api-spot": {
       h1: txt("Websocket-first runtime en dataflow", "Websocket-first runtime and dataflow"),
       lead: txt(
-        "KapitaalBot verwerkt data als langdurige websocketgedreven keten richting routebeslissingen en observability-export.",
-        "KapitaalBot processes data as a long-lived websocket-driven chain towards route decisions and observability export.",
+        "KapitaalBot verwerkt data als langdurige WebSocket-keten richting state en routebeslissingen. REST is strikt beperkt (o.a. WebSockets-token); trading en user-data lopen via WS v2.",
+        "KapitaalBot processes data as long-lived WebSocket chains toward state and route decisions. REST is strictly limited (e.g. WebSockets token); trading and user data use WS v2.",
       ),
-      definitions: baseDefs,
+      definitions: [
+        ...baseDefs,
+        {
+          term: txt("Reconnect-gedrag", "Reconnect behaviour"),
+          definition: txt(
+            "Na reconnect: nieuwe auth-token, opnieuw subscriben, snapshots waar vereist (L2/L3), en reconcile vanuit exchange-‘truth’ (o.a. executions-kanaal).",
+            "After reconnect: new auth token, resubscribe, snapshots where required (L2/L3), and reconcile from exchange truth (including the executions channel).",
+          ),
+        },
+      ],
       interpretation: [
+        ingestDecisionNote,
         txt(
-          "Publieke observability toont de functionele keten, niet de broncode of latency-workarounds.",
-          "Public observability shows the functional chain, not source code or latency workarounds.",
+          "Publieke observability toont de functionele keten (freshness, tellers, aggregates), niet interne multiplex-details of venue-rate-limits.",
+          "Public observability shows the functional chain (freshness, counters, aggregates), not internal multiplex details or venue rate limits.",
+        ),
+        txt(
+          "Zie `01_ARCHITECTURE` en `02_DATA_INGEST` voor het plaatje van processen ↔ DB-pools.",
+          "See `01_ARCHITECTURE` and `02_DATA_INGEST` for processes ↔ DB pools.",
         ),
       ],
     },
     "kraken-hybrid-maker-fees": {
       h1: txt("Execution-kwaliteit en fill feedback", "Execution quality and fill feedback"),
       lead: txt(
-        "Execution-uitkomsten worden publiek geaggregeerd getoond als kwaliteits- en feedbacksignalen richting route-evaluatie.",
-        "Execution outcomes are publicly shown in aggregated form as quality and feedback signals for route evaluation.",
+        "Execution-uitkomsten en fills zijn de waarheid voor order lifecycle; WS-method responses zijn hooguit ACK’s. Publiek zie je geaggregeerde kwaliteit (statusverdeling, fill-kant, latency), geen order-level tuning.",
+        "Execution outcomes and fills are the source of truth for order lifecycle; WS method responses are at best ACKs. Publicly you see aggregated quality (status mix, fill side, latency), not order-level tuning.",
       ),
       definitions: baseDefs,
       interpretation: [
         txt(
-          "Lees fillkwaliteit als operationele effectmeting, niet als private tuning- of allocatie-informatie.",
-          "Read fill quality as operational effect measurement, not as private tuning or allocation information.",
+          "Orders/fills worden persistent op de decision-pool vastgelegd; combineer nooit blind met ingest-only tabellen.",
+          "Orders/fills are persisted on the decision pool; never blindly join with ingest-only tables.",
+        ),
+        txt(
+          "Lees fillkwaliteit als operationele effectmeting richting route-evaluatie, niet als signaal om strategie te klonen.",
+          "Read fill quality as operational measurement toward route evaluation, not as a signal to copy the strategy.",
+        ),
+        txt(
+          "Zie `04_EXECUTION_ORDERS` en `05_PROTECTION_EXIT` voor lifecycle en bescherming rond posities.",
+          "See `04_EXECUTION_ORDERS` and `05_PROTECTION_EXIT` for lifecycle and position protection.",
         ),
       ],
     },
     "crypto-regime-detectie": {
       h1: txt("Regime-routering en multistrategy-selectie", "Regime routing and multistrategy selection"),
       lead: txt(
-        "Regime en strategie worden in de canonieke laag beschreven als context voor route-selectie, niet als losse botlabels.",
-        "Regime and strategy are described in the canonical layer as context for route selection, not as isolated bot labels.",
+        "Regime en strategie worden samengebracht in de pipeline vóór execution: ze bepalen welke routefamilies überhaupt in aanmerking komen — niet als decoratieve labels op een chart.",
+        "Regime and strategy are combined in the pipeline before execution: they determine which route families are even eligible — not as decorative labels on a chart.",
       ),
       definitions: baseDefs,
       interpretation: [
         txt(
-          "Het systeem kiest routes vanuit context en timing; het doel is uitlegbaarheid, niet tradefrequentie.",
-          "The system selects routes from context and timing; the goal is explainability, not trade frequency.",
+          "Het systeem kiest routes vanuit context, timing en geschiktheid; het doel is gecontroleerde uitlegbaarheid, niet maximale tradefrequentie.",
+          "The system chooses routes from context, timing, and suitability; the goal is controlled explainability, not maximum trade frequency.",
+        ),
+        txt(
+          "Dashboard toont regime-/strategy-samenvattingen uit snapshots; voor canonieke definities: `03_STRATEGY_PIPELINE` en module-inventaris.",
+          "The dashboard shows regime/strategy summaries from snapshots; for canonical definitions: `03_STRATEGY_PIPELINE` and the module inventory.",
         ),
       ],
     },
     "live-execution-transparency": {
       h1: txt("Why-No-Trade en route explainability", "Why-No-Trade and route explainability"),
       lead: txt(
-        "Publieke transparantie focust op decision outcomes: waarom niet gehandeld is, en waarom een route won.",
-        "Public transparency focuses on decision outcomes: why no trade happened, and why a route won.",
+        "Publieke transparantie focust op beslisuitkomsten: funnel-stages, reject-redenen, edgeboard-rangorde — niet op replay van ruwe signalen.",
+        "Public transparency focuses on decision outcomes: funnel stages, reject reasons, edgeboard ranking — not replay of raw signals.",
       ),
       definitions: baseDefs,
       interpretation: [
         txt(
-          "Gebruik deze pagina samen met FAQ en dashboard voor diagnose op oorzaak/gevolg-niveau.",
-          "Use this page together with FAQ and dashboard for cause/effect-level diagnostics.",
+          "Tier 2 bundle (`tier2_data_bundle`) aggregeert o.a. why-no-trade en route-context; interpreteer altijd met de juiste pool-labels (ingest vs decision) zoals in de engine-docs beschreven.",
+          "The Tier 2 bundle (`tier2_data_bundle`) aggregates why-no-trade and route context; always interpret with correct pool labels (ingest vs decision) as in the engine docs.",
+        ),
+        txt(
+          "Combineer met FAQ (secties observability & validatie) en dashboard voor cause→effect-debugging.",
+          "Combine with the FAQ (observability & validation sections) and the dashboard for cause→effect debugging.",
         ),
       ],
     },
     "veilige-kraken-api-bot": {
       h1: txt("Safety, position-context en risicogrenzen", "Safety, position context, and risk boundaries"),
       lead: txt(
-        "Safety wordt publiek beschreven als functionele grenslaag rond routebeslissingen en positiecontext.",
-        "Safety is publicly described as a functional boundary layer around route decisions and position context.",
+        "Safety-modi (normal / exit-only / hard-blocked) en position-context zijn harde guards vóór nieuwe risk: ze zijn bedoeld om trade te stoppen wanneer data of markt onbetrouwbaar is.",
+        "Safety modes (normal / exit-only / hard-blocked) and position context are hard guards before new risk: meant to stop trading when data or the market is unreliable.",
       ),
       definitions: baseDefs,
       interpretation: [
         txt(
-          "Publieke safety-data is geaggregeerd; private account- en allocatiedetails blijven admin-only.",
-          "Public safety data is aggregated; private account and allocation details remain admin-only.",
+          "`symbol_safety_state` en gerelateerde views horen canoniek op de decision-pool; publieke tiles tonen aggregaten, geen per-account overrides.",
+          "`symbol_safety_state` and related views belong on the decision pool canonically; public tiles show aggregates, not per-account overrides.",
+        ),
+        txt(
+          "Zie `06_RISK_SAFETY` voor capital allocator, quiet windows en circuit-breaker-semantiek in woorden.",
+          "See `06_RISK_SAFETY` for the capital allocator, quiet windows, and circuit-breaker semantics in prose.",
         ),
       ],
     },
     "low-latency-crypto-execution-nl": {
       h1: txt("Timing, latency-klassen en execution viability", "Timing, latency classes, and execution viability"),
       lead: txt(
-        "Timing is first-class in KapitaalBot: latency wordt functioneel geïnterpreteerd in hot/warm/cold paden.",
-        "Timing is first-class in KapitaalBot: latency is interpreted functionally across hot/warm/cold paths.",
+        "Timing is first-class: submit→ack, fill→exit-submit en feed-freshness bepalen of een route überhaupt uitvoerbaar is. Hot/warm/cold zijn functionele klassen, geen marketinglabels.",
+        "Timing is first-class: submit→ack, fill→exit-submit, and feed freshness determine whether a route is viable. Hot/warm/cold are functional classes, not marketing labels.",
       ),
       definitions: baseDefs,
       interpretation: [
         txt(
-          "Zie SPEC voor target/observed/why-it-matters latencystructuur en dashboard voor actuele observability.",
-          "See SPEC for target/observed/why-it-matters latency structure and dashboard for current observability.",
+          "Tier 2 toont latency-histogrammen wanneer de export die buckets bevat; anders blijven gemiddelden leidend — zie FAQ observability.",
+          "Tier 2 shows latency histograms when the export includes those buckets; otherwise averages lead — see the observability FAQ.",
+        ),
+        txt(
+          "Zie SPEC (`/spec`) voor latency-doelen en `07_OBSERVABILITY` voor metrics/snapshots.",
+          "See SPEC (`/spec`) for latency targets and `07_OBSERVABILITY` for metrics and snapshots.",
         ),
       ],
     },

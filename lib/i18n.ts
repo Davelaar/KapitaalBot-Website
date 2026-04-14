@@ -63,8 +63,13 @@ const strings: Record<Locale, Record<string, string>> = {
     "faq.chat.sending": "Bezig...",
     "faq.chat.send": "Stuur",
     "faq.chat.error": "Onbekende fout",
+    "faq.chat.questionRequired": "Stel eerst een vraag.",
     "faq.chat.fallbackNoMatch":
-      "Ik vind geen duidelijke match in de FAQ op deze pagina. Scroll omhoog naar de uitklapsecties of gebruik het contactformulier voor een specifieke vraag.",
+      "Ik vind geen duidelijke match in de FAQ of een sterk genoeg fragment in de technische documentatie. Probeer kernwoorden (bijv. ingest, safety, Tier 2), scroll naar de secties hierboven, bekijk `/docs`, of gebruik het contactformulier.",
+    "faq.chat.sourcesLabel": "Bronnen",
+    "faq.chat.docExtractPrefix": "Volgens de engine-documentatie (fragment):",
+    "faq.chat.docRetrievalNoMatch":
+      "In de technische documentatie vind ik geen passage die sterk genoeg aansluit op je vraag. Combineer kernwoorden met de FAQ hierboven of doorzoek `/docs`.",
     "faq.section.overview.title": "Overzicht & scope",
     "faq.overview.q1": "Wat is KapitaalBot?",
     "faq.overview.a1": "KapitaalBot is een autonoom crypto trading systeem dat op ruim 600 spotmarkten draait. De engine is multi-regime (bijv. range, trend, high-volatility, low-liquidity) en multi-strategy (bijv. liquidity-, momentum- en volumegerichte strategieën). Deze site toont alleen observability-data over die runtime, geen live orders of realtime signalen.",
@@ -196,6 +201,19 @@ const strings: Record<Locale, Record<string, string>> = {
     "faq.validation.a9": "Nieuwe releases worden getest tegen bestaande datasets en scenario's waarbij bekende uitkomsten verwacht worden. Afwijkingen worden onderzocht voordat een release live gaat. Validatie-scripts en observability-vergelijkingen helpen om subtiele regressies te vinden.",
     "faq.validation.q10": "Hoe weet ik als buitenstaander dat de documentatie actueel is?",
     "faq.validation.a10": "De documenten op deze site worden automatisch gesynchroniseerd met de hoofdrepository van de bot. Belangrijke wijzigingen worden vastgelegd in de changelog. Daarmee is er een directe koppeling tussen code, docs en wat hier gepresenteerd wordt.",
+    "faq.section.legal_data.title": "Juridisch, privacy & gebruik van deze site",
+    "faq.legal_data.q1": "Is de inhoud van deze site beleggingsadvies?",
+    "faq.legal_data.a1": "Nee. Teksten, dashboards en FAQ beschrijven technische architectuur, observability en risk-principes. Het is geen aanbeveling om te kopen of verkopen, geen persoonlijk financieel advies en geen uitnodiging tot deelname.",
+    "faq.legal_data.q2": "Welke persoons- of accountgegevens worden hier getoond?",
+    "faq.legal_data.a2": "Geen. Publieke en Tier 2-snapshots zijn geaggregeerd en bevatten geen identificeerbare accountdata, geen volledige order-id’s en geen reproduceerbare strategieparameters.",
+    "faq.legal_data.q3": "Mag ik FAQ- of doc-teksten commercieel hergebruiken?",
+    "faq.legal_data.a3": "De site is bedoeld voor inzicht in het systeem. Hergebruik van teksten is mogelijk met bronvermelding en zonder suggestie van samenwerking of endorsement tenzij schriftelijk overeengekomen.",
+    "faq.legal_data.q4": "Hoe zit het met crypto-regelgeving en disclaimers?",
+    "faq.legal_data.a4": "Crypto is zeer volatiel; de site bevat risicowaarschuwingen conform het beleid van het project. Dit vervangt geen juridisch advies; operators en bezoekers blijven zelf verantwoordelijk voor naleving van toepasselijke wet- en regelgeving.",
+    "faq.legal_data.q5": "Waarom geen live orderfeed of realtime PnL?",
+    "faq.legal_data.a5": "Dat voorkomt signal-leakage, beschermt operationele veiligheid en beperkt het risico op misbruik van geaggregeerde maar gevoelige informatie. Observability is bewust vertraagd en gesommeerd.",
+    "faq.legal_data.q6": "Wie is verantwoordelijk bij technische onjuistheden op de site?",
+    "faq.legal_data.a6": "De inhoud volgt de gesynchroniseerde engine-docs en snapshots; bij afwijking is de repository en runtime-export leidend. De site wordt ‘as is’ aangeboden voor transparantie, niet als garantie op winst of foutloze werking.",
     "access.title": "Tier 2-toegang aanvragen",
     "access.intro": "Tier 2 biedt uitgebreidere observability: execution dashboards, latency-metrics, strategy activity. Vul het formulier in; toegang wordt handmatig toegekend.",
     "access.footer": "Formulier wordt in een latere fase gekoppeld aan backend / e-mail of admin-panel.",
@@ -217,6 +235,12 @@ const strings: Record<Locale, Record<string, string>> = {
       "Technische documentatie vanuit de engine-repository: kernset 01–08 (architectuur t/m operations), index en aanvullende beleids- en operationele documenten.",
     "docs.page.introExtra":
       "Klik op een document voor de volledige inhoud inclusief Mermaid-diagrammen.",
+    "docs.article.disclaimer":
+      "Publieke docs zijn functioneel volledig en canoniek, maar bevatten geen broncode, geen private accountdetails en geen reproduceerbare tuning.",
+    "docs.index.boundaryTitle": "Publieke documentatiegrens",
+    "docs.index.boundaryBody":
+      "Deze documentatie legt functionele werking, architectuur en observability volledig uit, maar toont bewust geen broncode, geen private accountdetails en geen strategisch reproduceerbare tuningwaarden.",
+    "docs.nav.inlineAria": "Documentatie — alle pagina’s",
     "docs.table.topic": "Onderwerp",
     "docs.table.doc": "Document",
     "docs.slug.files": "Bestanden",
@@ -363,6 +387,21 @@ const strings: Record<Locale, Record<string, string>> = {
     "dashboard.topWinners": "Top 3 winnaars (quote)",
     "dashboard.topLosers": "Top 3 verliezers (quote)",
     "dashboard.pieOther": "Overig",
+    "dashboard.tier2.noCountsInSnapshot":
+      "Geen tellingen in deze export (geen events in het venster of veld ontbreekt in de snapshot).",
+    "dashboard.tier2.marketForecastIntro":
+      "Verwachte richting en beweging over een vast 15m-horizon uit `market_forecast_15m` in de Tier 2 bundle. Geen live feed; het aantal rijen volgt de laatste eval-run in de export.",
+    "dashboard.tier2.marketForecastEmpty":
+      "Geen forecast-sectie in deze bundle, of lege `forecasts`-lijst (`market_forecast_15m`).",
+    "dashboard.tier2.latencyHistogramNote":
+      "Ms-buckethistogrammen alleen als de latency-export `submit_to_ack_histogram_ms_24h` en/of `fill_to_exit_submit_histogram_ms_24h` bevat. Anders hierboven alleen gemiddelden.",
+    "dashboard.tier2.equityTrendEmpty":
+      "Geen sparkline: daarvoor zijn minimaal twee vertraagde equity-buckets (`equity_trend_delayed`) nodig.",
+    "dashboard.tier2.edgeboardNoRows":
+      "Edgeboard staat op beschikbaar, maar `top_signals` is leeg — geen zichtbare rijen voor dit universum/exportmoment.",
+    "dashboard.tier2.drilldownIntro":
+      "Dieper dan deze aggregaten (per order, parameters, ruwe logs) valt buiten de Tier 2-publicatieregel. Definities: SPEC en publieke documentatie.",
+    "dashboard.tier2.runHealthEmpty": "Geen run health-tijdlijn in deze snapshot-export.",
     "dashboard.execution.delayNote":
       "Execution-tabellen: tijden op 15 minuten afgerond (Tier 1). Order-ref = laatste tekens van client order id.",
     "dashboard.execution.ordersTitle": "Laatste 10 execution-orders",
@@ -485,8 +524,13 @@ const strings: Record<Locale, Record<string, string>> = {
     "faq.chat.sending": "Sending...",
     "faq.chat.send": "Send",
     "faq.chat.error": "Unknown error",
+    "faq.chat.questionRequired": "Please enter a question first.",
     "faq.chat.fallbackNoMatch":
-      "I can’t find a clear match in the FAQ on this page. Scroll up to the sections or use the contact form for a specific question.",
+      "I can’t find a clear FAQ match or a strong enough excerpt in the technical documentation. Try keywords (e.g. ingest, safety, Tier 2), scroll the sections above, open `/docs`, or use the contact form.",
+    "faq.chat.sourcesLabel": "Sources",
+    "faq.chat.docExtractPrefix": "From the engine documentation (excerpt):",
+    "faq.chat.docRetrievalNoMatch":
+      "I can’t find a passage in the technical docs that matches your question well enough. Try combining keywords with the FAQ above or browse `/docs`.",
     "faq.section.overview.title": "Overview & scope",
     "faq.overview.q1": "What is KapitaalBot?",
     "faq.overview.a1": "KapitaalBot is an autonomous crypto trading system running on 600+ spot markets. The engine is multi-regime (e.g. range, trend, high-volatility, low-liquidity) and multi-strategy (e.g. liquidity-, momentum- and volume-oriented strategies). This site shows only observability data about that runtime, no live orders or real-time signals.",
@@ -618,6 +662,19 @@ const strings: Record<Locale, Record<string, string>> = {
     "faq.validation.a9": "New releases are tested against existing datasets and scenarios with known expected outcomes. Deviations are investigated before a release goes live. Validation scripts and observability comparisons help detect subtle regressions.",
     "faq.validation.q10": "How can an outsider know that documentation here is still current?",
     "faq.validation.a10": "The docs on this site are synchronised automatically with the bot’s main repository. Important changes are captured in the changelog. That way there is a direct link between code, docs and what is presented here.",
+    "faq.section.legal_data.title": "Legal, privacy & use of this site",
+    "faq.legal_data.q1": "Is anything on this site investment advice?",
+    "faq.legal_data.a1": "No. Text, dashboards and FAQ describe technical architecture, observability and risk principles. It is not a recommendation to trade, not personal financial advice, and not an invitation to participate.",
+    "faq.legal_data.q2": "What personal or account data is shown here?",
+    "faq.legal_data.a2": "None. Public and Tier 2 snapshots are aggregated and contain no identifiable account data, no full order ids and no reproducible strategy parameters.",
+    "faq.legal_data.q3": "May I reuse FAQ or doc text commercially?",
+    "faq.legal_data.a3": "The site is for system insight. Reuse is allowed with attribution and without implying partnership or endorsement unless agreed in writing.",
+    "faq.legal_data.q4": "How does this relate to crypto regulation and disclaimers?",
+    "faq.legal_data.a4": "Crypto is highly volatile; the site carries risk warnings per project policy. This is not legal advice; visitors and operators remain responsible for compliance with applicable law.",
+    "faq.legal_data.q5": "Why no live order feed or real-time PnL?",
+    "faq.legal_data.a5": "That limits signal leakage, protects operational safety and reduces misuse of aggregated but sensitive information. Observability is intentionally delayed and summarized.",
+    "faq.legal_data.q6": "Who is responsible if the site is technically wrong?",
+    "faq.legal_data.a6": "Content follows synchronised engine docs and snapshots; the repository and runtime export are authoritative. The site is provided “as is” for transparency, not as a guarantee of profit or error-free operation.",
     "access.title": "Request Tier 2 access",
     "access.intro": "Tier 2 offers extended observability: execution dashboards, latency metrics, strategy activity. Fill in the form; access is granted manually.",
     "access.footer": "The form will be linked to backend / email or admin panel in a later phase.",
@@ -638,6 +695,12 @@ const strings: Record<Locale, Record<string, string>> = {
     "docs.intro":
       "Technical documentation from the engine repository: core set 01–08 (architecture through operations), the index, and supplementary policy and ops documents.",
     "docs.page.introExtra": "Click a document to see the full content, including Mermaid diagrams.",
+    "docs.article.disclaimer":
+      "Public docs are functionally complete and canonical, but contain no source code, no private account details, and no reproducible tuning.",
+    "docs.index.boundaryTitle": "Public documentation boundary",
+    "docs.index.boundaryBody":
+      "This documentation explains functional behavior, architecture, and observability in depth, while intentionally omitting source code, private account details, and strategically reproducible tuning values.",
+    "docs.nav.inlineAria": "Documentation — all pages",
     "docs.table.topic": "Topic",
     "docs.table.doc": "Document",
     "docs.slug.files": "Files",
@@ -784,6 +847,21 @@ const strings: Record<Locale, Record<string, string>> = {
     "dashboard.topWinners": "Top 3 winners (quote)",
     "dashboard.topLosers": "Top 3 losers (quote)",
     "dashboard.pieOther": "Other",
+    "dashboard.tier2.noCountsInSnapshot":
+      "No counts in this export (no events in the window or the field is missing from the snapshot).",
+    "dashboard.tier2.marketForecastIntro":
+      "Expected direction and move over a fixed 15m horizon from `market_forecast_15m` in the Tier 2 bundle. Not a live feed; row count follows the latest eval run in the export.",
+    "dashboard.tier2.marketForecastEmpty":
+      "No forecast section in this bundle, or an empty `forecasts` list (`market_forecast_15m`).",
+    "dashboard.tier2.latencyHistogramNote":
+      "Millisecond bucket histograms only appear when the latency export includes `submit_to_ack_histogram_ms_24h` and/or `fill_to_exit_submit_histogram_ms_24h`. Otherwise only the averages above.",
+    "dashboard.tier2.equityTrendEmpty":
+      "No sparkline: at least two delayed equity buckets (`equity_trend_delayed`) are required.",
+    "dashboard.tier2.edgeboardNoRows":
+      "Edgeboard is marked available, but `top_signals` is empty — no visible rows for this universe/export moment.",
+    "dashboard.tier2.drilldownIntro":
+      "Anything deeper than these aggregates (per-order detail, parameters, raw logs) is outside the Tier 2 publication scope. Definitions: SPEC and public documentation.",
+    "dashboard.tier2.runHealthEmpty": "No run health timeline in this snapshot export.",
     "dashboard.execution.delayNote":
       "Execution tables: timestamps rounded to 15 minutes (Tier 1). Order ref = trailing characters of client order id.",
     "dashboard.execution.ordersTitle": "Last 10 execution orders",
@@ -906,8 +984,13 @@ const strings: Record<Locale, Record<string, string>> = {
     "faq.chat.sending": "Wird gesendet...",
     "faq.chat.send": "Senden",
     "faq.chat.error": "Unbekannter Fehler",
+    "faq.chat.questionRequired": "Bitte zuerst eine Frage eingeben.",
     "faq.chat.fallbackNoMatch":
-      "Kein klarer Treffer in der FAQ auf dieser Seite. Nach oben scrollen zu den Abschnitten oder das Kontaktformular für eine konkrete Frage nutzen.",
+      "Kein klarer Treffer in der FAQ und kein ausreichend passendes Zitat in der technischen Dokumentation. Versuchen Sie Stichwörter (z. B. Ingest, Safety, Tier 2), scrollen Sie zu den Abschnitten oben, öffnen Sie `/docs`, oder nutzen Sie das Kontaktformular.",
+    "faq.chat.sourcesLabel": "Quellen",
+    "faq.chat.docExtractPrefix": "Aus der Engine-Dokumentation (Auszug):",
+    "faq.chat.docRetrievalNoMatch":
+      "In der technischen Dokumentation finde ich keinen Abschnitt, der Ihrer Formulierung ausreichend entspricht. Kombinieren Sie Stichwörter mit der FAQ oben oder durchsuchen Sie `/docs`.",
     "faq.section.overview.title": "Überblick & Umfang",
     "faq.overview.q1": "Was ist KapitaalBot?",
     "faq.overview.a1": "KapitaalBot ist ein autonomes Krypto-Trading-System, das auf über 600 Spotmärkten läuft. Die Engine ist multi-regime (z. B. Range, Trend, High-Volatility, Low-Liquidity) und multi-strategy (z. B. Liquiditäts-, Momentum- und volumenorientierte Strategien). Diese Seite zeigt nur Observability-Daten zu dieser Runtime, keine Live-Orders oder Echtzeit-Signale.",
@@ -1038,7 +1121,20 @@ const strings: Record<Locale, Record<string, string>> = {
     "faq.validation.q9": "Wie läuft Regressionstesting bei Releases?",
     "faq.validation.a9": "Neue Releases werden gegen bekannte Datensätze und Szenarien mit erwarteten Ergebnissen geprüft. Abweichungen werden vor Live-Rollout untersucht.",
     "faq.validation.q10": "Wie erkenne ich, dass die Dokumentation aktuell ist?",
-    "faq.validation.a10": "Die Website-Dokumente werden mit der Haupt-Repository synchronisiert; wichtige Änderungen landen im Changelog. Dadurch bleibt die Kopplung zwischen Code, Docs und Darstellung erhalten.",
+    "faq.validation.a10": "Die Website-Dokumente werden mit dem Haupt-Repository synchronisiert; wichtige Änderungen landen im Changelog. Dadurch bleibt die Kopplung zwischen Code, Docs und Darstellung erhalten.",
+    "faq.section.legal_data.title": "Rechtliches, Datenschutz & Nutzung der Website",
+    "faq.legal_data.q1": "Ist der Inhalt Anlageberatung?",
+    "faq.legal_data.a1": "Nein. Texte, Dashboards und FAQ beschreiben Architektur, Observability und Risikoprinzipien. Keine Empfehlung zum Kauf/Verkauf, keine persönliche Anlageberatung und keine Einladung zur Teilnahme.",
+    "faq.legal_data.q2": "Welche Personen- oder Kontodaten werden gezeigt?",
+    "faq.legal_data.a2": "Keine. Öffentliche und Tier-2-Snapshots sind aggregiert und enthalten keine identifizierbaren Kontodaten, keine vollen Order-IDs und keine reproduzierbaren Strategieparameter.",
+    "faq.legal_data.q3": "Darf ich FAQ- oder Doku-Texte kommerziell weiterverwenden?",
+    "faq.legal_data.a3": "Die Website dient dem Systemverständnis. Weiterverwendung mit Quellenangabe und ohne Implikation von Partnerschaft oder Endorsement, sofern nicht schriftlich vereinbart.",
+    "faq.legal_data.q4": "Wie verhält sich das zu Krypto-Regulierung und Haftungsausschlüssen?",
+    "faq.legal_data.a4": "Krypto ist stark volatil; die Website enthält Risikohinweise gemäß Projektrichtlinie. Kein Ersatz für Rechtsberatung; Nutzer und Betreiber bleiben für Compliance verantwortlich.",
+    "faq.legal_data.q5": "Warum gibt es keinen Live-Order-Feed und kein Echtzeit-PnL?",
+    "faq.legal_data.a5": "Um Signal-Leaks zu begrenzen, Betriebssicherheit zu schützen und Missbrauch aggregierter Daten zu vermeiden. Observability ist bewusst verzögert und zusammengefasst.",
+    "faq.legal_data.q6": "Wer haftet bei technischen Ungenauigkeiten auf der Website?",
+    "faq.legal_data.a6": "Inhalte folgen synchronisierten Engine-Docs und Snapshots; Repository und Runtime-Export sind maßgeblich. Die Website wird zur Transparenz „wie besehen“ bereitgestellt, ohne Gewähr für Gewinn oder fehlerfreien Betrieb.",
     "access.title": "Tier-2-Zugang anfragen",
     "access.intro": "Tier 2 bietet erweiterte Observability: Execution-Dashboards, Latenz-Metriken, Strategie-Aktivität. Formular ausfüllen; Zugang wird manuell erteilt.",
     "access.footer": "Das Formular wird in einer späteren Phase mit Backend / E-Mail oder Admin-Panel verknüpft.",
@@ -1059,6 +1155,12 @@ const strings: Record<Locale, Record<string, string>> = {
     "docs.intro":
       "Technische Dokumentation aus dem Engine-Repository: Kern 01–08 (Architektur bis Operations), Index und ergänzende Policy- und Betriebsdokumente.",
     "docs.page.introExtra": "Klicken Sie auf ein Dokument, um den vollständigen Inhalt inkl. Mermaid-Diagramme zu sehen.",
+    "docs.article.disclaimer":
+      "Die öffentlichen Docs sind funktional vollständig und kanonisch, enthalten aber keinen Quellcode, keine privaten Kontodaten und keine reproduzierbaren Tuning-Parameter.",
+    "docs.index.boundaryTitle": "Grenze der öffentlichen Dokumentation",
+    "docs.index.boundaryBody":
+      "Diese Dokumentation erklärt Verhalten, Architektur und Observability vollständig, lässt aber bewusst Quellcode, private Kontodaten und strategisch reproduzierbare Tuning-Werte weg.",
+    "docs.nav.inlineAria": "Dokumentation — alle Seiten",
     "docs.table.topic": "Thema",
     "docs.table.doc": "Dokument",
     "docs.slug.files": "Dateien",
@@ -1205,6 +1307,21 @@ const strings: Record<Locale, Record<string, string>> = {
     "dashboard.topWinners": "Top 3 Gewinner (Quote)",
     "dashboard.topLosers": "Top 3 Verlierer (Quote)",
     "dashboard.pieOther": "Sonstige",
+    "dashboard.tier2.noCountsInSnapshot":
+      "Keine Zählungen in diesem Export (keine Ereignisse im Fenster oder Feld fehlt im Snapshot).",
+    "dashboard.tier2.marketForecastIntro":
+      "Erwartete Richtung und Bewegung über einen festen 15m-Horizont aus `market_forecast_15m` im Tier-2-Bundle. Kein Live-Feed; die Zeilenanzahl folgt dem letzten Eval-Lauf im Export.",
+    "dashboard.tier2.marketForecastEmpty":
+      "Kein Forecast-Abschnitt in diesem Bundle oder leere `forecasts`-Liste (`market_forecast_15m`).",
+    "dashboard.tier2.latencyHistogramNote":
+      "Ms-Bucket-Histogramme nur, wenn der Latency-Export `submit_to_ack_histogram_ms_24h` und/oder `fill_to_exit_submit_histogram_ms_24h` enthält. Sonst nur die Mittelwerte oben.",
+    "dashboard.tier2.equityTrendEmpty":
+      "Keine Sparkline: mindestens zwei verzögerte Equity-Buckets (`equity_trend_delayed`) nötig.",
+    "dashboard.tier2.edgeboardNoRows":
+      "Edgeboard ist „verfügbar“, aber `top_signals` ist leer — keine sichtbaren Zeilen für dieses Universum/diesen Exportzeitpunkt.",
+    "dashboard.tier2.drilldownIntro":
+      "Tiefer als diese Aggregationen (pro Order, Parameter, Rohlogs) liegt außerhalb der Tier-2-Publikationsregel. Definitionen: SPEC und öffentliche Dokumentation.",
+    "dashboard.tier2.runHealthEmpty": "Keine Run-Health-Zeitleiste in diesem Snapshot-Export.",
     "dashboard.execution.delayNote":
       "Execution-Tabellen: Zeitstempel auf 15 Minuten gerundet (Tier 1). Order-Ref = letzte Zeichen der Client-Order-ID.",
     "dashboard.execution.ordersTitle": "Letzte 10 Execution-Orders",
@@ -1327,8 +1444,13 @@ const strings: Record<Locale, Record<string, string>> = {
     "faq.chat.sending": "Envoi...",
     "faq.chat.send": "Envoyer",
     "faq.chat.error": "Erreur inconnue",
+    "faq.chat.questionRequired": "Saisissez d’abord une question.",
     "faq.chat.fallbackNoMatch":
-      "Aucune correspondance claire dans la FAQ de cette page. Remontez vers les sections ou utilisez le formulaire de contact pour une question précise.",
+      "Aucune correspondance nette dans la FAQ ni extrait assez pertinent dans la documentation technique. Essayez des mots-clés (ex. ingest, safety, Tier 2), remontez aux sections ci-dessus, ouvrez `/docs`, ou utilisez le formulaire de contact.",
+    "faq.chat.sourcesLabel": "Sources",
+    "faq.chat.docExtractPrefix": "D’après la documentation moteur (extrait) :",
+    "faq.chat.docRetrievalNoMatch":
+      "Je ne trouve pas de passage dans la documentation technique qui corresponde assez à votre question. Combinez des mots-clés avec la FAQ ci-dessus ou parcourez `/docs`.",
     "faq.section.overview.title": "Aperçu et périmètre",
     "faq.overview.q1": "Qu'est-ce que KapitaalBot ?",
     "faq.overview.a1": "KapitaalBot est un système de trading crypto autonome qui tourne sur plus de 600 marchés au comptant. Le moteur est multi-régime (ex. range, tendance, haute volatilité, faible liquidité) et multi-stratégie (ex. liquidité, momentum, volume). Ce site n'affiche que des données d'observability sur cette runtime, pas d'ordres en direct ni de signaux en temps réel.",
@@ -1460,6 +1582,19 @@ const strings: Record<Locale, Record<string, string>> = {
     "faq.validation.a9": "Chaque release est testée sur des jeux/scénarios de référence avec résultats attendus. Les écarts sont analysés avant mise en production.",
     "faq.validation.q10": "Comment savoir que la documentation affichée est à jour ?",
     "faq.validation.a10": "Les docs du site sont synchronisées avec le dépôt principal du bot ; les changements importants sont consignés dans le changelog, assurant un lien direct code/docs/site.",
+    "faq.section.legal_data.title": "Juridique, confidentialité et usage du site",
+    "faq.legal_data.q1": "Le contenu constitue-t-il un conseil en investissement ?",
+    "faq.legal_data.a1": "Non. Textes, tableaux de bord et FAQ décrivent l’architecture technique, l’observability et les principes de risque. Ce n’est pas une recommandation d’acheter ou vendre, ni un conseil financier personnalisé, ni une invitation à participer.",
+    "faq.legal_data.q2": "Quelles données personnelles ou de compte sont affichées ?",
+    "faq.legal_data.a2": "Aucune. Les instantanés publics et Tier 2 sont agrégés : pas de données de compte identifiables, pas d’identifiants d’ordre complets, pas de paramètres de stratégie reproductibles.",
+    "faq.legal_data.q3": "Puis-je réutiliser le texte FAQ ou docs à des fins commerciales ?",
+    "faq.legal_data.a3": "Le site vise la compréhension du système. Réutilisation avec attribution et sans suggérer partenariat ou approbation, sauf accord écrit.",
+    "faq.legal_data.q4": "Et la réglementation crypto / les avertissements ?",
+    "faq.legal_data.a4": "Les crypto-actifs sont très volatils ; le site comporte des avertissements selon la politique du projet. Ce n’est pas un avis juridique ; visiteurs et opérateurs restent responsables de la conformité.",
+    "faq.legal_data.q5": "Pourquoi pas de flux d’ordres en direct ni de PnL temps réel ?",
+    "faq.legal_data.a5": "Pour limiter la fuite de signaux, protéger l’exploitation et réduire l’abus d’informations agrégées mais sensibles. L’observability est volontairement retardée et synthétisée.",
+    "faq.legal_data.q6": "Qui est responsable si le site est techniquement inexact ?",
+    "faq.legal_data.a6": "Le contenu suit la doc moteur et les snapshots synchronisés ; le dépôt et l’export runtime font foi. Le site est fourni « tel quel » pour la transparence, sans garantie de gain ni d’absence d’erreurs.",
     "access.title": "Demander l'accès Tier 2",
     "access.intro": "Tier 2 offre une observability étendue : tableaux de bord d'exécution, métriques de latence, activité de stratégie. Remplissez le formulaire ; l'accès est accordé manuellement.",
     "access.footer": "Le formulaire sera relié au backend / e-mail ou panneau admin dans une phase ultérieure.",
@@ -1480,6 +1615,12 @@ const strings: Record<Locale, Record<string, string>> = {
     "docs.intro":
       "Documentation technique depuis le dépôt moteur : jeu principal 01–08 (architecture à operations), index et documents de politique et d'exploitation complémentaires.",
     "docs.page.introExtra": "Cliquez sur un document pour voir le contenu complet, y compris les diagrammes Mermaid.",
+    "docs.article.disclaimer":
+      "Les docs publiques sont fonctionnellement complètes et canoniques, mais sans code source, sans détails de compte privés et sans paramètres de tuning reproductibles.",
+    "docs.index.boundaryTitle": "Périmètre de la documentation publique",
+    "docs.index.boundaryBody":
+      "Cette documentation décrit le comportement, l’architecture et l’observability en profondeur, tout en omettant le code source, les détails de compte privés et les réglages de tuning stratégiquement reproductibles.",
+    "docs.nav.inlineAria": "Documentation — toutes les pages",
     "docs.table.topic": "Sujet",
     "docs.table.doc": "Document",
     "docs.slug.files": "Fichiers",
@@ -1626,6 +1767,21 @@ const strings: Record<Locale, Record<string, string>> = {
     "dashboard.topWinners": "Top 3 gagnants (quote)",
     "dashboard.topLosers": "Top 3 perdants (quote)",
     "dashboard.pieOther": "Autres",
+    "dashboard.tier2.noCountsInSnapshot":
+      "Aucun décompte dans cet export (pas d’événements dans la fenêtre ou champ absent du snapshot).",
+    "dashboard.tier2.marketForecastIntro":
+      "Direction attendue et mouvement sur un horizon 15m fixe depuis `market_forecast_15m` dans le bundle Tier 2. Pas de flux live ; le nombre de lignes suit le dernier eval dans l’export.",
+    "dashboard.tier2.marketForecastEmpty":
+      "Pas de section forecast dans ce bundle, ou liste `forecasts` vide (`market_forecast_15m`).",
+    "dashboard.tier2.latencyHistogramNote":
+      "Histogrammes en buckets ms seulement si l’export latence inclut `submit_to_ack_histogram_ms_24h` et/ou `fill_to_exit_submit_histogram_ms_24h`. Sinon seulement les moyennes ci-dessus.",
+    "dashboard.tier2.equityTrendEmpty":
+      "Pas de sparkline : il faut au moins deux buckets equity retardés (`equity_trend_delayed`).",
+    "dashboard.tier2.edgeboardNoRows":
+      "Edgeboard est « disponible », mais `top_signals` est vide — aucune ligne visible pour cet univers / cet instant d’export.",
+    "dashboard.tier2.drilldownIntro":
+      "Au-delà de ces agrégats (détail par ordre, paramètres, logs bruts) sort du périmètre de publication Tier 2. Définitions : SPEC et documentation publique.",
+    "dashboard.tier2.runHealthEmpty": "Pas de chronologie run health dans cet export snapshot.",
     "dashboard.execution.delayNote":
       "Tableaux d’exécution : horodatages arrondis à 15 minutes (Tier 1). Réf. ordre = derniers caractères de l’id client.",
     "dashboard.execution.ordersTitle": "10 derniers ordres d’exécution",

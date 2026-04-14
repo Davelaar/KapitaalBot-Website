@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 /**
- * Sync engine markdown from the Krakenbot repo into content/docs/.
+ * Sync engine markdown from the Krakenbot repo into content/docs/<locale>/.
  *
- * - Copies every docs/*.md from the bot repo (same basename).
- * - Copies systemd/README.md → SYSTEMD_README.md.
+ * - Writes canonical copies to `content/docs/nl/` (same basenames as bot `docs/*.md`).
+ * - Replicates every nl file to `en/` only (DE/FR markdown dirs are added later when translations exist).
+ * - Copies systemd/README.md → nl/SYSTEMD_README.md (+ en replica).
  * - If docs/OBSERVABILITY_SNAPSHOT_CONTRACT.md exists in the bot repo, copies it;
- *   otherwise leaves the website copy untouched (contract may live only here until restored in bot).
+ *   otherwise leaves the website nl copy untouched (contract may live only here until restored in bot).
  *
  * Usage: node scripts/sync-docs-from-bot.cjs [path/to/bot-repo]
  */
@@ -36,7 +37,10 @@ function resolveBotRepo() {
 }
 
 const repo = resolveBotRepo();
-const destDir = path.join(__dirname, "..", "content", "docs");
+const destRoot = path.join(__dirname, "..", "content", "docs");
+/** Locales to receive a copy from nl (besides nl itself). DE/FR site routes use nl fallback until translated. */
+const replicateLocales = ["en"];
+const destNl = path.join(destRoot, "nl");
 const botDocsDir = path.join(repo, "docs");
 
 if (!fs.existsSync(botDocsDir)) {
@@ -44,35 +48,48 @@ if (!fs.existsSync(botDocsDir)) {
   process.exit(1);
 }
 
-fs.mkdirSync(destDir, { recursive: true });
+fs.mkdirSync(destNl, { recursive: true });
 
-let copied = 0;
+let copiedNl = 0;
 for (const name of fs.readdirSync(botDocsDir).sort()) {
   if (!name.endsWith(".md")) continue;
   const src = path.join(botDocsDir, name);
-  const dst = path.join(destDir, name);
+  const dst = path.join(destNl, name);
   fs.copyFileSync(src, dst);
-  copied += 1;
+  copiedNl += 1;
 }
 
 const systemdSrc = path.join(repo, "systemd", "README.md");
-const systemdDst = path.join(destDir, "SYSTEMD_README.md");
+const systemdDstNl = path.join(destNl, "SYSTEMD_README.md");
 if (fs.existsSync(systemdSrc)) {
-  fs.copyFileSync(systemdSrc, systemdDst);
-  copied += 1;
+  fs.copyFileSync(systemdSrc, systemdDstNl);
+  copiedNl += 1;
 } else {
   console.warn(`sync-docs-from-bot: skip SYSTEMD_README (missing ${systemdSrc})`);
 }
 
 const obsBot = path.join(botDocsDir, "OBSERVABILITY_SNAPSHOT_CONTRACT.md");
-const obsDst = path.join(destDir, "OBSERVABILITY_SNAPSHOT_CONTRACT.md");
+const obsDstNl = path.join(destNl, "OBSERVABILITY_SNAPSHOT_CONTRACT.md");
 if (fs.existsSync(obsBot)) {
-  fs.copyFileSync(obsBot, obsDst);
-  copied += 1;
+  fs.copyFileSync(obsBot, obsDstNl);
+  copiedNl += 1;
 } else {
   console.warn(
-    "sync-docs-from-bot: OBSERVABILITY_SNAPSHOT_CONTRACT.md not in bot repo — keeping existing website file if present",
+    "sync-docs-from-bot: OBSERVABILITY_SNAPSHOT_CONTRACT.md not in bot repo — keeping existing website nl file if present",
   );
 }
 
-console.log(`sync-docs-from-bot: wrote ${copied} file(s) from ${repo}`);
+let replicated = 0;
+for (const loc of replicateLocales) {
+  const destLoc = path.join(destRoot, loc);
+  fs.mkdirSync(destLoc, { recursive: true });
+  for (const name of fs.readdirSync(destNl)) {
+    if (!name.endsWith(".md")) continue;
+    fs.copyFileSync(path.join(destNl, name), path.join(destLoc, name));
+    replicated += 1;
+  }
+}
+
+console.log(
+  `sync-docs-from-bot: wrote ${copiedNl} file(s) under content/docs/nl from ${repo}; replicated ${replicated} file(s) to en/`,
+);

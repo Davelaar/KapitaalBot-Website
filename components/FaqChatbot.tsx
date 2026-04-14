@@ -106,7 +106,7 @@ export function FaqChatbot() {
             </div>
             {m.role === "assistant" && m.sources && m.sources.length > 0 && (
               <div style={{ marginTop: "0.35rem", color: "var(--muted)", fontSize: "0.8rem" }}>
-                Bronnen:{" "}
+                {t(locale, "faq.chat.sourcesLabel")}:{" "}
                 {m.sources.map((slug, i) => (
                   <span key={`${slug}-${i}`}>
                     <Link

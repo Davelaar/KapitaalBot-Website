@@ -1,20 +1,9 @@
 import type { MetadataRoute } from "next";
-import fs from "fs";
-import path from "path";
 import { locales } from "@/lib/i18n";
 import { getSiteUrl } from "@/lib/site";
 import { withLocale } from "@/lib/locale-path";
 import { KENNIS_SLUGS } from "@/lib/kennis-slugs";
-
-const DOCS_DIR = path.join(process.cwd(), "content", "docs");
-
-function getDocSlugs(): string[] {
-  if (!fs.existsSync(DOCS_DIR)) return [];
-  return fs
-    .readdirSync(DOCS_DIR)
-    .filter((f) => f.endsWith(".md"))
-    .map((f) => f.replace(/\.md$/, ""));
-}
+import { getDocSlugs } from "@/lib/docs-filesystem";
 
 const PATHS = [
   "",

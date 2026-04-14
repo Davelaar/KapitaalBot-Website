@@ -1,5 +1,6 @@
 /**
- * Metadata for public engine docs (content/docs/*.md). Keys match markdown basenames without .md
+ * Metadata for public engine docs (`content/docs/<locale>/*.md`, canonical list under `nl/`).
+ * Keys match markdown basenames without .md
  */
 export const DOCS_META: Record<string, { labelKey: string; descKey: string }> = {
   DOC_INDEX: { labelKey: "docs.meta.DOC_INDEX.label", descKey: "docs.meta.DOC_INDEX.desc" },

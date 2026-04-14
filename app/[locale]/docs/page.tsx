@@ -1,20 +1,9 @@
 import Link from "next/link";
-import fs from "fs";
-import path from "path";
 import { t, type Locale } from "@/lib/i18n";
 import { buildPageMetadata } from "@/lib/page-metadata";
 import { parseLocaleParam, withLocale } from "@/lib/locale-path";
 import { DOCS_META } from "@/lib/docs-catalog";
-
-const DOCS_DIR = path.join(process.cwd(), "content", "docs");
-
-function getDocSlugs(): string[] {
-  if (!fs.existsSync(DOCS_DIR)) return [];
-  return fs
-    .readdirSync(DOCS_DIR)
-    .filter((f) => f.endsWith(".md"))
-    .map((f) => f.replace(/\.md$/, ""));
-}
+import { getDocSlugs } from "@/lib/docs-filesystem";
 
 export const dynamic = "force-dynamic";
 
@@ -50,14 +39,8 @@ export default async function DocsPage({ params }: { params: { locale: string } 
         {t(locale, "docs.intro")} {t(locale, "docs.page.introExtra")}
       </p>
       <section className="card" style={{ marginBottom: "1rem", padding: "1rem 1.25rem", borderLeft: "4px solid var(--brand)" }}>
-        <h2 style={{ fontSize: "1.05rem", marginBottom: "0.45rem" }}>
-          {locale === "nl" ? "Publieke documentatiegrens" : "Public documentation boundary"}
-        </h2>
-        <p style={{ margin: 0, color: "var(--muted)", fontSize: "0.9rem", lineHeight: 1.6 }}>
-          {locale === "nl"
-            ? "Deze documentatie legt functionele werking, architectuur en observability volledig uit, maar toont bewust geen broncode, geen private accountdetails en geen strategisch reproduceerbare tuningwaarden."
-            : "This documentation explains functional behavior, architecture, and observability in depth, while intentionally omitting source code, private account details, and strategically reproducible tuning values."}
-        </p>
+        <h2 style={{ fontSize: "1.05rem", marginBottom: "0.45rem" }}>{t(locale, "docs.index.boundaryTitle")}</h2>
+        <p style={{ margin: 0, color: "var(--muted)", fontSize: "0.9rem", lineHeight: 1.6 }}>{t(locale, "docs.index.boundaryBody")}</p>
       </section>
       <section className="card" style={{ padding: "1rem 1.25rem" }}>
         <table className="docs-index-table" style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.9rem" }}>

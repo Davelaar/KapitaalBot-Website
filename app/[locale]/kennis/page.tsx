@@ -98,6 +98,11 @@ export default async function KennisHubPage({ params }: { params: { locale: stri
             ? "Focus: wat het systeem doet en waarom. Geen broncode, geen private accountdetails, geen reproduceerbare fine-tuning."
             : "Focus: what the system does and why. No source code, no private account details, no reproducible fine-tuning."}
         </p>
+        <p style={{ color: "var(--muted)", maxWidth: "70ch", lineHeight: 1.65, marginTop: "0.75rem" }}>
+          {isNl
+            ? "Deze pagina’s (EN: ‘Insights’) zijn SEO-pilaren die dezelfde semantiek volgen als `/docs` (01–08), SPEC en de uitgebreide FAQ — bewust kort gehouden; detail staat in de engine-documentatie."
+            : "These pages (‘Insights’ in the English nav) are SEO pillars aligned with `/docs` (01–08), SPEC, and the expanded FAQ — kept short on purpose; depth lives in the engine documentation."}
+        </p>
         <div style={{ display: "grid", gap: "1rem", marginTop: "2rem" }}>
           {KENNIS_SLUGS.map((slug) => (
             <Link
