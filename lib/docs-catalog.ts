@@ -52,28 +52,4 @@ export const DOCS_META: Record<string, { labelKey: string; descKey: string }> = 
     labelKey: "docs.meta.00_MODULE_INVENTORY.label",
     descKey: "docs.meta.00_MODULE_INVENTORY.desc",
   },
-  FASE_0B_RUNTIME: {
-    labelKey: "docs.meta.FASE_0B_RUNTIME.label",
-    descKey: "docs.meta.FASE_0B_RUNTIME.desc",
-  },
-  DECIMAL_F64_POLICY_AND_INVENTORY: {
-    labelKey: "docs.meta.DECIMAL_F64_POLICY_AND_INVENTORY.label",
-    descKey: "docs.meta.DECIMAL_F64_POLICY_AND_INVENTORY.desc",
-  },
-  FORWARD_RETURNS_OBSERVABILITY: {
-    labelKey: "docs.meta.FORWARD_RETURNS_OBSERVABILITY.label",
-    descKey: "docs.meta.FORWARD_RETURNS_OBSERVABILITY.desc",
-  },
-  DOCS_TARGET_STRUCTURE: {
-    labelKey: "docs.meta.DOCS_TARGET_STRUCTURE.label",
-    descKey: "docs.meta.DOCS_TARGET_STRUCTURE.desc",
-  },
-  OBSERVABILITY_SNAPSHOT_CONTRACT: {
-    labelKey: "docs.meta.OBSERVABILITY_SNAPSHOT_CONTRACT.label",
-    descKey: "docs.meta.OBSERVABILITY_SNAPSHOT_CONTRACT.desc",
-  },
-  SYSTEMD_README: {
-    labelKey: "docs.meta.SYSTEMD_README.label",
-    descKey: "docs.meta.SYSTEMD_README.desc",
-  },
 };
