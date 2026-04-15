@@ -25,7 +25,7 @@ export default async function OverPage({ params }: { params: { locale: string } 
   const pStyle = { color: "var(--muted)", lineHeight: 1.65 as const, fontSize: "0.9375rem", marginBottom: "1rem" };
   const h2Style = { fontSize: "1.2rem", marginTop: "1.75rem", marginBottom: "0.75rem", fontWeight: 600 as const };
   return (
-    <main style={{ maxWidth: 720, margin: "0 auto", padding: "0 1.25rem 2.5rem" }}>
+    <main>
       <nav style={{ marginBottom: "1.5rem" }}>
         <Link href={withLocale(locale, "/")} className="kb-text-link" style={{ fontSize: "0.9rem" }}>
           ← {t(locale, "over.nav.back")}

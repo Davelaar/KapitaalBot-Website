@@ -55,7 +55,7 @@ export default async function WatIsKapitaalbotPage({ params }: { params: { local
   const w = wat(locale);
 
   return (
-    <main style={{ maxWidth: 720, margin: "0 auto", padding: "0 1.25rem 2.5rem" }}>
+    <main>
       <nav style={{ marginBottom: "1.5rem" }}>
         <Link href={withLocale(locale, "/over")} className="kb-text-link" style={{ fontSize: "0.9rem" }}>
           ← {t(locale, "nav.over.story")}
