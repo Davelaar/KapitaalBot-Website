@@ -140,6 +140,20 @@ export function NavBar() {
                 {t(locale, "nav.over.truth")}
               </Link>
               <Link
+                href={withLocale(locale, "/over/bitvavo-vs-kraken")}
+                style={{
+                  display: "block",
+                  padding: "0.4rem 0.9rem",
+                  fontSize: "0.9rem",
+                  color: "var(--text)",
+                  textDecoration: "none",
+                  whiteSpace: "normal",
+                }}
+                onClick={() => setOverOpen(false)}
+              >
+                {t(locale, "nav.over.bitvavoKraken")}
+              </Link>
+              <Link
                 href={withLocale(locale, "/over/fundme")}
                 style={{
                   display: "block",
@@ -291,6 +305,13 @@ export function NavBar() {
             onClick={() => setMobileOpen(false)}
           >
             {t(locale, "nav.over.truth")}
+          </Link>
+          <Link
+            href={withLocale(locale, "/over/bitvavo-vs-kraken")}
+            className="mobile-nav-link mobile-nav-sub"
+            onClick={() => setMobileOpen(false)}
+          >
+            {t(locale, "nav.over.bitvavoKraken")}
           </Link>
           <Link
             href={withLocale(locale, "/over/fundme")}

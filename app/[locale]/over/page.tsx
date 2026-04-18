@@ -75,6 +75,9 @@ export default async function OverPage({ params }: { params: { locale: string } 
           <Link href={withLocale(locale, "/over/wat-is-kapitaalbot")} className="kb-cta-row-btn kb-cta-row-btn--primary">
             {t(locale, "over.canonical.wat")}
           </Link>
+          <Link href={withLocale(locale, "/over/bitvavo-vs-kraken")} className="kb-cta-row-btn">
+            {t(locale, "nav.over.bitvavoKraken")}
+          </Link>
           <Link href={withLocale(locale, "/over/fundme")} className="kb-cta-row-btn">
             {t(locale, "nav.over.fundme")}
           </Link>

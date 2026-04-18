@@ -8,6 +8,7 @@ import { aboutStrings } from "@/lib/about-i18n";
 import { faqFundingStrings } from "@/lib/faq-funding-i18n";
 import { watIsKapitaalbotStrings } from "@/lib/wat-is-kapitaalbot-i18n";
 import { fundMeStrings } from "@/lib/fundme-i18n";
+import { bitvavoKrakenStrings } from "@/lib/bitvavo-kraken-i18n";
 
 export type Locale = "nl" | "en" | "de" | "fr";
 
@@ -2535,18 +2536,21 @@ export function t(locale: Locale, key: string): string {
     aboutStrings[locale]?.[key] ??
     watIsKapitaalbotStrings[locale]?.[key] ??
     fundMeStrings[locale]?.[key] ??
+    bitvavoKrakenStrings[locale]?.[key] ??
     faqFundingStrings[locale]?.[key] ??
     strings.en?.[key] ??
     seoStrings.en?.[key] ??
     aboutStrings.en?.[key] ??
     watIsKapitaalbotStrings.en?.[key] ??
     fundMeStrings.en?.[key] ??
+    bitvavoKrakenStrings.en?.[key] ??
     faqFundingStrings.en?.[key] ??
     strings.nl[key] ??
     seoStrings.nl[key] ??
     aboutStrings.nl[key] ??
     watIsKapitaalbotStrings.nl[key] ??
     fundMeStrings.nl[key] ??
+    bitvavoKrakenStrings.nl[key] ??
     faqFundingStrings.nl[key] ??
     key
   );
