@@ -20,6 +20,7 @@ const hreflangFor: Record<Locale, string> = {
 
 /**
  * @param path Pad zonder taal-segment: `/`, `/faq`, `/kennis/slug`
+ * @param openGraphType `article` voor lange artikelpagina's (OG share als artikel); default `website`.
  */
 export function buildPageMetadata(opts: {
   locale: Locale;
@@ -27,6 +28,7 @@ export function buildPageMetadata(opts: {
   description: string;
   path: string;
   keywords?: string | string[];
+  openGraphType?: "website" | "article";
 }): Metadata {
   const base = getSiteUrl().replace(/\/+$/, "");
   const rawPath = opts.path.startsWith("/") ? opts.path : `/${opts.path}`;
@@ -48,6 +50,8 @@ export function buildPageMetadata(opts: {
         ? opts.keywords
         : opts.keywords.split(",").map((s) => s.trim()).filter(Boolean);
 
+  const ogType = opts.openGraphType ?? "website";
+
   return {
     title: {
       absolute: opts.title,
@@ -62,7 +66,7 @@ export function buildPageMetadata(opts: {
       title: opts.title,
       description: opts.description,
       url,
-      type: "website",
+      type: ogType,
       locale: ogLocale[opts.locale] ?? ogLocale.nl,
       siteName: "KapitaalBot",
     },

@@ -19,6 +19,7 @@ export async function generateMetadata({ params }: { params: { locale: string } 
     description: m.description,
     keywords: m.keywords,
     path: PATH,
+    openGraphType: "article",
   });
 }
 
