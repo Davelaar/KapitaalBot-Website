@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { useLocale } from "@/lib/locale";
 import { withLocale } from "@/lib/locale-path";
 import { t, type Locale } from "@/lib/i18n";
@@ -16,15 +16,68 @@ function pathActive(pathname: string | null, locale: Locale, path: string): bool
   return pathname === href || (pathname?.startsWith(`${href}/`) ?? false);
 }
 
+const dropdownPanelStyle: CSSProperties = {
+  position: "absolute",
+  minWidth: "220px",
+  borderRadius: 8,
+  border: "1px solid var(--border-strong)",
+  background: "var(--surface)",
+  boxShadow: "var(--shadow-soft)",
+  padding: "0.35rem 0",
+  zIndex: 20,
+};
+
+const dropdownLinkStyle: CSSProperties = {
+  display: "block",
+  padding: "0.4rem 0.9rem",
+  fontSize: "0.9rem",
+  color: "var(--text)",
+  textDecoration: "none",
+  whiteSpace: "normal",
+};
+
+function dropdownButtonStyle(activeSection: boolean): CSSProperties {
+  return {
+    background: "transparent",
+    border: "none",
+    color: activeSection ? "var(--text)" : "var(--text-secondary)",
+    fontSize: "0.9rem",
+    cursor: "pointer",
+    padding: "0.2rem 0",
+    fontWeight: activeSection ? 600 : 500,
+  };
+}
+
 export function NavBar() {
   const locale = useLocale();
   const pathname = usePathname();
-  const [accountOpen, setAccountOpen] = useState(false);
+  const [docsOpen, setDocsOpen] = useState(false);
+  const [updatesOpen, setUpdatesOpen] = useState(false);
   const [overOpen, setOverOpen] = useState(false);
+  const [accessOpen, setAccessOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const headerRef = useRef<HTMLElement | null>(null);
 
   const active = (path: string) => pathActive(pathname, locale, path);
+  const docsActive = active("/docs") || active("/spec");
+  const updatesActive = active("/faq") || active("/changelog");
+  const overActive = active("/over");
+  const accessActive = active("/tier2-request") || active("/login");
+
+  const closeAllDropdowns = () => {
+    setDocsOpen(false);
+    setUpdatesOpen(false);
+    setOverOpen(false);
+    setAccessOpen(false);
+  };
+
+  useEffect(() => {
+    setDocsOpen(false);
+    setUpdatesOpen(false);
+    setOverOpen(false);
+    setAccessOpen(false);
+    setMobileOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     if (!mobileOpen) return;
@@ -37,6 +90,7 @@ export function NavBar() {
     const onEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setMobileOpen(false);
+        closeAllDropdowns();
       }
     };
     document.addEventListener("mousedown", onPointerDown);
@@ -48,6 +102,31 @@ export function NavBar() {
       document.removeEventListener("keydown", onEscape);
     };
   }, [mobileOpen]);
+
+  const openOnlyDocs = () => {
+    setUpdatesOpen(false);
+    setOverOpen(false);
+    setAccessOpen(false);
+    setDocsOpen((v) => !v);
+  };
+  const openOnlyUpdates = () => {
+    setDocsOpen(false);
+    setOverOpen(false);
+    setAccessOpen(false);
+    setUpdatesOpen((v) => !v);
+  };
+  const openOnlyOver = () => {
+    setDocsOpen(false);
+    setUpdatesOpen(false);
+    setAccessOpen(false);
+    setOverOpen((v) => !v);
+  };
+  const openOnlyAccess = () => {
+    setDocsOpen(false);
+    setUpdatesOpen(false);
+    setOverOpen(false);
+    setAccessOpen((v) => !v);
+  };
 
   return (
     <header className="site-header" ref={headerRef}>
@@ -74,185 +153,105 @@ export function NavBar() {
         <Link href={withLocale(locale, "/kennis")} className={`nav-link${active("/kennis") ? " nav-link--active" : ""}`}>
           {t(locale, "nav.kennis")}
         </Link>
+
         <div style={{ position: "relative" }}>
           <button
             type="button"
-            onClick={() => {
-              setOverOpen((v) => !v);
-              setAccountOpen(false);
-            }}
+            onClick={openOnlyDocs}
             aria-haspopup="menu"
-            aria-expanded={overOpen}
-            style={{
-              background: "transparent",
-              border: "none",
-              color: "var(--text-secondary)",
-              fontSize: "0.9rem",
-              cursor: "pointer",
-              padding: "0.2rem 0",
-              fontWeight: 500,
-            }}
+            aria-expanded={docsOpen}
+            style={dropdownButtonStyle(docsActive)}
           >
-            {t(locale, "nav.about")}
+            {t(locale, "nav.menu.docs")}
           </button>
-          {overOpen && (
-            <div
-              role="menu"
-              style={{
-                position: "absolute",
-                left: 0,
-                top: "1.75rem",
-                minWidth: "220px",
-                borderRadius: 8,
-                border: "1px solid var(--border-strong)",
-                background: "var(--surface)",
-                boxShadow: "var(--shadow-soft)",
-                padding: "0.35rem 0",
-                zIndex: 20,
-              }}
-            >
-              <Link
-                href={withLocale(locale, "/over")}
-                style={{
-                  display: "block",
-                  padding: "0.4rem 0.9rem",
-                  fontSize: "0.9rem",
-                  color: "var(--text)",
-                  textDecoration: "none",
-                  whiteSpace: "nowrap",
-                }}
-                onClick={() => setOverOpen(false)}
-              >
-                {t(locale, "nav.over.story")}
+          {docsOpen && (
+            <div role="menu" style={{ ...dropdownPanelStyle, left: 0, top: "1.75rem" }}>
+              <Link href={withLocale(locale, "/docs")} style={{ ...dropdownLinkStyle, whiteSpace: "nowrap" }} onClick={() => setDocsOpen(false)}>
+                {t(locale, "nav.docs")}
               </Link>
-              <Link
-                href={withLocale(locale, "/over/wat-is-kapitaalbot")}
-                style={{
-                  display: "block",
-                  padding: "0.4rem 0.9rem",
-                  fontSize: "0.9rem",
-                  color: "var(--text)",
-                  textDecoration: "none",
-                  whiteSpace: "normal",
-                }}
-                onClick={() => setOverOpen(false)}
-              >
-                {t(locale, "nav.over.truth")}
-              </Link>
-              <Link
-                href={withLocale(locale, "/over/bitvavo-vs-kraken")}
-                style={{
-                  display: "block",
-                  padding: "0.4rem 0.9rem",
-                  fontSize: "0.9rem",
-                  color: "var(--text)",
-                  textDecoration: "none",
-                  whiteSpace: "normal",
-                }}
-                onClick={() => setOverOpen(false)}
-              >
-                {t(locale, "nav.over.bitvavoKraken")}
-              </Link>
-              <Link
-                href={withLocale(locale, "/over/fundme")}
-                style={{
-                  display: "block",
-                  padding: "0.4rem 0.9rem",
-                  fontSize: "0.9rem",
-                  color: "var(--text)",
-                  textDecoration: "none",
-                  whiteSpace: "normal",
-                }}
-                onClick={() => setOverOpen(false)}
-              >
-                {t(locale, "nav.over.fundme")}
+              <Link href={withLocale(locale, "/spec")} style={{ ...dropdownLinkStyle, whiteSpace: "nowrap" }} onClick={() => setDocsOpen(false)}>
+                {t(locale, "nav.spec.label")}
               </Link>
             </div>
           )}
         </div>
-        <Link href={withLocale(locale, "/changelog")} className={`nav-link${active("/changelog") ? " nav-link--active" : ""}`}>
-          {t(locale, "nav.notes")}
-        </Link>
-        <Link href={withLocale(locale, "/contact")} className={`nav-link${active("/contact") ? " nav-link--active" : ""}`}>
-          {t(locale, "nav.contact")}
-        </Link>
-        <Link href={withLocale(locale, "/docs")} className={`nav-link${active("/docs") ? " nav-link--active" : ""}`}>
-          {t(locale, "nav.architecture")}
-        </Link>
-        <Link href={withLocale(locale, "/spec")} className={`nav-link${active("/spec") ? " nav-link--active" : ""}`}>
-          SPEC
-        </Link>
-        <Link href={withLocale(locale, "/faq")} className={`nav-link${active("/faq") ? " nav-link--active" : ""}`}>
-          {t(locale, "nav.research")}
-        </Link>
-        <Link href={withLocale(locale, "/over/fundme")} className={`nav-link${active("/over/fundme") ? " nav-link--active" : ""}`}>
-          {t(locale, "nav.fundme")}
-        </Link>
+
         <div style={{ position: "relative" }}>
           <button
             type="button"
-            onClick={() => setAccountOpen((v) => !v)}
+            onClick={openOnlyOver}
             aria-haspopup="menu"
-            aria-expanded={accountOpen}
-            style={{
-              background: "transparent",
-              border: "none",
-              color: "var(--text-secondary)",
-              fontSize: "0.9rem",
-              cursor: "pointer",
-              padding: "0.2rem 0",
-              fontWeight: 500,
-            }}
+            aria-expanded={overOpen}
+            style={dropdownButtonStyle(overActive)}
           >
-            {t(locale, "nav.account") ?? "Account"}
+            {t(locale, "nav.about")}
           </button>
-          {accountOpen && (
-            <div
-              style={{
-                position: "absolute",
-                right: 0,
-                top: "1.75rem",
-                minWidth: "160px",
-                borderRadius: 8,
-                border: "1px solid var(--border-strong)",
-                background: "var(--surface)",
-                boxShadow: "var(--shadow-soft)",
-                padding: "0.35rem 0",
-                zIndex: 20,
-              }}
-              role="menu"
-            >
-              <Link
-                href={withLocale(locale, "/tier2-request")}
-                style={{
-                  display: "block",
-                  padding: "0.4rem 0.9rem",
-                  fontSize: "0.9rem",
-                  color: "var(--text)",
-                  textDecoration: "none",
-                  whiteSpace: "nowrap",
-                }}
-                onClick={() => setAccountOpen(false)}
-              >
-                {t(locale, "nav.access")}
+          {overOpen && (
+            <div role="menu" style={{ ...dropdownPanelStyle, left: 0, top: "1.75rem" }}>
+              <Link href={withLocale(locale, "/over")} style={{ ...dropdownLinkStyle, whiteSpace: "nowrap" }} onClick={() => setOverOpen(false)}>
+                {t(locale, "nav.over.story")}
               </Link>
-              <Link
-                href={withLocale(locale, "/login")}
-                style={{
-                  display: "block",
-                  padding: "0.4rem 0.9rem",
-                  fontSize: "0.9rem",
-                  color: "var(--text)",
-                  textDecoration: "none",
-                  whiteSpace: "nowrap",
-                }}
-                onClick={() => setAccountOpen(false)}
-              >
+              <Link href={withLocale(locale, "/over/wat-is-kapitaalbot")} style={dropdownLinkStyle} onClick={() => setOverOpen(false)}>
+                {t(locale, "nav.over.truth")}
+              </Link>
+              <Link href={withLocale(locale, "/over/bitvavo-vs-kraken")} style={dropdownLinkStyle} onClick={() => setOverOpen(false)}>
+                {t(locale, "nav.over.bitvavoKraken")}
+              </Link>
+              <Link href={withLocale(locale, "/over/fundme")} style={dropdownLinkStyle} onClick={() => setOverOpen(false)}>
+                {t(locale, "nav.fundme")}
+              </Link>
+            </div>
+          )}
+        </div>
+
+        <div style={{ position: "relative" }}>
+          <button
+            type="button"
+            onClick={openOnlyUpdates}
+            aria-haspopup="menu"
+            aria-expanded={updatesOpen}
+            style={dropdownButtonStyle(updatesActive)}
+          >
+            {t(locale, "nav.menu.updates")}
+          </button>
+          {updatesOpen && (
+            <div role="menu" style={{ ...dropdownPanelStyle, left: 0, top: "1.75rem" }}>
+              <Link href={withLocale(locale, "/faq")} style={{ ...dropdownLinkStyle, whiteSpace: "nowrap" }} onClick={() => setUpdatesOpen(false)}>
+                {t(locale, "nav.faq")}
+              </Link>
+              <Link href={withLocale(locale, "/changelog")} style={{ ...dropdownLinkStyle, whiteSpace: "nowrap" }} onClick={() => setUpdatesOpen(false)}>
+                {t(locale, "nav.changelog")}
+              </Link>
+            </div>
+          )}
+        </div>
+
+        <div style={{ position: "relative" }}>
+          <button
+            type="button"
+            onClick={openOnlyAccess}
+            aria-haspopup="menu"
+            aria-expanded={accessOpen}
+            style={dropdownButtonStyle(accessActive)}
+          >
+            {t(locale, "nav.menu.access")}
+          </button>
+          {accessOpen && (
+            <div role="menu" style={{ ...dropdownPanelStyle, right: 0, left: "auto", top: "1.75rem" }}>
+              <Link href={withLocale(locale, "/tier2-request")} style={{ ...dropdownLinkStyle, whiteSpace: "normal" }} onClick={() => setAccessOpen(false)}>
+                {t(locale, "nav.tier2.request")}
+              </Link>
+              <Link href={withLocale(locale, "/login")} style={{ ...dropdownLinkStyle, whiteSpace: "nowrap" }} onClick={() => setAccessOpen(false)}>
                 {t(locale, "nav.login")}
               </Link>
             </div>
           )}
         </div>
+
+        <Link href={withLocale(locale, "/contact")} className={`nav-link${active("/contact") ? " nav-link--active" : ""}`}>
+          {t(locale, "nav.contact")}
+        </Link>
+
         <LanguageSwitcher />
         <ThemeToggle />
       </nav>
@@ -295,38 +294,45 @@ export function NavBar() {
           >
             {t(locale, "nav.kennis")}
           </Link>
+
+          <div className="mobile-nav-section">{t(locale, "nav.menu.docs")}</div>
+          <Link href={withLocale(locale, "/docs")} className="mobile-nav-link mobile-nav-sub" onClick={() => setMobileOpen(false)}>
+            {t(locale, "nav.docs")}
+          </Link>
+          <Link href={withLocale(locale, "/spec")} className="mobile-nav-link mobile-nav-sub" onClick={() => setMobileOpen(false)}>
+            {t(locale, "nav.spec.label")}
+          </Link>
+
           <div className="mobile-nav-section">{t(locale, "nav.about")}</div>
           <Link href={withLocale(locale, "/over")} className="mobile-nav-link mobile-nav-sub" onClick={() => setMobileOpen(false)}>
             {t(locale, "nav.over.story")}
           </Link>
-          <Link
-            href={withLocale(locale, "/over/wat-is-kapitaalbot")}
-            className="mobile-nav-link mobile-nav-sub"
-            onClick={() => setMobileOpen(false)}
-          >
+          <Link href={withLocale(locale, "/over/wat-is-kapitaalbot")} className="mobile-nav-link mobile-nav-sub" onClick={() => setMobileOpen(false)}>
             {t(locale, "nav.over.truth")}
           </Link>
-          <Link
-            href={withLocale(locale, "/over/bitvavo-vs-kraken")}
-            className="mobile-nav-link mobile-nav-sub"
-            onClick={() => setMobileOpen(false)}
-          >
+          <Link href={withLocale(locale, "/over/bitvavo-vs-kraken")} className="mobile-nav-link mobile-nav-sub" onClick={() => setMobileOpen(false)}>
             {t(locale, "nav.over.bitvavoKraken")}
           </Link>
-          <Link
-            href={withLocale(locale, "/over/fundme")}
-            className="mobile-nav-link mobile-nav-sub"
-            onClick={() => setMobileOpen(false)}
-          >
-            {t(locale, "nav.over.fundme")}
+          <Link href={withLocale(locale, "/over/fundme")} className="mobile-nav-link mobile-nav-sub" onClick={() => setMobileOpen(false)}>
+            {t(locale, "nav.fundme")}
           </Link>
-          <Link
-            href={withLocale(locale, "/changelog")}
-            className={`mobile-nav-link${active("/changelog") ? " mobile-nav-link--active" : ""}`}
-            onClick={() => setMobileOpen(false)}
-          >
-            {t(locale, "nav.notes")}
+
+          <div className="mobile-nav-section">{t(locale, "nav.menu.updates")}</div>
+          <Link href={withLocale(locale, "/faq")} className="mobile-nav-link mobile-nav-sub" onClick={() => setMobileOpen(false)}>
+            {t(locale, "nav.faq")}
           </Link>
+          <Link href={withLocale(locale, "/changelog")} className="mobile-nav-link mobile-nav-sub" onClick={() => setMobileOpen(false)}>
+            {t(locale, "nav.changelog")}
+          </Link>
+
+          <div className="mobile-nav-section">{t(locale, "nav.menu.access")}</div>
+          <Link href={withLocale(locale, "/tier2-request")} className="mobile-nav-link mobile-nav-sub" onClick={() => setMobileOpen(false)}>
+            {t(locale, "nav.tier2.request")}
+          </Link>
+          <Link href={withLocale(locale, "/login")} className="mobile-nav-link mobile-nav-sub" onClick={() => setMobileOpen(false)}>
+            {t(locale, "nav.login")}
+          </Link>
+
           <Link
             href={withLocale(locale, "/contact")}
             className={`mobile-nav-link${active("/contact") ? " mobile-nav-link--active" : ""}`}
@@ -334,41 +340,7 @@ export function NavBar() {
           >
             {t(locale, "nav.contact")}
           </Link>
-          <Link
-            href={withLocale(locale, "/docs")}
-            className={`mobile-nav-link${active("/docs") ? " mobile-nav-link--active" : ""}`}
-            onClick={() => setMobileOpen(false)}
-          >
-            {t(locale, "nav.architecture")}
-          </Link>
-          <Link
-            href={withLocale(locale, "/spec")}
-            className={`mobile-nav-link${active("/spec") ? " mobile-nav-link--active" : ""}`}
-            onClick={() => setMobileOpen(false)}
-          >
-            SPEC
-          </Link>
-          <Link
-            href={withLocale(locale, "/faq")}
-            className={`mobile-nav-link${active("/faq") ? " mobile-nav-link--active" : ""}`}
-            onClick={() => setMobileOpen(false)}
-          >
-            {t(locale, "nav.research")}
-          </Link>
-          <Link
-            href={withLocale(locale, "/over/fundme")}
-            className={`mobile-nav-link${active("/over/fundme") ? " mobile-nav-link--active" : ""}`}
-            onClick={() => setMobileOpen(false)}
-          >
-            {t(locale, "nav.fundme")}
-          </Link>
-          <div className="mobile-nav-section">{t(locale, "nav.account") ?? "Account"}</div>
-          <Link href={withLocale(locale, "/tier2-request")} className="mobile-nav-link mobile-nav-sub" onClick={() => setMobileOpen(false)}>
-            {t(locale, "nav.access")}
-          </Link>
-          <Link href={withLocale(locale, "/login")} className="mobile-nav-link mobile-nav-sub" onClick={() => setMobileOpen(false)}>
-            {t(locale, "nav.login")}
-          </Link>
+
           <div className="mobile-nav-tools">
             <LanguageSwitcher />
             <ThemeToggle />

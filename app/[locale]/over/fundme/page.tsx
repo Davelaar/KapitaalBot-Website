@@ -64,7 +64,7 @@ export default async function FundMePage({ params }: { params: { locale: string 
 
         <p style={footerStyle}>
           <Link href={withLocale(locale, "/faq")} className="kb-text-link">
-            {t(locale, "nav.research")}
+            {t(locale, "nav.faq")}
           </Link>
           {" · "}
           <Link href={withLocale(locale, "/contact")} className="kb-text-link">

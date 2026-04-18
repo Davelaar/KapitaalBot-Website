@@ -30,10 +30,10 @@ export function Footer() {
         {t(locale, "nav.about")}
       </Link>
       <Link href={withLocale(locale, "/faq")} style={linkStyle}>
-        {t(locale, "nav.research")}
+        {t(locale, "nav.faq")}
       </Link>
       <Link href={withLocale(locale, "/docs")} style={linkStyle}>
-        {t(locale, "nav.architecture")}
+        {t(locale, "nav.docs")}
       </Link>
       <Link href={withLocale(locale, "/spec")} style={linkStyle}>
         SPEC

@@ -117,7 +117,7 @@ flowchart LR
           </Link>
           {" · "}
           <Link href={withLocale(locale, "/docs")} className="kb-text-link">
-            {t(locale, "nav.architecture")}
+            {t(locale, "nav.docs")}
           </Link>
           {" · "}
           <Link href={withLocale(locale, "/faq")} className="kb-text-link">
