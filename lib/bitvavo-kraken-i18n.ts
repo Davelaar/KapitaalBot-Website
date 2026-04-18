@@ -3,6 +3,7 @@ import type { Locale } from "@/lib/i18n";
 /** Nav + microcopy for Bitvavo vs Kraken page (short strings only). */
 export const bitvavoKrakenStrings: Record<Locale, Record<string, string>> = {
   nl: {
+    "nav.over.vision": "Toekomstvisie",
     "nav.over.bitvavoKraken": "Bitvavo vs Kraken (bot / platform)",
     "bk.nav.back": "Terug naar Over",
     "bk.footer.sources": "Bronbasis",
@@ -10,6 +11,7 @@ export const bitvavoKrakenStrings: Record<Locale, Record<string, string>> = {
       "AFM, ESMA (MiCA-registers); openbare mededelingen van Bitvavo, Kraken, Coinbase, OKX, Crypto.com en Bybit. Controleer vóór publicatie het actuele AFM-cryptoregister en het ESMA Interim MiCA Register — registraties en productbeschikbaarheid kunnen wijzigen. Geen juridisch of beleggingsadvies.",
   },
   en: {
+    "nav.over.vision": "Future vision",
     "nav.over.bitvavoKraken": "Bitvavo vs Kraken (bot / platform)",
     "bk.nav.back": "Back to About",
     "bk.footer.sources": "Sources",
@@ -17,6 +19,7 @@ export const bitvavoKrakenStrings: Record<Locale, Record<string, string>> = {
       "AFM, ESMA (MiCA registers); public disclosures by Bitvavo, Kraken, Coinbase, OKX, Crypto.com, and Bybit. Before publishing or relying on this page, re-check the current AFM crypto register and the ESMA Interim MiCA Register — registrations and product availability can change. Not legal or investment advice.",
   },
   de: {
+    "nav.over.vision": "Zukunftsvision",
     "nav.over.bitvavoKraken": "Bitvavo vs Kraken (Bot / Plattform)",
     "bk.nav.back": "Zurück zu Über KapitaalBot",
     "bk.footer.sources": "Quellenhinweis",
@@ -24,6 +27,7 @@ export const bitvavoKrakenStrings: Record<Locale, Record<string, string>> = {
       "AFM, ESMA (MiCA-Register); öffentliche Mitteilungen von Bitvavo, Kraken, Coinbase, OKX, Crypto.com und Bybit. Vor Veröffentlichung oder Verlassen auf diese Seite das aktuelle AFM-Kryptoregister und das ESMA Interim MiCA Register erneut prüfen — Registrierungen und Produktverfügbarkeit können sich ändern. Keine Rechts- oder Anlageberatung.",
   },
   fr: {
+    "nav.over.vision": "Vision d’avenir",
     "nav.over.bitvavoKraken": "Bitvavo vs Kraken (bot / plateforme)",
     "bk.nav.back": "Retour à À propos",
     "bk.footer.sources": "Sources",

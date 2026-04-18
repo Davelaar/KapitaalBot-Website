@@ -200,6 +200,9 @@ export function NavBar() {
               <Link href={withLocale(locale, "/over/fundme")} style={dropdownLinkStyle} onClick={() => setOverOpen(false)}>
                 {t(locale, "nav.fundme")}
               </Link>
+              <Link href={withLocale(locale, "/over/toekomstvisie")} style={dropdownLinkStyle} onClick={() => setOverOpen(false)}>
+                {t(locale, "nav.over.vision")}
+              </Link>
             </div>
           )}
         </div>
@@ -315,6 +318,9 @@ export function NavBar() {
           </Link>
           <Link href={withLocale(locale, "/over/fundme")} className="mobile-nav-link mobile-nav-sub" onClick={() => setMobileOpen(false)}>
             {t(locale, "nav.fundme")}
+          </Link>
+          <Link href={withLocale(locale, "/over/toekomstvisie")} className="mobile-nav-link mobile-nav-sub" onClick={() => setMobileOpen(false)}>
+            {t(locale, "nav.over.vision")}
           </Link>
 
           <div className="mobile-nav-section">{t(locale, "nav.menu.updates")}</div>
