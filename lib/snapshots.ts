@@ -3,6 +3,18 @@
  * See KRAKENBOTMAART docs/OBSERVABILITY_SNAPSHOT_CONTRACT.md
  */
 
+/** Global entry-block evidence (Krakenbot export contract 1.4+). */
+export interface RiskBlockActiveReason {
+  event_name: string;
+  decision_code?: string | null;
+  reason?: string | null;
+  scope?: string;
+  last_seen_at: string;
+  age_secs: number;
+  event_count: number;
+  sample_symbol?: string | null;
+}
+
 export interface PublicStatusSnapshot {
   contract_version: string;
   exported_at: string;
@@ -22,6 +34,14 @@ export interface PublicStatusSnapshot {
   safety_normal_count: number;
   safety_exit_only_count: number;
   safety_hard_blocked_count: number;
+  /**
+   * Runtime-truth: a globally-scoped ENTRY_BLOCKED funnel event fired within the export window.
+   * Use for the cockpit Stop / "no new risk" tile — do not substitute `safety_hard_blocked_count`
+   * (that counts per-symbol rows, not a global halt).
+   */
+  risk_block_active?: boolean;
+  risk_block_active_window_secs?: number;
+  risk_block_active_reasons?: RiskBlockActiveReason[];
 }
 
 export interface RegimeCount {

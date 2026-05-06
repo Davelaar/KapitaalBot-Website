@@ -94,7 +94,8 @@ export function DashboardCockpit({
   dataBundle: Tier2DataBundle | null;
 }) {
   const delaySecs = status?.data_freshness_secs ?? null;
-  const blocked = status?.safety_hard_blocked_count ?? 0;
+  const riskBlockActive = status?.risk_block_active === true;
+  const safetyHardBlocked = status?.safety_hard_blocked_count ?? 0;
   const exitOnly = status?.safety_exit_only_count ?? 0;
   const normal = status?.safety_normal_count ?? 0;
 
@@ -134,8 +135,8 @@ export function DashboardCockpit({
   const ordersCenter = String(orders24);
   const feedCenter = freshSecs != null ? `${freshSecs}s` : "—";
 
-  const allowActive = blocked === 0;
-  const haltActive = blocked > 0;
+  const allowActive = !riskBlockActive;
+  const haltActive = riskBlockActive;
 
   return (
     <div className="cockpit-root">
@@ -214,11 +215,11 @@ export function DashboardCockpit({
             </div>
             <div className="cockpit-runtime-row">
               <span className="cockpit-runtime-label">
-                <span className={`cockpit-dot ${blocked > 0 ? "cockpit-dot--red" : exitOnly > 0 ? "cockpit-dot--amber" : "cockpit-dot--green"}`} aria-hidden />
+                <span className={`cockpit-dot ${safetyHardBlocked > 0 ? "cockpit-dot--red" : exitOnly > 0 ? "cockpit-dot--amber" : "cockpit-dot--green"}`} aria-hidden />
                 {cockpitT(locale, "safety")}
               </span>
               <span className="cockpit-runtime-value mono">
-                N={normal} · E={exitOnly} · B={blocked}
+                N={normal} · E={exitOnly} · B={safetyHardBlocked}
               </span>
             </div>
           </section>
@@ -301,7 +302,7 @@ export function DashboardCockpit({
               <span className={`cockpit-cta cockpit-cta--halt${haltActive ? " is-active" : ""}`}>{cockpitT(locale, "btnHalt")}</span>
             </div>
             <p className="cockpit-cta-hint mono">
-              {blocked > 0
+              {riskBlockActive
                 ? cockpitT(locale, "cardIntentBlocked")
                 : exitOnly > 0
                   ? cockpitT(locale, "cardIntentGuard")
