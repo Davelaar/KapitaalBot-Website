@@ -130,7 +130,16 @@ export function RouteCentricDashboard({ locale, status, regime, strategy, tradin
               <table className="kb-table">
                 <thead style={{ position: "sticky", top: 0, zIndex: 1 }}>
                   <tr>
-                    {["#", "Symbol", "Route", t(locale, "dashboard.routeColHorizon"), "Net Edge (bps)", "Confidence", "Reason", "Fresh"].map((h) => (
+                    {[
+                      "#",
+                      t(locale, "dashboard.routeColSymbol"),
+                      t(locale, "dashboard.routeColRoute"),
+                      t(locale, "dashboard.routeColHorizon"),
+                      t(locale, "dashboard.routeColNetEdgeBps"),
+                      t(locale, "dashboard.routeColConfidence"),
+                      t(locale, "dashboard.routeColReason"),
+                      t(locale, "dashboard.routeColFresh"),
+                    ].map((h) => (
                       <th key={h} style={{ textAlign: "left" }}>
                         {h}
                       </th>
