@@ -1,116 +1,116 @@
-# KapitaalBot — Investor Overview
+# KapitaalBot — Investeerdersoverzicht
 
 **[← Index](./DOC_INDEX.md) · [13 — Investor Risk Report →](./13_INVESTOR_RISK_REPORT.md)**
 
 ---
 
-> **Notice**: This document is purely informational. It contains no investment advice, no return guarantees, and no invitation to invest. All claims in this document are technically defensible from the source code and system behaviour.
+> **Let op**: Dit document is uitsluitend informatief van aard. Het bevat geen beleggingsadvies, geen rendementsgaranties en geen uitnodiging tot investering. Alle claims in dit document zijn technisch verdedigbaar vanuit de broncode en het systeemgedrag.
 
 ---
 
-## Summary
+## Samenvatting
 
-KapitaalBot is an autonomous algorithmic trading system operating on spot markets at Kraken. The system combines regime detection, multi-strategy selection, and layered risk protection in a fully observable runtime.
+KapitaalBot is een autonoom algorithmic trading systeem dat draait op spotmarkten bij Kraken. Het systeem combineert regime-detectie, multi-strategie selectie en gelaagde risicobescherming in een volledig observeerbare runtime.
 
-The purpose of this document is to provide insight into the technical architecture, risk approach, and operational state of the system — without marketing language and without claims that cannot be verified from the system itself.
-
----
-
-## What the system is
-
-KapitaalBot is a **research and trading engine** with the following demonstrable properties:
-
-**Fully autonomous**: the system makes decisions without human intervention. An operator can start, stop, and configure the system, but all trading decisions are made entirely algorithmically.
-
-**Multi-regime**: the system detects five market regimes (trend, range, high volatility, low liquidity, chaos) and adapts its strategy selection to the detected regime.
-
-**Multi-strategy**: eleven strategy variants, grouped into six families, are assessed per trading pair and per evaluation cycle. Selection is deterministic and fully documented.
-
-**DB-first**: the database is the source of truth for all decision-relevant state. In-memory caches are tools, not authorities.
-
-**Observable by design**: every decision — including decisions not to trade — is classified, reasoned, and stored. The observability website provides public and tiered access to aggregated information.
-
-**Exchange-specific**: the current implementation is exclusively focused on spot markets at Kraken via WebSocket API v2.
+Het doel van dit document is inzicht bieden in de technische architectuur, de risico-aanpak en de operationele staat van het systeem — zonder marketingtaal en zonder claims die niet uit het systeem zelf zijn te verifiëren.
 
 ---
 
-## What the system is not
+## Wat het systeem is
 
-**Not a backtest-optimised system**: strategies are designed from market structure principles, not fitted to historical data.
+KapitaalBot is een **research- en trading-engine** met de volgende aantoonbare eigenschappen:
 
-**Not a black box**: the system is deliberately designed to explain its own behaviour. Every trading decision has a machine-readable reason.
+**Volledig autonoom**: het systeem neemt beslissingen zonder menselijke tussenkomst. Een operator kan het systeem starten, stoppen en configureren, maar de handelsbeslissingen worden volledig algoritmisch gemaakt.
 
-**Not a calculator for expected returns**: this document contains no return claims, no simulation results, and no forecasts. Algorithmic trading in crypto spot markets carries real risks of capital loss.
+**Multi-regime**: het systeem detecteert vijf marktregimes (trend, range, hoge volatiliteit, lage liquiditeit, chaos) en past zijn strategie-selectie aan op het gedetecteerde regime.
 
-**Not a product for end clients**: KapitaalBot is a proprietary trading system, not a managed fund or retail product.
+**Multi-strategie**: elf strategievarianten, gegroepeerd in zes families, worden per handelspaar en per evaluatiecyclus beoordeeld. De selectie is deterministisch en volledig gedocumenteerd.
 
----
+**DB-first**: de database is de bron van waarheid voor alle beslissingsrelevante toestand. In-memory caches zijn hulpmiddelen, niet autoriteiten.
 
-## Architecture overview
+**Observeerbaar by design**: elke beslissing — ook beslissingen om niet te traden — is geclassificeerd, geredeneerd en opgeslagen. De observability-website biedt publieke en tiered toegang tot geaggregeerde informatie.
 
-The system consists of four layers:
-
-| Layer | Primary function |
-|-------|----------------|
-| **Ingest** | Receive, validate, and persist market data via WebSocket connections |
-| **Strategy pipeline** | Regime detection, strategy activation, edge estimation, mandate production |
-| **Execution** | Manage order lifecycle, monitor positions, enforce protection |
-| **Observability** | Log decisions, measure outcomes, export snapshots |
-
-The architecture is built on the principle of strong separation: ingest load does not affect execution latency, and execution decisions do not affect the integrity of market data.
+**Exchange-specifiek**: de huidige implementatie is uitsluitend gericht op spotmarkten bij Kraken via WebSocket API v2.
 
 ---
 
-## Risk management
+## Wat het systeem niet is
 
-The system implements risk management at four levels:
+**Geen backtest-geoptimaliseerd systeem**: de strategieën zijn ontworpen vanuit marktstructuurprincipes, niet gefit op historische data.
 
-**Position level**: every open position always has an active protective stop on the exchange. Exit policy is pre-committed at entry.
+**Geen black box**: het systeem is bewust ontworpen om zijn eigen gedrag uit te leggen. Elke handelsbeslissing heeft een machineleesbare reden.
 
-**Symbol level**: every trading pair has a safety status (normal / exit-only / blocked). Unreliable market data or abnormal execution automatically leads to restrictions.
+**Geen rekenmachine voor verwacht rendement**: dit document bevat geen rendementsclaims, geen simulatieresultaten en geen prognoses. Algoritmisch traden op crypto-spotmarkten kent reële risico's op verlies van kapitaal.
 
-**Portfolio level**: limits on total exposure and the number of simultaneously open positions.
-
-**System level**: circuit breakers on error rates, stale data, and global loss limits. Dead man's switch at the exchange for protection against system failure.
+**Geen product voor eindklanten**: KapitaalBot is een eigenhandelssysteem, geen beheerd fonds of retail-product.
 
 ---
 
-## Operational infrastructure
+## Architectuuroverzicht
 
-The system runs as two systemd services on a dedicated Linux server:
-- **Ingest service**: continuous data collection
-- **Execution service**: strategy evaluation and trading
+Het systeem bestaat uit vier lagen:
 
-All code is version-controlled via Git. Every runtime execution is traceable to a specific commit hash. Deployment always requires a Git pull; direct server modifications are architecturally forbidden.
+| Laag | Primaire functie |
+|------|----------------|
+| **Ingest** | Marktdata ontvangen, valideren en persisteren via WebSocket-verbindingen |
+| **Strategy pipeline** | Regime-detectie, strategie-activatie, edge-schatting, mandate-productie |
+| **Execution** | Order-lifecycle beheren, posities monitoren, bescherming handhaven |
+| **Observability** | Beslissingen loggen, uitkomsten meten, snapshots exporteren |
 
----
-
-## Observability and transparency
-
-A distinguishing feature of KapitaalBot is its explicit observability. The public website (kapitaalbot.nl) displays aggregated system information without account-sensitive data or reproduction information:
-
-- Current system status, regimes, and strategy distribution
-- Why-no-trade analysis: why specific trading pairs were not traded
-- Execution quality metrics (Tier 2, on request)
-- Historical funnel analysis
+De architectuur is opgebouwd op het principe van sterke scheiding: ingest-last beïnvloedt execution-latency niet, en execution-beslissingen beïnvloeden de integriteit van marktdata niet.
 
 ---
 
-## What investors are buying
+## Risicobeheer
 
-This is an investment in the **further development and scaling** of the system, not in a proven profitable strategy. What is concretely available:
+Het systeem implementeert risicobeheer op vier niveaus:
 
-- Working, live trading engine
-- Full observability infrastructure
-- Documented architecture and design principles
-- Actively maintained codebase (Rust)
+**Positieniveau**: elke open positie heeft altijd een actieve beschermende stop op de exchange. Exit-beleid is pre-committed bij entry.
 
-What is **not** available as evidence:
-- Audited financial results
-- Formal backtesting infrastructure
-- Track record across varying market conditions
-- Third-party validation
+**Symboolniveau**: elk handelspaar heeft een veiligheidsstatus (normaal / alleen-uitstap / geblokkeerd). Onbetrouwbare marktdata of abnormale uitvoering leiden automatisch tot beperkingen.
+
+**Portfolioniveau**: limieten op totale blootstelling en het aantal gelijktijdige open posities.
+
+**Systeemniveau**: circuit breakers bij foutpercentages, verouderde data en globale verlieslimiet. Dead man's switch bij de exchange voor bescherming bij systeemuitval.
 
 ---
 
-*See also: [13 — Investor Risk Report](./13_INVESTOR_RISK_REPORT.md)*
+## Operationele infrastructuur
+
+Het systeem draait als twee systemd-diensten op een dedicated Linux-server:
+- **Ingest-dienst**: continue dataverzameling
+- **Execution-dienst**: strategie-evaluatie en trading
+
+Alle code is versiegebonden via Git. Elke runtime-uitvoering is herleidbaar naar een specifieke commit-hash. Deployment vereist altijd een Git-pull; directe server-aanpassingen zijn architecturaal verboden.
+
+---
+
+## Observability en transparantie
+
+Een onderscheidend kenmerk van KapitaalBot is de expliciete observability. De publieke website (kapitaalbot.nl) toont geaggregeerde systeeminformatie zonder accountgevoelige data of reproductie-informatie:
+
+- Actuele systeemstatus, regimes en strategie-verdeling
+- Why-no-trade analyse: waarom bepaalde handelsparen niet zijn getraded
+- Execution-kwaliteitsmetrieken (Tier 2, op aanvraag)
+- Historische funnel-analyse
+
+---
+
+## Wat investeerders kopen
+
+Dit is een investering in de **verdere ontwikkeling en schaling** van het systeem, niet in een bewezen renderende strategie. Wat concreet beschikbaar is:
+
+- Werkende, in productie draaiende trading-engine
+- Volledige observability-infrastructuur
+- Gedocumenteerde architectuur en design-principes
+- Actief onderhouden codebase (Rust)
+
+Wat **niet** beschikbaar is als bewijs:
+- Geauditeerde financiële resultaten
+- Formele backtesting-infrastructuur
+- Track record onder marktomstandigheidsvariatie
+- Derde-partij validatie
+
+---
+
+*Zie ook: [13 — Investor Risk Report](./13_INVESTOR_RISK_REPORT.md)*

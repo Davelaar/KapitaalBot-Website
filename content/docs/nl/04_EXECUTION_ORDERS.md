@@ -1,118 +1,108 @@
-# KapitaalBot — Execution & Order Lifecycle
+# 04 — Execution & Order Lifecycle
 
-**[← 03 — Strategy Pipeline](./03_STRATEGY_PIPELINE.md) · [05 — Protection & Exit →](./05_PROTECTION_EXIT.md)**
-
----
-
-## Wat dit document beschrijft
-
-Hoe KapitaalBot een handelsbeslissing omzet in een order op de exchange, en hoe de volledige lifecycle van die order wordt gevolgd. De nadruk ligt op de principes van betrouwbaarheid en traceerbaarheid.
+[← 03 — Strategy Pipeline](./03_STRATEGY_PIPELINE.md) | **04 — Execution & Orders** | [05 — Protection & Exit](./05_PROTECTION_EXIT.md) →
 
 ---
 
-## Van beslissing naar order
+Dit document beschrijft de executielaag van Krakenbot: hoe intenties worden omgezet in orders, hoe de lifecycle wordt beheerd en hoe de integriteit met de exchange wordt gewaarborgd.
 
-De strategy-pipeline produceert uitvoeringsmandaten. Het execution-systeem zet die mandaten om in acties:
+## Navigatiemenu
 
+- [Flow Poller & Execution](#flow-poller--execution)
+- [Order Placement (WS v2)](#order-placement-ws-v2)
+- [Order State Machine (SSOT)](#order-state-machine-ssot)
+- [Fill Handling & Ledger](#fill-handling--ledger)
+- [Dead-Man's Switch (Safety)](#dead-mans-switch-safety)
+- [Database Persistence](#database-persistence)
+
+---
+
+<a name="flow-poller--execution"></a>
+## Flow Poller & Execution
+
+De `flow_poller` is de motor van de executielaag. Het ontkoppelt de "denk-cyclus" (pipeline) van de "doe-cyclus" (submit).
+
+- **Flow Heap**: De pipeline plaatst kandidaten in een geprioriteerde heap (`edge_heap`).
+- **Continuous Drain**: de `flow_poller` haalt continu de beste kandidaat uit de heap en probeert deze uit te voeren, mits de `choke` (safety check) groen licht geeft.
+- **Concurrency**: Het systeem ondersteunt parallelle executie voor verschillende symbolen, maar dwingt volgordelijkheid af per symbool.
+
+---
+
+<a name="order-placement-ws-v2"></a>
+## Order Placement (WS v2)
+
+Alle trading acties verlopen via de Private WebSocket v2 (`ws-auth.kraken.com`).
+
+- **`add_order`**: Primaire methode voor entry en exit.
+- **`amend_order`**: Gebruikt voor het verplaatsen van limit orders (bijv. bij trailing) zonder queue-prioriteit volledig te verliezen.
+- **`cancel_order`**: Voor het intrekken van open orders.
+- **`req_id` Muxing**: Elk verzoek krijgt een uniek ID zodat de asynchrone respons correct gekoppeld kan worden aan de interne state.
+
+---
+
+<a name="order-state-machine-ssot"></a>
+## Order State Machine (SSOT)
+
+Krakenbot hanteert een strikte 13-state machine (`execution::order_state`). De **`executions`** WebSocket feed is de Single Source of Truth.
+
+```mermaid
+stateDiagram-v2
+    [*] --> Submitted: Intent Created
+    Submitted --> PendingAck: add_order sent
+    PendingAck --> Open: Status 'new'
+    Open --> PartiallyFilled: Status 'partially_filled'
+    PartiallyFilled --> Filled: Status 'filled'
+    Open --> Filled: Status 'filled'
+    
+    Open --> Cancelled: Status 'canceled'
+    PendingAck --> Rejected: Status 'rejected'
+    Open --> Expired: Expired deadline reached
+    
+    Filled --> [*]
+    Cancelled --> [*]
+    Rejected --> [*]
+    Expired --> [*]
+
+    Note right of PendingAck: WS method response is alleen ACK; executions feed is SSOT.
 ```
-Mandate (Execute)
-  ↓
-Kandidaat wordt in een prioriteitswachtrij geplaatst
-  ↓
-Execution-choke controleert veiligheidscondities
-  ↓ (groen licht)
-Order wordt aangemaakt in de database (status: pending)
-  ↓
-Order wordt verstuurd via private WebSocket
-  ↓
-Exchange bevestigt ontvangst (ACK)
-  ↓
-Exchange stuurt statusupdates: open, gedeeltelijk gevuld, gevuld, gecanceld
-  ↓
-Database bijgewerkt bij elke statusovergang
-```
-
-Belangrijk: de order bestaat in de database *voordat* hij naar de exchange wordt gestuurd. Als het systeem op enig moment herstart, is de order-toestand altijd reconstrueerbaar vanuit de database.
 
 ---
 
-## De executions-feed als bron van waarheid
+<a name="fill-handling--ledger"></a>
+## Fill Handling & Ledger
 
-De WebSocket-bevestiging op een geplaatste order is slechts een ACK — een bevestiging dat de exchange het verzoek heeft ontvangen. De werkelijke status (open, gevuld, gecanceld) komt uitsluitend via de `executions`-feed.
+Wanneer een order (gedeeltelijk) gevuld wordt, treedt het `fills_ledger` in werking. Dit proces is **idempotent** om dubbele verwerking van WS-berichten te voorkomen.
 
-Dit onderscheid is cruciaal: een positieve ACK betekent niet dat een order is gevuld. Het systeem wacht op expliciete statusberichten via de executions-feed voordat het de interne toestand bijwerkt.
-
----
-
-## Order-toestandsmachine
-
-Orders doorlopen een vaste reeks toestanden. Elke overgang heeft een reden en wordt gelogd:
-
-```
-[aangemaakt] → [verzonden naar exchange] → [open op de exchange]
-  → [gedeeltelijk gevuld] → [volledig gevuld]
-  → [gecanceld]
-  → [geweigerd door exchange]
-  → [verlopen]
-```
-
-Elke toestand is gedocumenteerd. Er zijn geen impliciete overgangen. Een order die niet meer in een actieve toestand staat, heeft altijd een eindtoestand met reden.
+1. **Fill Registratie**: De fill wordt opgeslagen in de `fills` tabel.
+2. **Position Update**: De netto exposure in `krakenbot.positions` wordt bijgewerkt.
+3. **Protection Trigger**: Voor entry-fills wordt direct de protectie-logica geactiveerd (zie [05 — Protection & Exit](./05_PROTECTION_EXIT.md)).
+4. **PnL Calculatie**: Bij een sluitende fill wordt de realized PnL berekend en opgeslagen.
 
 ---
 
-## Uitvoeringsintentie
+<a name="dead-mans-switch-safety"></a>
+## Dead-Man's Switch (Safety)
 
-KapitaalBot maakt expliciet onderscheid tussen drie uitvoeringsintentijes:
+Om te voorkomen dat orders "wees" achterblijven bij een crash of netwerkstoring, gebruikt de bot `cancel_all_orders_after`.
 
-| Intentie | Beschrijving |
-|----------|-------------|
-| **MakerEntry** | Limietorder op of nabij de beste koers; liquiditeit verschaffen |
-| **TakerEntry** | Order die direct kruist met bestaand aanbod in het boek; liquiditeit onttrekken |
-| **TakerExit** | Uitstap via een marktorder; prioriteit is snelheid, niet koers |
-
-De intentie bepaalt welk type order wordt geplaatst en hoe de exchange het zal verwerken.
+- **Werking**: De bot stuurt elke 15-30 seconden een verzoek om alle orders na 60 seconden te annuleren.
+- **Fail-Safe**: Als de bot stopt met pingen, annuleert de exchange automatisch alle open orders na het verstrijken van de timer.
 
 ---
 
-## Fill-verwerking
+<a name="database-persistence"></a>
+## Database Persistence
 
-Wanneer een order (gedeeltelijk) wordt gevuld, start een reeks gecoördineerde acties:
+Alle order-activiteit wordt gelogd in de `DECISION` database:
 
-1. De fill wordt vastgelegd in de fills-tabel
-2. De netto positie wordt bijgewerkt
-3. Voor entry-fills: protectie wordt direct geactiveerd (zie [05 — Protection & Exit](./05_PROTECTION_EXIT.md))
-4. Bij een sluitende fill: de gerealiseerde PnL wordt berekend
-
-Fill-verwerking is **idempotent**: als hetzelfde fill-bericht twee keer binnenkomt (wat kan bij reconnects), wordt het tweede bericht herkend en genegeerd. Er worden geen dubbele boekingen gemaakt.
+- **`execution_orders`**: De hoofdtabel voor alle orders, inclusief `cl_ord_id` en `exchange_order_id`.
+- **`order_events`**: Een audit-log van elke statusovergang.
+- **`order_latency`**: Meet de tijd tussen T0 (beslissing), T1 (submit), T2 (ack) en T3 (fill).
 
 ---
 
-## Dead man's switch
-
-Het systeem onderhoudt een veiligheidsautomaat bij de exchange: als de bot stopt met het sturen van een vernieuwingssignaal, worden alle open orders automatisch geannuleerd door de exchange na een ingesteld tijdvenster.
-
-Dit beschermt tegen situaties waarbij het systeem crasht, de verbinding verbreekt of anderszins onbereikbaar wordt terwijl er open orders zijn. De exchange neemt dan het initiatief om orders op te ruimen — er is geen actie van de operator vereist.
+[← 03 — Strategy Pipeline](./03_STRATEGY_PIPELINE.md) | **04 — Execution & Orders** | [05 — Protection & Exit](./05_PROTECTION_EXIT.md) →
 
 ---
 
-## Concurrentiebeheer
-
-Het systeem kan meerdere handelsparen tegelijkertijd evalueren en uitvoeren. Voor elk handelspaar geldt echter één tegelijkertijdigheidsbeperking: twee evaluatiecycli kunnen niet tegelijk een order proberen te openen voor hetzelfde handelspaar. Een veiligheidsslot per symbool voorkomt race conditions.
-
----
-
-## Traceerbaarheid
-
-Elke order is volledig traceerbaar:
-
-- **Aanmaaktijdstip**: wanneer de beslissing is genomen
-- **Verzendelingstijdstip**: wanneer de order naar de exchange is gestuurd
-- **Bevestigingstijdstip**: wanneer de exchange heeft bevestigd
-- **Fill-tijdstip**: wanneer uitvoering heeft plaatsgevonden
-- **Reden**: waarom elk type order is gekozen
-
-Dit maakt forensisch onderzoek na het feit mogelijk: elke handeling is herleidbaar naar een specifiek beslissingsmoment.
-
----
-
-*Volgende: [05 — Protection & Exit](./05_PROTECTION_EXIT.md)*
+*Document gegenereerd voor technische documentatie. Laatst bijgewerkt: 2026-04-13.*

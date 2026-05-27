@@ -1,0 +1,397 @@
+# Canonical Cleanup Ledger
+
+Generated from consolidation range `22431da4541213a9ed9ea5ae3862bc7430acf5ef..HEAD`.
+
+## Status Vocabulary
+- `KEEP_CANONICAL`: module/path is canonical as-is in the current architecture.
+- `FIXED_CANONICAL`: module/path was changed or adopted and is now the canonical path.
+- `REMOVED`: module/path was removed from the canonical graph.
+- `BLOCKS_PHASE`: path remains unresolved and blocks release.
+
+## Current Blockers
+- None. Working tree clean at ledger creation; server and local HEAD match `311b8c2c2e719f92516d2f384d262e28795cd20d`.
+
+## Removed Paths
+- `src/exchange/balance_feed.rs` — REMOVED — removed from active module graph; replacement path is private WS hub / canonical modules
+
+## Fixed Canonical Paths
+- `scripts/canonical_reconcile_sweep.sh` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `scripts/invariant_check.sh` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `scripts/small_live_safety_supervisor.sh` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/analysis/adverse_selection.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/analysis/capturable_move.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/analysis/cost_breakdown.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/analysis/current_run_analysis.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/analysis/directional_forward_signal.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/analysis/drift.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/analysis/expansion_classifier.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/analysis/expected_move.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/analysis/fill_probability.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/analysis/friction_attribution.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/analysis/latency_breakdown.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/analysis/latency_heatmap.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/analysis/margin_paper_resolver.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/analysis/mod.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/analysis/pair_classifier.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/analysis/realized_surplus.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/analysis/realized_vol.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/analysis/realized_vol_diagnostic.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/analysis/safety_invariants_v2.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/analysis/safety_report.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/analysis/shadow_evaluator.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/analysis/slippage_estimator.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/analysis/strategy_readiness_report.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/analysis/strategy_readiness_report_builder.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/analysis/strategy_readiness_report_cli.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/analysis/strategy_readiness_report_entry_gate.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/analysis/strategy_readiness_report_fanout.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/analysis/strategy_readiness_report_tests.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/analysis/tod_multiplier.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/analysis/trading_throughput_report.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/analysis/vwap_window.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/cli/analysis_commands.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/cli/analysis_commands_economics_breakdown.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/cli/analysis_commands_edge_chain.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/cli/analysis_commands_edge_diagnostics.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/cli/analysis_commands_edge_forensic.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/cli/analysis_commands_lineage_no_trade.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/cli/analysis_commands_route_economics.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/cli/analysis_commands_signal_features.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/cli/analysis_commands_status_reports.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/cli/balance_truth.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/cli/commands.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/cli/mod.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/cli/protection_repair.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/db/candidate_decision_vectors.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/db/candidate_decision_vectors_cost.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/db/cli_db_target.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/db/data_quality_snapshot.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/db/edge_bias_entry_capture.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/db/exchange_balances.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/db/execution_eval_cycle_funnel.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/db/execution_orders.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/db/execution_orders/exit_orders.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/db/execution_orders/query_helpers.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/db/execution_orders/transition_tests.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/db/exposure_nav_snapshot.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/db/fills.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/db/market_state_projection.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/db/mod.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/db/order_latency.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/db/positions.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/db/read/consistency_queries.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/db/read/epoch_queries.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/db/read/mod.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/db/read/observability_economics.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/db/read/observability_edgeboard_decision.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/db/read/observability_edgeboard_snapshots.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/db/read/observability_queries.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/db/read/observability_safety.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/db/read/stats_queries.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/db/read/stats_queries_decision.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/db/read/universe_queries.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/db/realized_pnl.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/db/run_symbol_state.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/db/run_symbol_state_debug.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/db/run_symbol_state_verification.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/db/symbol_exit_lease.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/db/symbol_safety_state.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/db/writer.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/edge_engine/diagnostics.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/edge_engine/fee_realism.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/edge_engine/move_distribution.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/edge_engine/route_selector_v2.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/edge_engine/route_selector_v2_matrix.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/edge_engine/route_selector_v2_support.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/edge_engine/shadow_compare.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/edgeboard/cache.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/edgeboard/coverage.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/edgeboard/live_blend.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/edgeboard/live_signal.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/edgeboard/match_tiers.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/edgeboard/mod.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/edgeboard/route_semantic_scale.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/edgeboard/routes.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/edgeboard/scoring.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/edgeboard/snapshot_run.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/edgeboard/snapshot_run_loaders.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/edgeboard/training_ingest.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/exchange/auth_rest.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/exchange/auth_ws.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/exchange/balance_cache.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/exchange/execution_holdings_cache.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/exchange/fees.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/exchange/instruments.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/exchange/instruments_tests.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/exchange/kraken_private.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/exchange/kraken_public.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/exchange/messages.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/exchange/mod.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/exchange/own_orders_cache.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/exchange/price_cache.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/exchange/private_ws_hub.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/exchange/trade_flow_window.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/exchange/universe_source.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/exchange/vwap_buffer.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/canonical_reconcile.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/decision_eligibility.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/dry_benchmark.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/dust_msp_sync.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/edge_heap.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/engine_mode.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/exit_lifecycle.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/exit_lifecycle_common.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/exit_lifecycle_partial_tp.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/exit_lifecycle_static.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/exit_lifecycle_tests.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/exit_lifecycle_trailing.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/exit_lifecycle_trailing_monitor.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/exposure_ghost_lock.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/exposure_reconcile.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/exposure_reconcile_inventory.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/exposure_reconcile_lock.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/exposure_reconcile_tests.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/fills_ledger.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/fills_ledger_tests.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/flow_admission.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/flow_entry_placement.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/flow_execution.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/flow_realism.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/flow_taker_reeval.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/historical_backfill_exit_repair.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/ignition_exit.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/ignition_exit_hybrid.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/ignition_exit_lifecycle.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/ignition_exit_shared.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/ignition_exit_trailing.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/ingest_runner.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/ingest_runner_health.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/kraken_adapter.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/lifecycle_terminalization.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/live_runner.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/live_runner_cycle_admission_scope.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/live_runner_cycle_circuit_breakers.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/live_runner_cycle_data_stale_alert.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/live_runner_cycle_engine_mode_block.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/live_runner_cycle_forecast_persist.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/live_runner_cycle_funnel_tail.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/live_runner_cycle_hard_blocks.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/live_runner_cycle_horizon_hot_state.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/live_runner_cycle_l3_resync.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/live_runner_cycle_latency_share.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/live_runner_cycle_marginal_admission.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/live_runner_cycle_no_execute.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/live_runner_cycle_order_reconcile.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/live_runner_cycle_protection.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/live_runner_cycle_readiness_persistence.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/live_runner_cycle_route_freshness.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/live_runner_cycle_state_sync.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/live_runner_cycle_universe_refresh.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/live_runner_execution_only.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/live_runner_execution_only_cycle_protection.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/live_runner_execution_only_no_execute.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/live_runner_execution_only_readiness_persist.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/live_runner_execution_only_route_pipeline.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/live_runner_execution_only_setup.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/live_runner_initial_universe.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/live_runner_preloop.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/live_runner_protection_helpers.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/live_runner_route_state.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/live_runner_startup_context.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/live_runner_startup_helpers.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/margin_paper_lane.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/market_edge_refresher.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/mod.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/order_buffer.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/order_execution_backend.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/order_reconcile.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/order_reconcile_status.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/order_reconcile_tests.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/order_state.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/order_tracker.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/path_tape.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/position_monitor.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/position_monitor_amend.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/position_monitor_exit.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/position_monitor_mfe.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/position_monitor_recovery.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/position_protection_invariant.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/position_protection_invariant_tests.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/position_reconcile.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/position_reconcile_durable.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/position_reconcile_tests.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/position_truth.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/post_fill_drift_sampler.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/private_msg_source.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/proof_runner.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/protection_flow.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/protection_flow_market.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/protection_flow_tests.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/raw_execution_backfill.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/raw_execution_backfill_post_fill.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/raw_execution_backfill_tests.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/replay_calibration.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/runner.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/runner_helpers.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/runner_once.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/runner_submit.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/runner_submit_audit.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/runner_submit_db.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/runner_submit_live_submit.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/runner_submit_precheck.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/runner_submit_ws.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/runner_submit_ws_loop.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/runner_tests.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/safety_supervisor.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/shadow_l3_long_expectancy.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/shadow_runtime_inputs.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/shadow_trade_thesis_quality.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/shadow_volatile_exit_policy.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/small_live_guard.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/stale_order_policy.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/state_machine.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/trail_bps_v1.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/ws_handler.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/ws_handler_helpers.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/ws_handler_latency.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/ws_handler_reconcile.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/execution/ws_handler_resolution.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/export/mod.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/export/parquet_cold.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/export/parquet_cold_cdv.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/export/parquet_cold_l2.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/export/parquet_cold_l3.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/export/parquet_cold_tfe.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/export/parquet_cold_ticker.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/export/parquet_cold_trade.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/health/consistency_watchdog.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/health/execution_progress.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/ignition/diagnostics.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/ignition/followthrough.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/ignition/metrics.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/ignition/route_map.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/ignition/state.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/ignition/store.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/ignition/trade_flow_report.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/l3/client.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/l3/mod.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/l3/pipeline_metrics.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/l3/queue_metrics.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/l3/subscribe_test.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/observability/export.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/observability/fill_feedback.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/observability/forward_returns/mod.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/observability/forward_returns/sweeper.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/observability/microstructure/capture.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/observability/microstructure/extract.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/observability/microstructure/metrics.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/observability/microstructure/mod.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/observability/tier2_data_bundle.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/observability/timing_metrics.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/observe/l2_feed.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/observe/l2_feed_book.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/observe/l3_feed.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/observe/metrics.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/observe/queue_model.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/observe/runner.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/observe/ticker_feed.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/observe/trade_feed.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/pipeline/bootstrap_live_edge.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/pipeline/chaos_routing.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/pipeline/conflict_lane.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/pipeline/execution_mandate.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/pipeline/horizon_selector.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/pipeline/mod.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/pipeline/position_policy.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/pipeline/position_state_machine.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/pipeline/position_state_machine_tests.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/pipeline/sizing.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/pipeline/strategy_activation.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/pipeline/strategy_activation_tests.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/pipeline/strategy_pipeline.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/pipeline/strategy_pipeline_admission_gates.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/pipeline/strategy_pipeline_cdv_persist.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/pipeline/strategy_pipeline_config.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/pipeline/strategy_pipeline_forensics.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/pipeline/strategy_pipeline_legacy.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/pipeline/strategy_pipeline_legacy_execution_loop.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/pipeline/strategy_pipeline_legacy_support.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/pipeline/strategy_pipeline_shadow_events.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/pipeline/strategy_pipeline_shadow_support.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/pipeline/strategy_pipeline_v2.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/pipeline/strategy_pipeline_v2_admit_gate.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/pipeline/strategy_pipeline_v2_execution_loop.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/pipeline/strategy_pipeline_v2_expansion_gate.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/pipeline/strategy_pipeline_v2_inner.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/pipeline/strategy_pipeline_v2_shadow_tail.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/pipeline/strategy_selector.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/risk/capital_allocator.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/risk/capital_model.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/risk/mod.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/risk/risk_gate.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/route_engine/cost_model.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/route_engine/expected_path.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/route_engine/forecast_15m.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/route_engine/mod.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/route_engine/move_thesis/grid.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/route_engine/move_thesis/liquidity_sweep.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/route_engine/move_thesis/mod.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/route_engine/move_thesis/order_flow_imbalance.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/route_engine/move_thesis/scalping.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/route_engine/move_thesis/tod_overlay.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/route_engine/route_expectancy.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/route_engine/route_expectancy_tests.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/route_engine/route_selector.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/route_engine/route_selector_matrix.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/route_engine/route_selector_persistence.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/route_engine/route_selector_scoring.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/route_engine/run_metrics.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/route_engine/shadow.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/route_engine/taker_fallback.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/route_engine/types.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/route_state/edgeboard_bridge.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/route_state/row.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/route_state/store.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/route_state/timing_profile.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/state/horizon_mirror.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/state/horizon_movers.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/state/projection.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/trading/economic_edge_gate.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/trading/entry_filter.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/trading/liquidity_exec_policy.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/trading/mod.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/trading/readiness_gate.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/trading/trade_expectancy.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/trading/trade_expectancy_builder.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/trading/trade_expectancy_pipeline_adapter.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+- `src/trading/trade_floor.rs` — FIXED_CANONICAL — adopted, repaired, or split into the active canonical code path with validation
+
+## Kept Canonical Support Paths
+- `src/alerts/mod.rs` — KEEP_CANONICAL — support/root/domain path retained as canonical after consolidation
+- `src/alerts/pushover.rs` — KEEP_CANONICAL — support/root/domain path retained as canonical after consolidation
+- `src/config/bool_env.rs` — KEEP_CANONICAL — support/root/domain path retained as canonical after consolidation
+- `src/config/dual_db_env_tests.rs` — KEEP_CANONICAL — support/root/domain path retained as canonical after consolidation
+- `src/config/env_parse.rs` — KEEP_CANONICAL — support/root/domain path retained as canonical after consolidation
+- `src/config/epoch_binding_policy.rs` — KEEP_CANONICAL — support/root/domain path retained as canonical after consolidation
+- `src/config/execution_mode.rs` — KEEP_CANONICAL — support/root/domain path retained as canonical after consolidation
+- `src/config/forward_returns_scope.rs` — KEEP_CANONICAL — support/root/domain path retained as canonical after consolidation
+- `src/config/mod.rs` — KEEP_CANONICAL — support/root/domain path retained as canonical after consolidation
+- `src/core/mod.rs` — KEEP_CANONICAL — support/root/domain path retained as canonical after consolidation
+- `src/domain/mod.rs` — KEEP_CANONICAL — support/root/domain path retained as canonical after consolidation
+- `src/domain/trade_pnl_breakdown.rs` — KEEP_CANONICAL — support/root/domain path retained as canonical after consolidation
+- `src/edge/effective_rank.rs` — KEEP_CANONICAL — support/root/domain path retained as canonical after consolidation
+- `src/edge/mod.rs` — KEEP_CANONICAL — support/root/domain path retained as canonical after consolidation
+- `src/fees/mod.rs` — KEEP_CANONICAL — support/root/domain path retained as canonical after consolidation
+- `src/main.rs` — KEEP_CANONICAL — support/root/domain path retained as canonical after consolidation
+- `src/market/mod.rs` — KEEP_CANONICAL — support/root/domain path retained as canonical after consolidation
+- `src/probe/live_execution_probe.rs` — KEEP_CANONICAL — support/root/domain path retained as canonical after consolidation
+- `src/probe/live_strategy_probe.rs` — KEEP_CANONICAL — support/root/domain path retained as canonical after consolidation
+- `src/probe/probe_full_lifecycle.rs` — KEEP_CANONICAL — support/root/domain path retained as canonical after consolidation
+- `src/selection/mod.rs` — KEEP_CANONICAL — support/root/domain path retained as canonical after consolidation
+
+## Validation Evidence
+- `cargo check`: green.
+- `./scripts/invariant_check.sh`: green.
+- Kraken WS/balance smoke: `BALANCE_TRUTH_SMOKE_OK=1`.
+- Canonical sweep final dry-run: `GLOBAL_RECONCILE_SWEEP_CLEAN restart_allowed=true`, `manual_blockers=[]`, `repairable_symbols=[]`.
+- Protection source fixes tested: `execution::position_reconcile`, `execution::order_reconcile`, `protection_flow`.

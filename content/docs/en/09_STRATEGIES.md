@@ -1,136 +1,136 @@
-# KapitaalBot — Strategy Families
+# KapitaalBot — Strategie-families
 
 **[← 08 — Operations](./08_OPERATIONS.md) · [Index →](./DOC_INDEX.md)**
 
 ---
 
-## What this document covers
+## Wat dit document beschrijft
 
-The six strategy families KapitaalBot uses. This document describes *what* each family tries to achieve and *in which market conditions* it applies. No exact thresholds, no implementation details.
-
----
-
-## How strategy selection works
-
-KapitaalBot has eleven specific strategy variants, grouped into six families. At each evaluation cycle, all eleven variants are assessed for every trading pair. Each variant that does not qualify is rejected with a machine-readable reason. Exactly one variant is selected — or the result is "no opportunity" if no variant qualifies.
-
-Selection is based on three factors:
-1. The detected market regime
-2. Current market properties (drift, spread, liquidity, volatility)
-3. Regime weights that indicate how suitable a strategy is for the current regime
+De zes strategie-families die KapitaalBot hanteert. Dit document beschrijft *wat* elke familie probeert te bereiken en *in welke marktomstandigheden* ze inzetbaar zijn. Geen exacte drempelwaarden, geen implementatiedetails.
 
 ---
 
-## Family 1: Breakout
+## Hoe strategie-selectie werkt
 
-**Core idea**: move with a price movement that clearly breaks through a level and accelerates.
+KapitaalBot hanteert elf specifieke strategievarianten, gegroepeerd in zes families. Bij elke evaluatiecyclus worden alle elf varianten beoordeeld voor elk handelspaar. Elke variant die niet voldoet, wordt afgewezen met een machineleesbare reden. Precies één variant wordt geselecteerd — of het resultaat is "geen kans" als geen enkele variant voldoet.
 
-**Two variants**:
-
-*Immediate breakout*: activate directly on strong acceleration. This is the fastest variant — intended for situations where delay means most of the move is already over.
-
-*Confirmed breakout*: activate only when the movement is consistent across multiple time horizons. More certainty, lower chance of a false signal, but later entry.
-
-**Favourable regimes**: Trend, High volatility (with caution), Chaos-directional
-
-**Less suitable for**: Low liquidity (too great a risk of poor execution), Range (movements revert)
+De selectie is gebaseerd op drie factoren:
+1. Het gedetecteerde marktregime
+2. De actuele markt-eigenschappen (drift, spread, liquiditeit, volatiliteit)
+3. Regime-gewichten die aangeven hoe geschikt een strategie is in het huidige regime
 
 ---
 
-## Family 2: Momentum
+## Familie 1: Breakout
 
-**Core idea**: engage with an existing sustained directional move — either riding it while it continues, or anticipating its fade.
+**Kernidee**: meebewegen met een koersbeweging die duidelijk door een niveau breekt en versnelt.
 
-**Two variants**:
+**Twee varianten**:
 
-*Momentum ride*: follow a movement that persists. Requires directional consistency across multiple horizons. Works best when the movement is accelerating or stable.
+*Directe uitbraak (Breakout Immediate)*: activeer direct bij sterke versnelling. Dit is de snelste variant — bedoeld voor situaties waarbij uitstel betekent dat het meeste van de beweging al voorbij is.
 
-*Momentum fade*: anticipate the weakening of an existing movement. Activate when there are signs that the trend is fading but not yet reversed.
+*Bevestigde uitbraak (Breakout Confirmed)*: activeer pas als de beweging consistent is over meerdere tijdshorizonten. Meer zekerheid, lagere kans op een vals signaal, maar later instap.
 
-**Favourable regimes**: Trend (Ride), Trend/High-vol (Fade when stronger fade signals are present)
+**Gunstige regimes**: Trend, Hoge volatiliteit (met voorzichtigheid), Chaos-directioneel
 
-**Less suitable for**: Range (no sustained movement), Chaos-noise (too unpredictable)
-
----
-
-## Family 3: MeanReversion
-
-**Core idea**: anticipate a return to an equilibrium level after a temporary overshoot.
-
-**Two variants**:
-
-*Snapback*: activate on a short, sharp overshoot in markets that typically revert. The trade direction is opposite to the overshoot.
-
-*Grind*: activate in stable range conditions where the return is more gradual. Requires higher spread stability.
-
-**Favourable regimes**: Range (primary), High volatility (Snapback on shallow overshoot)
-
-**Less suitable for**: Trend (counter-trend), Chaos-directional (risk of the move continuing)
+**Minder geschikt voor**: Lage-liquiditeit (te groot risico op slechte uitvoering), Range (bewegingen keren terug)
 
 ---
 
-## Family 4: Maker
+## Familie 2: Momentum
 
-**Core idea**: provide liquidity to the market via passive limit orders, and capture the spread as margin.
+**Kernidee**: inspelen op een bestaande aanhoudende koersbeweging — óf meerijden terwijl hij aanhoudt, óf anticiperen op het uitdoven ervan.
 
-**Two variants**:
+**Twee varianten**:
 
-*Maker step ahead*: places a limit order at a specific position in the queue, ahead of anticipated order flow. Requires authenticated L3 orderbook data for queue visibility.
+*Momentumrit (Momentum Ride)*: volg een beweging die aanhoudt. Vereist dat de richting consistent is over meerdere horizons. Werkt het best als de beweging versnelt of stabiel blijft.
 
-*Passive maker queue*: places a standard passive limit order at the best price. Less selective than step-ahead, broader applicability.
+*Momentumuitdoving (Momentum Fade)*: anticipeer op het afzwakken van een bestaande beweging. Activeer als er tekenen zijn dat de trend uitdooft, maar nog niet omgekeerd is.
 
-**Favourable regimes**: Range, Low volatility, Low liquidity (Passive variant)
+**Gunstige regimes**: Trend (Ride), Trend/High-vol (Fade bij sterkere tekenen van uitdoving)
 
-**Less suitable for**: Strong trends (the book moves away from the limit order), Chaos (too unpredictable for maker execution)
-
-**Special characteristics**: Maker strategies generate a maker exit at take-profit, which also has a lower fee for the exit. However, they are more sensitive to adverse selection.
+**Minder geschikt voor**: Range (geen aanhoudende beweging), Chaos-ruis (te onvoorspelbaar)
 
 ---
 
-## Family 5: Volatility
+## Familie 3: MeanReversion
 
-**Core idea**: capture directionally-biased accelerated movements in high-volatility regimes.
+**Kernidee**: anticiperen op terugkeer naar een evenwichtsniveau na een tijdelijke uitschieter.
 
-**One variant**: *Volatility surge*: activate in high-volatility or chaos regimes where the movement clearly accelerates and has a direction. This is an aggressive strategy active exclusively in the two most extreme regimes.
+**Twee varianten**:
 
-**Favourable regimes**: High volatility, Chaos-directional
+*Snelle terugkeer (Snapback)*: activeer bij een korte, scherpe uitschieter in markten die typisch terugkeren. De richting van de trade is tegengesteld aan de uitschieter.
 
-**Less suitable for**: All other regimes
+*Geleidelijke terugkeer (Grind)*: activeer in stabiele range-omstandigheden waarbij de terugkeer geleidelijker verloopt. Vereist hogere spread-stabiliteit.
 
----
+**Gunstige regimes**: Range (primair), Hoge volatiliteit (Snapback bij ondiepte uitschieter)
 
-## Family 6: Liquidity
-
-**Core idea**: operate in specific low-liquidity conditions where trade density and the trade profile show a recognisable pattern.
-
-**One variant**: *Liquidity vacuum*: activate exclusively in the low-liquidity regime where trade density falls within a specific range. Combines limited activity with characteristic price dynamics.
-
-**Favourable regimes**: Low liquidity only
-
-**Less suitable for**: All other regimes (the activation condition excludes them)
+**Minder geschikt voor**: Trend (tegengesteld aan de trend), Chaos-directioneel (risico op doorzettende beweging)
 
 ---
 
-## No opportunity
+## Familie 4: Maker
 
-None of the eleven variants qualifies. The system takes no position and explicitly logs why each variant was rejected.
+**Kernidee**: liquiditeit verschaffen aan de markt via passieve limietorders, en de spread als marge incasseren.
 
-This is a valid outcome — not an error condition. The system waits for better conditions for the next trading pair or the next evaluation moment.
+**Twee varianten**:
 
----
+*Maker stap vooruit (MakerStepAhead)*: plaatst een limietorder op een specifieke positie in de wachtrij, vooruitlopend op verwachte orderstromen. Vereist geauthenticeerde L3-orderboekdata voor wachtrijzichtbaarheid.
 
-## Relationship between families and execution
+*Passieve maker (MakerPassiveQueue)*: plaatst een standaard passieve limietorder op de beste koers. Minder selectief dan stap-vooruit, bredere toepasbaarheid.
 
-The strategy family determines not only *which position* is taken, but also *how* it is executed:
+**Gunstige regimes**: Range, Lage volatiliteit, Lage liquiditeit (Passieve variant)
 
-- Breakout and Momentum families: typically taker execution (speed is priority)
-- Maker families: always maker execution (limit orders)
-- MeanReversion: mix depending on urgency
-- Volatility: taker execution (acceleration requires fast entry)
-- Liquidity: depends on market situation
+**Minder geschikt voor**: Sterke trends (het boek beweegt weg van de limietorder), Chaos (te onvoorspelbaar voor maker-uitvoering)
 
-And also *how the position is protected*: each family has associated exit policy types that match the expected price dynamics.
+**Bijzonderheden**: Maker-strategieën genereren een maker-exit bij take-profit, wat ook voor de uitstap een lagere fee heeft. Ze zijn echter gevoeliger voor adverse selection.
 
 ---
 
-*Back to: [Index](./DOC_INDEX.md)*
+## Familie 5: Volatility
+
+**Kernidee**: profiteren van versnelde, richtingsgevoelige bewegingen in hoog-volatiele regimes.
+
+**Één variant**: *Volatiliteitspieksurge (VolatilitySurge)*: activeer in hoog-volatiele of chaosregimes waarbij de beweging duidelijk versnelt en een richting heeft. Dit is een agressievere strategie die uitsluitend in de twee meest extreme regimes actief is.
+
+**Gunstige regimes**: Hoge volatiliteit, Chaos-directioneel
+
+**Minder geschikt voor**: Alle andere regimes
+
+---
+
+## Familie 6: Liquidity
+
+**Kernidee**: opereren in specifieke laag-liquiditeitsomstandigheden waarbij de handelsdichtheid en het handelsprofiel een herkenbaar patroon vertonen.
+
+**Één variant**: *Liquiditeitsvacuüm (LiquidityVacuum)*: activeer uitsluitend in het laag-liquiditeitsregime waarbij de handelsdichtheid binnen een specifiek bereik valt. Combineert beperkte activiteit met kenmerkende koersdynamiek.
+
+**Gunstige regimes**: Uitsluitend Laag-liquiditeit
+
+**Minder geschikt voor**: Alle andere regimes (de activatieconditie sluit ze uit)
+
+---
+
+## Geen kans (NoOpportunity)
+
+Geen van de elf varianten voldoet. Het systeem neemt geen positie in en logt expliciet waarom elke variant is afgewezen.
+
+Dit is een valide uitkomst — geen foutconditie. Het systeem wacht op betere omstandigheden voor het volgende handelspaar of het volgende evaluatiemoment.
+
+---
+
+## Relatie tussen families en uitvoering
+
+De strategie-familie bepaalt niet alleen *welke positie* wordt ingenomen, maar ook *hoe* die wordt uitgevoerd:
+
+- Breakout- en Momentum-families: doorgaans taker-uitvoering (snelheid prioriteit)
+- Maker-families: altijd maker-uitvoering (limietorders)
+- MeanReversion: mix afhankelijk van urgentie
+- Volatility: taker-uitvoering (versnelling vereist snelle entry)
+- Liquidity: afhankelijk van marktsituatie
+
+En ook *hoe de positie wordt beschermd*: elke familie heeft bijbehorende exit-beleidstypen die passen bij de verwachte prijsdynamiek.
+
+---
+
+*Terug naar: [Index](./DOC_INDEX.md)*

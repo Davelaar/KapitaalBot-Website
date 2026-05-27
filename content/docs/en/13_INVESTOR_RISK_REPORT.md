@@ -1,95 +1,95 @@
 # KapitaalBot — Investor Risk Report
 
-**[← 12 — Investor Overview](./12_INVESTOR_OVERVIEW.md) · [Index →](./DOC_INDEX.md)**
+**[← 12 — Investeerdersoverzicht](./12_INVESTOR_OVERVIEW.md) · [Index →](./DOC_INDEX.md)**
 
 ---
 
-> This report is intended to give potential investors an honest picture of the risks and shortcomings of KapitaalBot in its current state. No point in this report is hidden. Technical observations are demonstrable from the codebase.
+> Dit rapport is bedoeld om potentiële investeerders een eerlijk beeld te geven van de risico's en tekortkomingen van KapitaalBot in zijn huidige staat. Geen enkel punt in dit rapport is verborgen. Technische opmerkingen zijn aantoonbaar vanuit de codebase.
 
 ---
 
-## Risk 1: Single-exchange dependency
+## Risico 1: Single-exchange afhankelijkheid
 
-**Issue**: the system operates exclusively on Kraken spot markets. There is no multi-exchange architecture.
+**Probleem**: het systeem draait uitsluitend op Kraken spotmarkten. Er is geen multi-exchange architectuur.
 
-**Impact on investability**: during a prolonged Kraken outage, API change, or unavailability, the system is completely inactive. There is no failover to another venue.
+**Impact op investeerbaarheid**: bij een langdurige Kraken-storing, API-wijziging of onbeschikbaarheid is het systeem volledig inactief. Er is geen failover naar een andere venue.
 
-**Technical solution**: multi-exchange architecture requires significant refactoring of the exchange adapters, execution layer, and balance reconciliation. This is a substantial technical undertaking, not a quick addition.
-
----
-
-## Risk 2: No formalised backtesting infrastructure
-
-**Issue**: the codebase contains no integrated backtesting pipeline. Strategy performance has not been systematically validated against historical data across varying market conditions.
-
-**Impact on investability**: it is not possible to state with statistical confidence that strategies have historically worked. The only available validation is live behaviour and forward observations.
-
-**Technical solution**: building a replay environment that can run historical market data through the pipeline, combined with a strategy validation framework. This exists as an infrastructure concept but has not yet been built.
+**Technische oplossing**: multi-exchange architectuur vereist significante refactoring van de exchange-adapters, de execution-laag en de balans-reconciliatie. Dit is een groot technisch traject, niet een snelle toevoeging.
 
 ---
 
-## Risk 3: Operational single point of failure
+## Risico 2: Geen geformaliseerde backtesting-infrastructuur
 
-**Issue**: the system is managed by a single operator. There is no documented procedure for handover or continuity in the event of operator unavailability.
+**Probleem**: de codebase bevat geen geïntegreerde backtesting-pipeline. Strategieprestaties zijn niet systematisch gevalideerd op historische data over variërende marktomstandigheden.
 
-**Impact on investability**: single point of failure at the operational level. In the event of illness, unavailability, or another disruption, no one else can manage the system.
+**Impact op investeerbaarheid**: het is niet mogelijk om met statistisch vertrouwen te stellen dat de strategieën historisch hebben gewerkt. De enige beschikbare validatie is live-gedrag en forward observations.
 
-**Technical solution**: documented runbook for operational handover, multiple administrators with access, and operational SLA documentation.
-
----
-
-## Risk 4: Complex migration history (132 SQL migrations)
-
-**Issue**: the database has 132 SQL migration scripts across three pools (ingest, decision, research). There is no centralised overview or change log documenting what each migration changed and why.
-
-**Impact on investability**: the complexity of the data structure makes onboarding of new developers more difficult and increases the risk of migration problems during major schema changes.
-
-**Technical solution**: introduce a migration documentation standard, create a schema overview document, and periodically consolidate obsolete migrations into consolidated schema snapshots.
+**Technische oplossing**: bouwen van een replay-omgeving die historische marktdata door de pipeline kan sturen, gecombineerd met een framework voor strategie-validatie. Dit bestaat als infrastructuurplan maar is nog niet gebouwd.
 
 ---
 
-## Risk 5: Documentation completeness was recently limited
+## Risico 3: Operationele afhankelijkheid van één persoon
 
-**Issue**: until the recent update, public documentation was incomplete and partially contained overly technical details that could enable reconstruction. Strategy documentation was entirely absent.
+**Probleem**: het systeem wordt beheerd door één operator. Er is geen gedocumenteerde procedure voor overdracht of continuïteit bij uitval van de operator.
 
-**Impact on investability**: incomplete documentation weakens due-diligence possibilities and increases reliance on the operator as a knowledge source.
+**Impact op investeerbaarheid**: single point of failure op operationeel niveau. Bij ziekte, onbeschikbaarheid of een andere storing is er niemand anders die het systeem kan beheren.
 
-**Technical solution**: this risk is partially mitigated by the documentation revision in this project. Remaining gaps: no formal API documentation, no formal SLA documentation.
-
----
-
-## Risk 6: No formal disaster recovery procedure
-
-**Issue**: there is no documented DR procedure for scenarios such as complete server failure, database corruption, or loss of critical credentials.
-
-**Impact on investability**: in a catastrophic system incident, recovery time is unknown and not guaranteed.
-
-**Technical solution**: create a DR playbook, implement regular DB backups with a documented restore procedure, and store credentials offsite.
+**Technische oplossing**: gedocumenteerd runbook voor operationele overdracht, meerdere beheerders met toegang, en operationele SLA-documentatie.
 
 ---
 
-## Risk 7: Crypto market risk
+## Risico 4: Complexe migratiegeschiedenis (132 SQL-migraties)
 
-**Issue**: the system trades exclusively in cryptocurrencies. Crypto markets feature extreme price volatility, regulatory uncertainty, exchange risks, and lower liquidity than traditional markets.
+**Probleem**: de database heeft 132 SQL-migratiescripts over drie pools (ingest, decision, research). Er is geen centraal overzicht of verzettingslog van wat elke migratie heeft gewijzigd en waarom.
 
-**Impact on investability**: the underlying asset class carries inherent risks that the system cannot eliminate.
+**Impact op investeerbaarheid**: de complexiteit van de datastructuur maakt onboarding van nieuwe ontwikkelaars moeilijker en vergroot het risico op migratieproblemen bij grote schema-wijzigingen.
 
-**Technical "solution"**: this is not a technical risk but a market risk. The system has protective mechanisms (stops, circuit breakers, exposure limits) but does not eliminate market risk.
-
----
-
-## Summary: risk assessment by category
-
-| Category | Severity | Mitigability |
-|----------|----------|-------------|
-| Single-exchange dependency | High | Yes, but large undertaking |
-| No backtesting | High | Yes, but significant undertaking |
-| Operational single PoF | High | Yes, relatively quickly |
-| Migration complexity | Medium | Yes, gradually |
-| Documentation completeness | Medium | Yes, partially already mitigated |
-| No DR procedure | High | Yes, relatively quickly |
-| Crypto market risk | Inherent | No (market factor) |
+**Technische oplossing**: migratie-documentatiestandaard invoeren, schema-overzichtsdocument opstellen, en periodiek opschonen van verouderde migraties naar consolidated schema-snapshots.
 
 ---
 
-*Back to: [12 — Investor Overview](./12_INVESTOR_OVERVIEW.md)*
+## Risico 5: Documentatie-volledigheid was tot voor kort beperkt
+
+**Probleem**: de publieke documentatie was tot de recente update onvolledig en bevatte deels te technische details die reconstructie mogelijk maakten. De strategie-documentatie ontbrak volledig.
+
+**Impact op investeerbaarheid**: onvolledige documentatie verzwakt due-diligence-mogelijkheden en vergroot de afhankelijkheid van de operator als kennisbron.
+
+**Technische oplossing**: dit risico is gedeeltelijk gemitigeerd door de documentatieherziening in dit project. Resterende lacunes: geen formele API-documentatie, geen formele SLA-documentatie.
+
+---
+
+## Risico 6: Geen formele disaster recovery-procedure
+
+**Probleem**: er is geen gedocumenteerde DR-procedure voor scenario's zoals volledige serverfailure, database-corruptie of verlies van kritieke credentials.
+
+**Impact op investeerbaarheid**: bij een catastrofaal systeem-incident is de hersteltijd onbekend en niet gegarandeerd.
+
+**Technische oplossing**: opstellen van DR-playbook, regelmatige DB-backups met gedocumenteerde restore-procedure, en offsite opslag van credentials.
+
+---
+
+## Risico 7: Crypto-marktrisico
+
+**Probleem**: het systeem handelt uitsluitend in cryptocurrencies. Cryptomarkten kennen extreme koersvolatiliteit, regelgeving-onzekerheid, exchange-risico's en lagere liquiditeit dan traditionele markten.
+
+**Impact op investeerbaarheid**: de basisactivaklasse brengt inherente risico's mee die niet door het systeem kunnen worden geëlimineerd.
+
+**Technische "oplossing"**: dit is geen technisch risico maar een marktrisico. Het systeem heeft beschermingsmechanismen (stops, circuit breakers, exposure-limieten) maar elimineert het marktrisico niet.
+
+---
+
+## Samenvatting: risico-inschatting per categorie
+
+| Categorie | Ernst | Mitigeerbaarheid |
+|-----------|-------|-----------------|
+| Single-exchange afhankelijkheid | Hoog | Ja, maar groot traject |
+| Geen backtesting | Hoog | Ja, maar significant traject |
+| Operationele single PoF | Hoog | Ja, relatief snel |
+| Migratiecomplexiteit | Middel | Ja, geleidelijk |
+| Documentatievolledigheid | Middel | Ja, deels al gemitigeerd |
+| Geen DR-procedure | Hoog | Ja, relatief snel |
+| Crypto-marktrisico | Inherent | Nee (marktfactor) |
+
+---
+
+*Terug naar: [12 — Investeerdersoverzicht](./12_INVESTOR_OVERVIEW.md)*

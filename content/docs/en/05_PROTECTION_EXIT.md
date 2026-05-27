@@ -1,86 +1,97 @@
-# KapitaalBot — Protection & Exit
+# 05 — Protection & Exit Strategieën
 
-**[← 04 — Execution](./04_EXECUTION_ORDERS.md) · [06 — Risk & Safety →](./06_RISK_SAFETY.md)**
-
----
-
-## What this document covers
-
-How KapitaalBot protects and closes open positions. Protection is not an afterthought — it is an integral part of every trading decision: exit policy is committed at the time of entry, not retroactively.
+[← 04 — Execution & Orders](./04_EXECUTION_ORDERS.md) | **05 — Protection & Exit** | [06 — Risk & Safety](./06_RISK_SAFETY.md) →
 
 ---
 
-## The principle: protection is not optional
+Dit document beschrijft hoe Krakenbot open posities beheert, beschermt en sluit. Het doel is het maximaliseren van winst bij asymmetrische moves en het strikt beperken van verliezen.
 
-An open position without protection is architecturally forbidden. The system provides an explicit guarantee: every open position always has an active protective stop on the exchange. If that protection is absent for any reason, it is immediately restored.
+## Navigatiemenu
 
-This is not a policy rule but a hard system property: the state machine for open positions has no state that permits "open without protection."
-
----
-
-## Protection layers
-
-### Initial stop
-Placed immediately after a successful entry fill. Protects against immediate adverse movement. The stop distance is strategy-dependent and is part of the execution mandate.
-
-### Breakeven trigger
-Once a position has accumulated sufficient profit, the stop is moved to the entry price. From that point, the maximum loss on this position is zero (excluding fees and slippage).
-
-### Trailing stop
-The primary method for locking in profit on favourable moves. The stop "travels with" the price in the favourable direction but does not move back on adverse movements.
-
-The width of the trailing stop is calibrated to market conditions at the time of entry. A volatile instrument needs a wider trail to absorb noise; a stable instrument can use a tight trail.
-
-### Profit target
-For certain exit policy types, a fixed profit target is used. When the price reaches that target, the position is actively closed — either via a limit order (maker exit) or directly via a market order.
-
-### Time limit
-Every position has a maximum duration. If a position is still open after that time, it is automatically closed. This prevents positions from being "forgotten" in the system.
-
-### Panic exit
-If the loss on a position reaches a critical threshold higher than the initial stop, an emergency exit is triggered. This is a backstop for situations where the normal stop was bypassed — for example, by extreme market movements.
+- [Protectie-types (TSL, SL, TP)](#protectie-types-tsl-sl-tp)
+- [Trailing Stop Logica](#trailing-stop-logica)
+- [Exit Scenario's & Regels](#exit-scenarios--regels)
+- [Position Monitor & Advisory](#position-monitor--advisory)
+- [Technisch Herstel (Orphans & Dust)](#technisch-herstel-orphans--dust)
 
 ---
 
-## Exit scenarios
+<a name="protectie-types-tsl-sl-tp"></a>
+## Protectie-types (TSL, SL, TP)
 
-The system recognises multiple path types for closing positions:
+Zodra een positie geopend is, plaatst de bot direct beschermende orders.
 
-**Planned path**
-The position is closed via the pre-committed exit policy: the trailing stop or profit target has been reached, or the time limit has expired.
-
-**Safety path**
-An external safety rule triggers exit: the maximum loss has been reached, or the system detects that market conditions have changed significantly relative to the entry.
-
-**Recovery path**
-A technical issue has left the position without associated protection. The system detects this at startup or during periodic checks and restores protection immediately.
+- **Stop-Loss (SL)**: Een harde prijs-trigger die de positie sluit bij een ongunstige beweging.
+- **Trailing-Stop (TSL)**: Een dynamische stop die meebeweegt met de prijs in gunstige richting. Dit is de primaire methode om winst te vergrendelen.
+- **Take-Profit (TP)**: Een koersdoel waarbij de positie (deels) gesloten wordt. Dit kan een limit-order zijn of een market-exit getriggerd door de bot.
 
 ---
 
-## Orphan detection
+<a name="trailing-stop-logica"></a>
+## Trailing Stop Logica
 
-At startup, the system checks whether there are positions on the exchange without associated protection in the database. Such "orphan" positions are immediately protected: the bot places a protective stop without waiting for a new signal cycle.
+De TSL-logica is adaptief en gebaseerd op volatiliteit (`ATR`) en winst-progressie.
 
-This scenario can occur after a crash or connectivity failure. The system is designed to handle this robustly.
+```mermaid
+graph TD
+    Price[Prijs stijgt] --> Move[Verplaats Trigger Prijs]
+    Move --> Tighten{Winst > Drempel?}
+    Tighten -- "Ja" --> Curve[Versnel Trailing Curve]
+    Tighten -- "Nee" --> Standard[Standaard Trailing]
+    Curve --> Amend[Verstuur amend_order]
+    Standard --> Amend
+```
 
----
-
-## Dust recovery
-
-A position can become technically uncloseable if its size falls just below the exchange's minimum order size — a situation that arises from partial fills or rounding differences. In that case, the system can make a minimal top-up to make the position closeable.
-
-This is exclusively a technical recovery path. It is not position averaging or buying into a losing position as a defensive strategy.
-
----
-
-## Why this design?
-
-**Protection is pre-committed**: exit policy is locked in at the time of entry. This eliminates situations where a losing position is held because "the market will come back."
-
-**Layered protection**: multiple independent mechanisms (stop, trailing, panic exit, time limit) ensure there is always an exit, even if one mechanism fails.
-
-**Exchange-side stops**: the primary protection lives on the exchange, not only in the bot. If the bot becomes unreachable, protection is still active.
+- **Breakeven**: Zodra een positie een bepaalde winst behaalt, wordt de stop naar de entry-prijs verplaatst.
+- **ATR-Width**: De breedte van de trail wordt berekend in `execution::trail_atr` om rekening te houden met de "noise" van het instrument.
 
 ---
 
-*Next: [06 — Risk & Safety](./06_RISK_SAFETY.md)*
+<a name="exit-scenarios--regels"></a>
+## Exit Scenario's & Regels
+
+Naast de exchange-side orders, bewaakt de bot posities via de `position_monitor` met specifieke regels:
+
+1. **Harde 1% Loss Cap**: Als een positie meer dan 1% verlies toont (t.o.v. entry), wordt deze direct via een market-order gesloten. Geen uitzonderingen.
+2. **Stale Position Exit**: Als een positie 5 minuten lang niet beweegt en in het verlies staat, volgt een exit.
+3. **15-Minute Regime Shift**: Na 15 minuten verandert de filosofie:
+   - Verlieslatend? Direct sluiten.
+   - Winstgevend? De trailing stop wordt extreem strak aangetrokken om de winst te "oogsten".
+
+---
+
+<a name="position-monitor--advisory"></a>
+## Position Monitor & Advisory
+
+De `position_monitor` draait elke 30 seconden en evalueert elke positie tegen de `ManagementAdvice` uit de route-engine.
+
+```mermaid
+flowchart TD
+    A[Positie open] --> B{Verlies groter dan 1 pct?}
+    B -- Ja --> C[Market exit veiligheid]
+    B -- Nee --> D{Positie ouder dan 15 min?}
+    D -- Ja --> E{Winstgevend?}
+    E -- Nee --> F[Market exit tijd]
+    E -- Ja --> G[TSL aanscherpen oogst]
+    D -- Nee --> H{Stale of geen edge?}
+    H -- Ja --> I[Market exit advisory]
+    H -- Nee --> J[Blijven monitoren]
+```
+
+---
+
+<a name="technisch-herstel-orphans--dust"></a>
+## Technisch Herstel (Orphans & Dust)
+
+Om operationele fouten op te vangen, zijn er twee herstelpaden:
+
+- **Orphan Recovery**: Als er een positie op Kraken staat zonder bijbehorende protectie-order in de bot, wordt er direct een TSL geplaatst.
+- **Top-Up Recovery**: Als een exit faalt omdat de positie net onder de `min_qty` van de exchange valt (dust), kan de bot een minimale hoeveelheid bijbestellen om de positie technisch sluitbaar te maken. Dit is een strikt technisch pad, geen "averaging down".
+
+---
+
+[← 04 — Execution & Orders](./04_EXECUTION_ORDERS.md) | **05 — Protection & Exit** | [06 — Risk & Safety](./06_RISK_SAFETY.md) →
+
+---
+
+*Document gegenereerd voor technische documentatie. Laatst bijgewerkt: 2026-04-13.*

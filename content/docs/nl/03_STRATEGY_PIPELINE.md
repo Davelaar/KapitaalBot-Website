@@ -1,142 +1,112 @@
-# KapitaalBot — Strategy Pipeline
+# 03 — Strategy Pipeline & Signaalgeneratie
 
-**[← 02 — Data-ingest](./02_DATA_INGEST.md) · [04 — Execution →](./04_EXECUTION_ORDERS.md)**
-
----
-
-## Wat dit document beschrijft
-
-Hoe KapitaalBot van marktdata naar een handelsbeslissing komt. De pipeline is de "denklaag" van het systeem. Dit document beschrijft de stappen en de principes erachter — geen exacte formules of drempelwaarden.
+[← 02 — Data-ingest](./02_DATA_INGEST.md) | **03 — Strategy Pipeline** | [04 — Execution & Orders](./04_EXECUTION_ORDERS.md) →
 
 ---
 
-## Overzicht van de pipeline
+Dit document beschrijft de "denklaag" van Krakenbot: hoe ruwe marktdata wordt getransformeerd in handelsbeslissingen via de strategy pipeline en de route engine.
 
-De strategy-pipeline is een reeks beslisfilters die voor elk handelspaar worden doorlopen:
+## Navigatiemenu
 
-```
-Geconsolideerde toestandsrij per handelspaar
-  ↓
-Markt-eigenschappen berekenen
-  (spread, volatiliteit, drift, liquiditeit)
-  ↓
-Marktregime classificeren
-  (welk type markt is dit nu?)
-  ↓
-Strategie activeren
-  (welke strategie past bij dit regime?)
-  ↓
-Entry-route selecteren
-  (maker of taker? welk type uitvoering?)
-  ↓
-Exit-beleid koppelen
-  (welke bescherming hoort bij deze strategie?)
-  ↓
-Mandate evalueren
-  (alles samenbrengen: uitvoeren, observeren of blokkeren)
+- [Pipeline Architectuur](#pipeline-architectuur)
+- [Market Features & Extractie](#market-features-extractie)
+- [Regime Detection](#regime-detection)
+- [Route Engine (V1 & V2)](#route-engine-v1-v2)
+- [Edge & Confidence Math](#edge-confidence-math)
+- [Decision Persistence (CDV)](#decision-persistence-cdv)
+
+---
+
+<a name="pipeline-architectuur"></a>
+## Pipeline Architectuur
+
+De pipeline is een lineair proces dat elke evaluatie-tick (getriggerd door `mid_price` wijzigingen of timers) wordt doorlopen.
+
+```mermaid
+flowchart LR
+    State[Refreshed State] --> Features[Feature Extraction]
+    Features --> Regime[Regime Classifier]
+    Regime --> Selector[Strategy Selector]
+    Selector --> Routes[Route Engine]
+    Routes --> Scoring[Edge/Confidence Scoring]
+    Scoring --> Mandate[Execution Mandate]
 ```
 
-Elke stap is traceerbaar: de reden voor elke beslissing — inclusief afwijzingen — wordt opgeslagen.
+---
+
+<a name="market-features-extractie"></a>
+## Market Features & Extractie
+
+Features zijn de numerieke bouwstenen voor alle beslissingen. Ze worden berekend in `route_engine::market_features`.
+
+- **Microstructure**: Spread, book-imbalance (L2), queue-pressure (L3).
+- **Momentum**: Getekende drift en versnelling over meerdere horizons (5s tot 15m).
+- **Volume**: Buy/sell imbalance uit de `trade_flow_window`.
+- **Volatility**: ATR (Average True Range) en realized volatility.
 
 ---
 
-## Stap 1: Markt-eigenschappen
+<a name="regime-detection"></a>
+## Regime Detection
 
-Voordat een strategiebeslissing mogelijk is, worden de relevante eigenschappen van het handelspaar berekend:
+Voordat strategieën worden geëvalueerd, bepaalt de `regime_detection` de huidige marktomstandigheden:
 
-- **Spread en spread-stabiliteit**: hoe breed is de spread, en is die stabiel of variabel?
-- **Volatiliteit**: hoe groot zijn recente prijsbewegingen?
-- **Drift en richtingsconsistentie**: beweegt de prijs consistent in één richting over meerdere tijdshorizonten?
-- **Handelsdichtheid**: hoe actief is het handelspaar op dit moment?
-- **Versnelling**: neemt de prijsbeweging toe of af?
-
-Deze eigenschappen zijn de input voor alle vervolgstappen. Ze worden niet opgeslagen als absolute getallen, maar als signalen die de strategie-selectie sturen.
+- **TREND**: Duidelijke directionele beweging met volume-ondersteuning.
+- **RANGE**: Consolidatie tussen bekende L2-levels.
+- **EXPANSION**: Plotselinge toename in volatiliteit en spread (Phase 1).
+- **CHAOS**: Onvoorspelbare microstructure (vaak een block-conditie).
 
 ---
 
-## Stap 2: Marktregime
+<a name="route-engine-v1-v2"></a>
+## Route Engine (V1 & V2)
 
-Het systeem classificeert elk handelspaar in één van vijf marktregimes:
+De Route Engine (`route_engine::route_selector`) evalueert specifieke "Move Theses".
 
-| Regime | Korte beschrijving |
-|--------|-------------------|
-| **Trend** | Duidelijke koersrichting met hoge handelsactiviteit |
-| **Range** | Stabiele spread, lage koersbeweging, consolidatie |
-| **Hoge volatiliteit** | Sterke koersbewegingen zonder het extreme karakter van chaos |
-| **Lage liquiditeit** | Dunne orderboeken, lage handelsactiviteit |
-| **Chaos** | Extreme spreads of extreme koersbewegingen; verder onderverdeeld in directioneel en ruis |
+- **V1 (Deterministisch)**: Gebruikt vaste drempels en lineaire scoring.
+- **V2 (Adaptief)**: Gebruikt historische uitkomsten uit de RESEARCH pool om scores aan te passen aan recente marktprestaties (`edge_engine`).
 
-Het regime bepaalt welke strategie-families in aanmerking komen en welk gewicht ze krijgen bij de selectie. Een strategie die uitstekend werkt in een trendmarkt kan contraproductief zijn in een rangemarket.
-
----
-
-## Stap 3: Strategie-activatie
-
-KapitaalBot heeft elf strategievarianten, gegroepeerd in zes families:
-
-| Familie | Beschrijving |
-|---------|-------------|
-| **Breakout** | Meebewegen met een versnellende koersbeweging die door een niveau breekt |
-| **Momentum** | Volgen van een aanhoudende koersrichting, of anticiperen op het uitdoven ervan |
-| **MeanReversion** | Anticiperen op terugkeer naar een evenwichtsniveau na een tijdelijke uitschieter |
-| **Maker** | Passief liquiditeit verschaffen via limietorders aan de beste koers |
-| **Volatility** | Profiteren van versnelde bewegingen in hoog-volatiele regimes |
-| **Liquidity** | Specifiek voor laag-liquiditeitsomstandigheden met kenmerkende handelsdichtheid |
-
-Voor elk handelspaar worden alle elf varianten geëvalueerd. Elke variant die niet voldoet, wordt afgewezen met een machineleesbare reden. Precies één variant wordt geselecteerd — altijd inclusief motivatie.
-
-**Belang van expliciete afwijzingen**: het systeem logt niet alleen *wat* is geselecteerd, maar ook *waarom* andere opties zijn afgewezen. Dit maakt het mogelijk om te analyseren waarom het systeem in bepaalde marktomstandigheden niet handelt.
+### Move Theses
+Een thesis is een hypothese over de prijsbeweging, bijv:
+- `AtrBreakout`: Prijs breekt door een ATR-band.
+- `MeanReversion`: Prijs keert terug naar de VWAP.
+- `LiquiditySweep`: Absorptie van een groot L2-level.
 
 ---
 
-## Stap 4: Entry-route selectie
+<a name="edge-confidence-math"></a>
+## Edge & Confidence Math
 
-Nadat een strategie is geselecteerd, bepaalt de pipeline hoe de entry wordt uitgevoerd:
+Elke route krijgt een **Edge** (verwachte winst in bps) en een **Confidence** (betrouwbaarheid).
 
-- **Maker-routes**: limietorder op of net voor de beste koers. Lagere transactiekosten, risico op niet-uitvoering als de markt beweegt.
-- **Taker-routes**: marktorder die direct kruist met bestaand aanbod. Hogere kosten, hogere zekerheid van uitvoering.
-- **Hybride routes**: begin als maker, val terug naar taker als de order niet wordt uitgevoerd binnen een tijdslimiet.
+```mermaid
+graph TD
+    Move[Verwachte Move] --> GrossEdge[Gross Edge]
+    Costs[Fees + Spread + Slippage] --> GrossEdge
+    GrossEdge --> NetEdge[Net Edge]
+    Features[Feature Strength] --> Confidence
+    History[Historical Winrate] --> Confidence
+    NetEdge --> FinalScore[Final Ranking Score]
+    Confidence --> FinalScore
+```
 
-De route-keuze is strategie-afhankelijk: een breakout-strategie vereist snelle uitvoering en kiest doorgaans taker. Een maker-strategie is per definitie een limietorder.
-
-Bij elke route wordt ook de fill-kans geschat. Een te lage fill-kans resulteert in blokkering van de entry, ook als alle andere criteria zijn voldaan.
-
----
-
-## Stap 5: Exit-beleid
-
-Elk uitvoerbaar mandaat bevat van tevoren vastgesteld exit-beleid. Er zijn tien exit-beleidvarianten, elk afgestemd op de bijbehorende strategie en entry-route:
-
-De kern van elk exitbeleid bestaat uit:
-- een **initiële stop** (beschermt bij directe tegenbeweging)
-- optionele **trailing stop** (vergrendelt winst bij gunstige beweging)
-- optioneel **winstdoel** (bij strategieën met duidelijk koersdoel)
-- een **tijdslimiet** (automatisch uitstappen als een positie te lang open blijft)
-
-Het exit-beleid wordt niet gekozen nadat een positie open staat, maar is onderdeel van het uitvoeringsmandaat. Dit voorkomt dat beslissingen over uitstappen worden genomen op basis van emotie of actuele situatie.
+- **Edge**: `(Expected Move - Transaction Costs)`.
+- **Confidence**: Een genormaliseerde waarde (0.0 - 1.0) gebaseerd op signaalsterkte en historische marktoutcomes.
 
 ---
 
-## Stap 6: Mandate-evaluatie
+<a name="decision-persistence-cdv"></a>
+## Decision Persistence (CDV)
 
-De mandate combineert alle voorgaande stappen in één beslissing:
+Elke serieuze kandidaat wordt opgeslagen als een **Candidate Decision Vector (CDV)** in de `DECISION` database.
 
-- **Execute**: alle criteria voldaan, coherente beleidsketen, positieve edge — order wordt geplaatst
-- **Observe**: een of meer criteria voldoen niet (bijv. te lage fill-kans, spread te dicht bij stop, noodtoestand in exit-beleid) — kandidaat wordt opgeslagen maar niet uitgevoerd
-- **Block**: fundamentele tegenspraak in de beleidsketen — kandidaat wordt geblokkeerd
-
-De mandate maakt zichtbaar waarom een specifiek handelspaar op een specifiek moment niet is uitgevoerd. Dit is de kern van de why-no-trade observability.
+- **Traceerbaarheid**: De CDV bevat alle inputs (features) en outputs (edge, confidence, reason codes).
+- **Shadow Markouts**: Ook niet-gekozen routes worden gelogd om "counterfactual" analyses mogelijk te maken (wat als we wél hadden getrade?).
 
 ---
 
-## Beslissingsvector (CDV)
-
-Elke serieuze kandidaat — ook niet-uitgevoerde — wordt opgeslagen als **Candidate Decision Vector** (beslissingsvector). Deze bevat alle inputs (markt-eigenschappen, regime, strategie-scores) en outputs (edge-schatting, mandate-beslissing, reden).
-
-De CDV maakt twee dingen mogelijk:
-1. **Audit**: reconstructie van elke beslissing na het feit
-2. **Kwaliteitsanalyse**: vergelijking van de verwachte edge met wat werkelijk is gebeurd
+[← 02 — Data-ingest](./02_DATA_INGEST.md) | **03 — Strategy Pipeline** | [04 — Execution & Orders](./04_EXECUTION_ORDERS.md) →
 
 ---
 
-*Volgende: [04 — Execution & Orders](./04_EXECUTION_ORDERS.md)*
+*Document gegenereerd voor technische documentatie. Laatst bijgewerkt: 2026-04-13.*

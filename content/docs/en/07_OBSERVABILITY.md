@@ -1,117 +1,102 @@
-# KapitaalBot — Observability & Diagnostics
+# 07 — Observability & Diagnostiek
 
-**[← 06 — Risk & Safety](./06_RISK_SAFETY.md) · [08 — Operations →](./08_OPERATIONS.md)**
-
----
-
-## What this document covers
-
-How KapitaalBot makes its own behaviour transparent. Observability is not a byproduct but a core function: the system is designed to be auditable, even for an external party that does not have access to the source code.
+[← 06 — Risk & Safety](./06_RISK_SAFETY.md) | **07 — Observability** | [08 — Operations](./08_OPERATIONS.md) →
 
 ---
 
-## What observability means in KapitaalBot
+Dit document beschrijft hoe Krakenbot inzicht geeft in zijn eigen werking, van real-time logging tot lange-termijn performance analyse (Forward-Returns).
 
-Observability here means: the ability to reconstruct *why* the system made a specific decision — or chose not to — at any point in time.
+## Navigatiemenu
 
-This includes:
-- making rejection reasons visible (why-no-trade)
-- storing all decision inputs at every evaluation
-- measuring outcomes against expectations
-- exporting aggregated information to an external website
-
-What observability does *not* include: publishing implementation details, exact parameter values, or reproduction information.
+- [Logging Taxonomie](#logging-taxonomie)
+- [Trading Funnel & Events](#trading-funnel--events)
+- [Forward-Return Observability](#forward-return-observability)
+- [Edgeboard & CDV Snapshots](#edgeboard--cdv-snapshots)
+- [Resource Telemetry](#resource-telemetry)
+- [Fill Feedback & Slippage](#fill-feedback--slippage)
 
 ---
 
-## The trading funnel
+<a name="logging-taxonomie"></a>
+## Logging Taxonomie
 
-The system tracks where signals drop off in the decision chain. This is called the "funnel":
+Krakenbot gebruikt gestructureerde logging via het `tracing` crate. Om ruis te minimaliseren, zijn logs strikt ingedeeld:
 
+- **`ERROR`**: Kritieke fouten die actie vereisen (bijv. DB verbinding verloren, API keys ongeldig).
+- **`WARN`**: Onverwachte situaties (bijv. L2 checksum mismatch, order rejected).
+- **`INFO`**: Belangrijke lifecycle events (bijv. order geplaatst, fill ontvangen, positie gesloten).
+- **`DEBUG`**: Hoog-volume diagnostiek (bijv. elke evaluatie-tick, heartbeat, interne state-updates).
+
+> **Opmerking**: Tijdens de cleanup-ronde zijn veel repetitieve `INFO` logs gedegradeerd naar `DEBUG` om de live-observatie werkbaar te houden.
+
+---
+
+<a name="trading-funnel--events"></a>
+## Trading Funnel & Events
+
+De bot houdt een "funnel" bij om te zien waar signalen afvallen. Dit wordt opgeslagen in de `trading_funnel_events` tabel.
+
+```mermaid
+graph TD
+    A[Signals Generated] --> B{Readiness Gate}
+    B -- "Block" --> C[Blocker: Spread/Vol/L3]
+    B -- "Pass" --> D{Route Engine}
+    D -- "No Edge" --> E[Skip: Low Expectancy]
+    D -- "Edge" --> F{Risk Gate}
+    F -- "Block" --> G[Blocker: Exposure/Slots]
+    F -- "Pass" --> H[EXECUTE]
 ```
-Signals generated per trading pair (universe)
-  ↓ Readiness check: is this pair ready to evaluate?
-    → No: reason logged (e.g. stale data, unsafe mode)
-  ↓ Strategy pipeline: which strategy, what edge?
-    → No edge: reason logged
-  ↓ Risk gate: is there capital capacity and safety permission?
-    → No: reason logged
-  ↓ EXECUTION
+
+---
+
+<a name="forward-return-observability"></a>
+## Forward-Return Observability
+
+Dit is het hart van de leer-lus van de bot. Het meet de kwaliteit van signalen, ook als ze **niet** zijn uitgevoerd.
+
+- **`directional_forward_observations`**: Elke keer dat de pipeline een signaal ziet, wordt dit gelogd in de `RESEARCH` database.
+- **Sweeper**: Een achtergrondtaak controleert na 5, 10 en 15 minuten wat de prijs heeft gedaan t.o.v. het signaal.
+- **Markout**: Dit levert de "markout curve" op, die laat zien of onze entry-timing statistisch voordeel (edge) heeft.
+
+---
+
+<a name="edgeboard--cdv-snapshots"></a>
+## Edgeboard & CDV Snapshots
+
+- **CDV (Candidate Decision Vector)**: Een rijke JSON-dump van alle features en scores op het moment van een beslissing.
+- **Edgeboard**: Een real-time overzicht van de top-kandidaten per symbool, horizon en strategie. Dit wordt gebruikt voor de UI en voor handmatige inspectie van de "markt-kansen".
+
+---
+
+<a name="resource-telemetry"></a>
+## Resource Telemetry
+
+De bot bewaakt zijn eigen "footprint" om degradatie op de server te voorkomen.
+
+- **CPU/RAM**: Gelogd via `observability::resource_telemetry`.
+- **DB Latency**: Meet de tijd van SQL-queries om trage indexen of locks te detecteren.
+- **Event Loop Lag**: Meet of de Tokio runtime de ticks op tijd kan verwerken.
+
+---
+
+<a name="fill-feedback--slippage"></a>
+## Fill Feedback & Slippage
+
+Na elke fill berekent de bot de **slippage**: het verschil tussen de prijs waarop we *wilden* traden en de prijs die we *kregen*.
+
+```mermaid
+flowchart LR
+    Intent[Intended Price] --> Fill[Actual Fill Price]
+    Fill --> Diff[Slippage / Friction]
+    Diff --> Model[Update Cost Model]
 ```
 
-Every blockage at every layer is classified with a machine-readable code. The trading funnel makes it possible to analyse where most candidates drop off and whether that pattern changes over time.
+- **`fill_feedback`**: Deze data wordt gebruikt om de `cost_model` in de pipeline te verfijnen, zodat de bot in de toekomst realistischer rekent.
 
 ---
 
-## Decision vectors
-
-Every serious candidate — including non-executed ones — is stored as a full decision vector (CDV). This contains:
-
-- the market properties at the moment of decision
-- the detected regime
-- the strategy activation with scores and rejections
-- the edge estimate and fill probability
-- the mandate decision and reason
-
-This enables two types of analysis:
-
-**Direct audit**: for a specific trade or non-trade, everything is traceable to the data the decision was based on.
-
-**Statistical quality analysis**: by comparing decision vectors with actual outcomes, it can be measured whether edge estimates are accurate.
+[← 06 — Risk & Safety](./06_RISK_SAFETY.md) | **07 — Observability** | [08 — Operations](./08_OPERATIONS.md) →
 
 ---
 
-## Forward observations
-
-To measure signal quality — even for signals that were not executed — the system logs forward-looking observations:
-
-Every time the pipeline sees a strong signal, it records what the price subsequently did over multiple time horizons. This produces the "markout curve": a statistical picture of whether signal timing has had an edge.
-
-This data is stored in a separate research database and forms the basis for quality reporting.
-
----
-
-## Edgeboard
-
-The edgeboard is a real-time overview of the strongest candidates per trading pair. It shows which pairs have the most likelihood of reaching execution, based on current market conditions.
-
-The edgeboard is not a signal feed — it is a diagnostic tool that provides insight into the current state of the market from the system's perspective.
-
----
-
-## Slippage measurement
-
-After every fill, the system measures slippage: the difference between the intended and actual execution price.
-
-Systematic slippage (consistently worse than expected) is a signal that the cost modelling needs adjustment. The system uses slippage data to refine edge calculations.
-
----
-
-## Observability tiers for external users
-
-KapitaalBot exports snapshots to the observability website. There are three access levels:
-
-| Tier | Available to | What is visible |
-|------|-------------|----------------|
-| **Tier 1** | Public | Aggregated status, regimes, strategy distribution, trade counts |
-| **Tier 2** | On request | Deeper diagnostics: execution quality, latency histograms, funnel analysis |
-| **Tier 3** | Internal | Full lifecycle telemetry, forensic data, account-specific information |
-
-The separation is deliberate: public observability provides technical transparency without releasing reproduction information or account-sensitive data.
-
----
-
-## Logging structure
-
-The system uses structured logging with four levels:
-
-- **ERROR**: critical failures requiring action
-- **WARN**: unexpected situations to be monitored
-- **INFO**: important lifecycle events (order placed, fill received, position closed)
-- **DEBUG**: high-volume diagnostics for detailed analysis
-
-Logs are machine-readable. Every log message consistently contains the relevant context (trading pair, run ID, strategy, reason).
-
----
-
-*Next: [08 — Operations](./08_OPERATIONS.md)*
+*Document gegenereerd voor technische documentatie. Laatst bijgewerkt: 2026-04-13.*

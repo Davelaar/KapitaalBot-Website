@@ -1,118 +1,108 @@
-# KapitaalBot — Execution & Order Lifecycle
+# 04 — Execution & Order Lifecycle
 
-**[← 03 — Strategy Pipeline](./03_STRATEGY_PIPELINE.md) · [05 — Protection & Exit →](./05_PROTECTION_EXIT.md)**
-
----
-
-## What this document covers
-
-How KapitaalBot turns a trading decision into an order on the exchange, and how the full lifecycle of that order is tracked. The emphasis is on reliability and traceability.
+[← 03 — Strategy Pipeline](./03_STRATEGY_PIPELINE.md) | **04 — Execution & Orders** | [05 — Protection & Exit](./05_PROTECTION_EXIT.md) →
 
 ---
 
-## From decision to order
+Dit document beschrijft de executielaag van Krakenbot: hoe intenties worden omgezet in orders, hoe de lifecycle wordt beheerd en hoe de integriteit met de exchange wordt gewaarborgd.
 
-The strategy pipeline produces execution mandates. The execution system converts those mandates into actions:
+## Navigatiemenu
 
+- [Flow Poller & Execution](#flow-poller--execution)
+- [Order Placement (WS v2)](#order-placement-ws-v2)
+- [Order State Machine (SSOT)](#order-state-machine-ssot)
+- [Fill Handling & Ledger](#fill-handling--ledger)
+- [Dead-Man's Switch (Safety)](#dead-mans-switch-safety)
+- [Database Persistence](#database-persistence)
+
+---
+
+<a name="flow-poller--execution"></a>
+## Flow Poller & Execution
+
+De `flow_poller` is de motor van de executielaag. Het ontkoppelt de "denk-cyclus" (pipeline) van de "doe-cyclus" (submit).
+
+- **Flow Heap**: De pipeline plaatst kandidaten in een geprioriteerde heap (`edge_heap`).
+- **Continuous Drain**: de `flow_poller` haalt continu de beste kandidaat uit de heap en probeert deze uit te voeren, mits de `choke` (safety check) groen licht geeft.
+- **Concurrency**: Het systeem ondersteunt parallelle executie voor verschillende symbolen, maar dwingt volgordelijkheid af per symbool.
+
+---
+
+<a name="order-placement-ws-v2"></a>
+## Order Placement (WS v2)
+
+Alle trading acties verlopen via de Private WebSocket v2 (`ws-auth.kraken.com`).
+
+- **`add_order`**: Primaire methode voor entry en exit.
+- **`amend_order`**: Gebruikt voor het verplaatsen van limit orders (bijv. bij trailing) zonder queue-prioriteit volledig te verliezen.
+- **`cancel_order`**: Voor het intrekken van open orders.
+- **`req_id` Muxing**: Elk verzoek krijgt een uniek ID zodat de asynchrone respons correct gekoppeld kan worden aan de interne state.
+
+---
+
+<a name="order-state-machine-ssot"></a>
+## Order State Machine (SSOT)
+
+Krakenbot hanteert een strikte 13-state machine (`execution::order_state`). De **`executions`** WebSocket feed is de Single Source of Truth.
+
+```mermaid
+stateDiagram-v2
+    [*] --> Submitted: Intent Created
+    Submitted --> PendingAck: add_order sent
+    PendingAck --> Open: Status 'new'
+    Open --> PartiallyFilled: Status 'partially_filled'
+    PartiallyFilled --> Filled: Status 'filled'
+    Open --> Filled: Status 'filled'
+    
+    Open --> Cancelled: Status 'canceled'
+    PendingAck --> Rejected: Status 'rejected'
+    Open --> Expired: Expired deadline reached
+    
+    Filled --> [*]
+    Cancelled --> [*]
+    Rejected --> [*]
+    Expired --> [*]
+
+    Note right of PendingAck: WS method response is alleen ACK; executions feed is SSOT.
 ```
-Mandate (Execute)
-  ↓
-Candidate placed in a priority queue
-  ↓
-Execution choke checks safety conditions
-  ↓ (green light)
-Order created in the database (status: pending)
-  ↓
-Order sent via private WebSocket
-  ↓
-Exchange confirms receipt (ACK)
-  ↓
-Exchange sends status updates: open, partially filled, filled, cancelled
-  ↓
-Database updated on every status transition
-```
-
-Important: the order exists in the database *before* it is sent to the exchange. If the system restarts at any point, the order state is always reconstructible from the database.
 
 ---
 
-## The executions feed as source of truth
+<a name="fill-handling--ledger"></a>
+## Fill Handling & Ledger
 
-The WebSocket acknowledgement on a placed order is only an ACK — a confirmation that the exchange received the request. The actual status (open, filled, cancelled) comes exclusively via the `executions` feed.
+Wanneer een order (gedeeltelijk) gevuld wordt, treedt het `fills_ledger` in werking. Dit proces is **idempotent** om dubbele verwerking van WS-berichten te voorkomen.
 
-This distinction is critical: a positive ACK does not mean an order has been filled. The system waits for explicit status messages via the executions feed before updating its internal state.
-
----
-
-## Order state machine
-
-Orders move through a fixed sequence of states. Every transition has a reason and is logged:
-
-```
-[created] → [sent to exchange] → [open on the exchange]
-  → [partially filled] → [fully filled]
-  → [cancelled]
-  → [rejected by exchange]
-  → [expired]
-```
-
-Every state is documented. There are no implicit transitions. An order that is no longer in an active state always has a final state with a reason.
+1. **Fill Registratie**: De fill wordt opgeslagen in de `fills` tabel.
+2. **Position Update**: De netto exposure in `krakenbot.positions` wordt bijgewerkt.
+3. **Protection Trigger**: Voor entry-fills wordt direct de protectie-logica geactiveerd (zie [05 — Protection & Exit](./05_PROTECTION_EXIT.md)).
+4. **PnL Calculatie**: Bij een sluitende fill wordt de realized PnL berekend en opgeslagen.
 
 ---
 
-## Execution intent
+<a name="dead-mans-switch-safety"></a>
+## Dead-Man's Switch (Safety)
 
-KapitaalBot makes an explicit distinction between three execution intents:
+Om te voorkomen dat orders "wees" achterblijven bij een crash of netwerkstoring, gebruikt de bot `cancel_all_orders_after`.
 
-| Intent | Description |
-|--------|-------------|
-| **MakerEntry** | Limit order at or near the best price; providing liquidity |
-| **TakerEntry** | Order that immediately crosses with existing supply in the book; taking liquidity |
-| **TakerExit** | Exit via a market order; priority is speed, not price |
-
-The intent determines what type of order is placed and how the exchange will process it.
+- **Werking**: De bot stuurt elke 15-30 seconden een verzoek om alle orders na 60 seconden te annuleren.
+- **Fail-Safe**: Als de bot stopt met pingen, annuleert de exchange automatisch alle open orders na het verstrijken van de timer.
 
 ---
 
-## Fill processing
+<a name="database-persistence"></a>
+## Database Persistence
 
-When an order is (partially) filled, a coordinated sequence of actions begins:
+Alle order-activiteit wordt gelogd in de `DECISION` database:
 
-1. The fill is recorded in the fills table
-2. The net position is updated
-3. For entry fills: protection is immediately activated (see [05 — Protection & Exit](./05_PROTECTION_EXIT.md))
-4. For closing fills: realised PnL is calculated
-
-Fill processing is **idempotent**: if the same fill message arrives twice (which can happen during reconnects), the duplicate is detected and ignored. No double-booking occurs.
+- **`execution_orders`**: De hoofdtabel voor alle orders, inclusief `cl_ord_id` en `exchange_order_id`.
+- **`order_events`**: Een audit-log van elke statusovergang.
+- **`order_latency`**: Meet de tijd tussen T0 (beslissing), T1 (submit), T2 (ack) en T3 (fill).
 
 ---
 
-## Dead man's switch
-
-The system maintains a safety automaton at the exchange: if the bot stops sending a renewal signal, all open orders are automatically cancelled by the exchange after a configured time window.
-
-This protects against situations where the system crashes, loses connectivity, or otherwise becomes unreachable while orders are open. The exchange then takes initiative to clean up orders — no operator action is required.
+[← 03 — Strategy Pipeline](./03_STRATEGY_PIPELINE.md) | **04 — Execution & Orders** | [05 — Protection & Exit](./05_PROTECTION_EXIT.md) →
 
 ---
 
-## Concurrency management
-
-The system can evaluate and execute multiple trading pairs simultaneously. For each trading pair, however, one concurrency constraint applies: two evaluation cycles cannot simultaneously try to open an order for the same trading pair. A per-symbol safety lock prevents race conditions.
-
----
-
-## Traceability
-
-Every order is fully traceable:
-
-- **Creation time**: when the decision was made
-- **Submission time**: when the order was sent to the exchange
-- **Acknowledgement time**: when the exchange confirmed receipt
-- **Fill time**: when execution occurred
-- **Reason**: why each type of order was chosen
-
-This enables forensic analysis after the fact: every action is traceable to a specific decision moment.
-
----
-
-*Next: [05 — Protection & Exit](./05_PROTECTION_EXIT.md)*
+*Document gegenereerd voor technische documentatie. Laatst bijgewerkt: 2026-04-13.*
